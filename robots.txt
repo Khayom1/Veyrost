@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://khayom1.github.io/Veyrost/sitemap.xml
