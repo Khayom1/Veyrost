@@ -1,297 +1,234 @@
-# Veyrost
-VEYROST — Personal AI System created by Khayom Abdurahmonov.
-
 # VEYROST
 
-### A Personal AI System Built From Nothing.
+## Technology. Intelligence. Innovation.
 
-> **VEYROST is an independent personal AI project created by Khayom Abdurahmonov in Tajikistan.**
+VEYROST is an independent technology project and emerging technology company founded by **Khayom Abdurahmonov** in Tajikistan.
 
-Veyrost is not intended to be just another chatbot.
+VEYROST is designed as a long-term technology ecosystem rather than a single product.
 
-It is an attempt to build a personal artificial intelligence system — one that can evolve with its creator, operate across different environments, understand context, work with local tools, and eventually become a persistent intelligent system rather than a simple question-and-answer interface.
-
----
-
-## The Origin
-
-VEYROST was started as an independent project by **Khayom Abdurahmonov**, a young developer and dentistry student from Tajikistan.
-
-The project began without a large development team, research laboratory, venture capital, or dedicated AI infrastructure.
-
-It started with a phone, limited resources, curiosity, and a simple question:
-
-> **What if one person could build their own AI system?**
-
-That question became Veyrost.
+Its current development includes artificial intelligence, software engineering, automation, local computing and experimental intelligent systems.
 
 ---
 
-## What Is Veyrost?
+# What is VEYROST?
 
-Veyrost is a long-term experimental AI architecture focused on:
+VEYROST is a long-term technology initiative focused on turning technological ideas into real systems, products and eventually larger ventures.
 
-- Personal AI assistance
-- Local and offline AI
-- Large Language Models
+The project is not defined by a single technology.
+
+Artificial intelligence is one of the foundational technological directions being developed within the broader VEYROST ecosystem.
+
+The long-term objective is to build technologies and organizations capable of operating across multiple areas.
+
+---
+
+# VEYROST AI
+
+**VEYROST AI** is one of the first major technological directions of the VEYROST project.
+
+The current AI work explores:
+
+- Artificial intelligence
+- Language models
+- Local AI
 - AI agents
-- Context and memory
+- Automation
 - Tool integration
-- Automation
-- Local inference
+- Context and memory
+- Intelligent software systems
+- Experimental AI architectures
 - Human-AI interaction
-- Personal computing
 
-The long-term vision is to create an AI system that is deeply integrated with its user's digital environment while remaining understandable, customizable, and independently controlled.
+The purpose is not simply to create another chatbot.
 
----
+The project explores how an intelligent system can become more capable, adaptable and useful while operating with limited hardware and resources.
 
-## The Vision
-
-The goal is not to create another copy of an existing AI assistant.
-
-The goal is to explore something different:
-
-**A personal intelligence layer.**
-
-An AI system that can understand its user, remember relevant context, operate tools, assist with complex tasks, and continuously evolve alongside the person using it.
-
-Veyrost is an ongoing experiment in that direction.
+VEYROST AI is therefore a component of the broader VEYROST ecosystem, not the definition of VEYROST itself.
 
 ---
 
-## Long-Term Vision
+# Origin
 
-VEYROST is designed to become more than a single AI model or chatbot.
+VEYROST was founded by **Khayom Abdurahmonov** in Tajikistan.
 
-The long-term vision is to build a unified personal AI system that can combine frontier AI models, local language models, persistent memory, specialized models, automation, APIs, external tools, software agents, and device-level capabilities.
+The project began as an independent exploration of artificial intelligence, software development, local computing and experimental technology.
 
-The goal is not simply to create another model that competes with the largest AI models.
+It started with limited resources and a simple objective:
 
-Instead, VEYROST is intended to become a system built around intelligence — capable of combining different sources of intelligence and turning them into a persistent, personalized computing environment.
+> Build real technology instead of only imagining it.
 
-### Intelligence Layer
-
-Future versions of VEYROST may use frontier AI models as an intelligence layer while extending their capabilities through additional systems such as:
-
-- Persistent memory
-- Local AI and language models
-- Specialized AI models
-- Tool and API integration
-- Autonomous workflows
-- Software agents
-- Device interaction
-- Personal context
-- Automation and decision systems
-
-In this architecture, the underlying model is the intelligence engine.
-
-**VEYROST is the system built around it.**
-
-This means VEYROST is not tied to one particular AI model. As frontier models become more capable, VEYROST can potentially integrate them while continuing to provide its own memory, tools, automation, local processing, and personalized capabilities.
-
-The long-term objective is therefore not to claim that VEYROST itself is a larger neural model than systems such as GPT.
-
-The objective is to build a broader AI system whose overall capabilities can extend beyond what any single underlying model provides on its own.
-
-> **A model provides intelligence. VEYROST is designed to turn intelligence into a system.**
-
-## Built Under Constraints
-
-Veyrost was not created under ideal conditions.
-
-Development has been limited by:
-
-- Hardware limitations
-- Computational resources
-- Infrastructure costs
-- Limited access to high-end computing
-- Limited development budget
-- Time constraints
-
-At certain stages, parts of the project had to be paused because maintaining the required technical infrastructure was beyond the available budget.
-
-This is not the end of Veyrost.
-
-It is a pause in its development.
-
-> **Some projects stop because the idea is impossible.  
-> Others stop because the resources run out.  
-> Veyrost belongs to the second category.**
+The project continues to evolve through experimentation, development and research.
 
 ---
 
-## Current Status
+# Current Stage
 
-**Development status: Experimental / Paused**
+VEYROST is currently an independent technology project in an experimental and early development stage.
 
-The Veyrost architecture has gone through multiple experiments involving local language models, inference environments, automation, and personal AI tooling.
+Its present focus is primarily:
 
-Some components remain experimental and are not currently maintained.
-
-The project may resume when sufficient hardware, infrastructure, time, and funding become available.
-
----
-
-## Creator
-
-### Khayom Abdurahmonov
-
-**Founder & Creator of Veyrost**
-
-Tajikistan
-
-Khayom Abdurahmonov is an independent developer and dentistry student interested in artificial intelligence, local AI systems, software engineering, automation, and human-computer interaction.
-
-Veyrost is his long-term personal AI project.
-
----
-
-## Why Veyrost Exists
-
-Modern AI systems are becoming increasingly powerful.
-
-But most people interact with them through centralized platforms.
-
-Veyrost explores another possibility:
-
-> **What if the AI belongs to the person using it?**
-
-Not merely as an application.
-
-Not merely as a website.
-
-But as a personal intelligence system that can exist across devices, models, tools, and environments.
-
----
-
-## Technical Direction
-
-Veyrost has explored technologies and concepts including:
-
-- Local LLM inference
-- GGUF models
-- llama.cpp
-- Android environments
-- Termux
-- Python
-- API-based AI systems
-- Local AI servers
-- Agent architectures
-- Context management
+- Artificial intelligence
+- Software development
+- Local computing
 - Automation
-- Personal AI infrastructure
+- Experimental technology
+- Research and prototyping
 
-The technical architecture is experimental and continues to evolve.
-
----
-
-## Project Philosophy
-
-Veyrost follows several principles:
-
-**1. Personal**
-
-The system should serve the individual rather than a generic audience.
-
-**2. Modular**
-
-Models, tools, interfaces, and infrastructure should be replaceable.
-
-**3. Local-first where possible**
-
-Computing locally should remain an important direction whenever hardware permits it.
-
-**4. Transparent**
-
-The system should make it clear what it can and cannot actually do.
-
-**5. Experimental**
-
-Veyrost is a research and engineering experiment, not a finished commercial product.
+Future projects will be documented publicly as they become real, operational and verifiable.
 
 ---
 
-## The Future
+# Long-Term Vision
 
-The current version of Veyrost is not the final version.
+The long-term vision of VEYROST is to develop into a broad technology ecosystem.
 
-The project is intended to evolve as technology, hardware, and resources improve.
+Potential future areas include:
 
-Possible future directions include:
+### Artificial Intelligence
 
-- More capable local models
-- Persistent personal memory
-- Multimodal interaction
-- Advanced AI agents
-- Device-level automation
-- Voice interaction
-- Personal knowledge systems
-- Cross-device synchronization
-- Autonomous task execution
-- A dedicated Veyrost interface
-- Dedicated hardware infrastructure
+Advanced AI systems, intelligent software, agents and future AI technologies.
 
----
+### Software
 
-## Status
+Applications, platforms, digital services, operating systems and software infrastructure.
 
-| Component | Status |
-|---|---|
-| Core concept | Active |
-| Architecture | Experimental |
-| Local AI | Experimental |
-| Agent systems | Experimental |
-| Infrastructure | Limited |
-| Development | Paused / Intermittent |
-| Long-term vision | Active |
+### Hardware
 
----
+Computing devices, consumer electronics, specialized equipment and future hardware technologies.
 
-## A Project From Tajikistan
+### Mobility
 
-Veyrost is an independent project originating from **Tajikistan**.
+Long-term exploration of automotive, transportation and mobility technologies.
 
-It represents an attempt to explore advanced personal AI development from outside the traditional technology centers.
+### Education
 
-No large laboratory.
+Educational technologies and, potentially, educational institutions and programs.
 
-No major corporation.
+### Consumer Products
 
-No dedicated AI research team.
+Technology products, devices, brands and services designed for everyday users.
 
-Just an idea, limited resources, and the decision to build.
+### Other Industries
+
+Additional industries may be explored as the organization grows and new opportunities emerge.
+
+These areas represent long-term ambitions and should not be interpreted as existing products, companies or institutions unless they are officially launched and documented.
 
 ---
 
-## Final Note
+# Philosophy
 
-Veyrost is unfinished.
+VEYROST follows a simple principle:
 
-It is imperfect.
+> **Build first. Learn through experimentation. Improve continuously.**
 
-Some parts are incomplete.
+The project emphasizes:
 
-Some experiments failed.
+- Real experimentation
+- Engineering
+- Independent development
+- Learning through building
+- Technological curiosity
+- Long-term thinking
+- Transparent documentation
 
-Some ideas had to be abandoned.
-
-And some parts are currently frozen because the resources required to continue are not available.
-
-But the project remains.
-
-Because stopping development is not the same thing as abandoning the idea.
-
-> **VEYROST — Built from curiosity.  
-> Limited by resources.  
-> Designed for something bigger.**
+The objective is to transform ideas into functioning technology.
 
 ---
 
-## Official Repository
+# Built Under Constraints
 
-This repository contains the public development history and documentation of Veyrost.
+VEYROST began without a large engineering organization, research laboratory or major infrastructure.
 
-**Created by Khayom Abdurahmonov.**
+The early development environment was based on limited resources, personal hardware and independent experimentation.
 
-© 2026 Khayom Abdurahmonov
+These constraints are part of the project's history.
+
+They also represent one of its central principles:
+
+> **Meaningful technology can begin with limited resources.**
+
+---
+
+# Founder
+
+## Khayom Abdurahmonov
+
+**Khayom Abdurahmonov** is the founder of VEYROST and a dentistry student from Tajikistan with interests in artificial intelligence, technology, software development and experimental computing.
+
+Official founder profile:
+
+**https://khayom1.github.io/Veyrost/person.html**
+
+Online identity:
+
+**Veyrost Riley**
+
+Public profile:
+
+**https://users.playground.ru/686**
+
+GitHub:
+
+**https://github.com/Khayom1**
+
+---
+
+# Official Website
+
+**https://khayom1.github.io/Veyrost/**
+
+Founder profile:
+
+**https://khayom1.github.io/Veyrost/person.html**
+
+---
+
+# Transparency
+
+VEYROST distinguishes between:
+
+1. Existing technology
+2. Active experiments
+3. Projects under development
+4. Long-term concepts and ambitions
+
+Future concepts are not presented as completed products or institutions.
+
+When new VEYROST projects become operational, they will be documented separately with publicly verifiable information.
+
+This approach is intended to keep the public record of VEYROST accurate as the project evolves.
+
+---
+
+# Current Development
+
+The primary public development repository is:
+
+**https://github.com/Khayom1/Veyrost**
+
+The repository contains publicly available project information and development materials.
+
+---
+
+# Identity
+
+**Organization:** VEYROST
+
+**Founder:** Khayom Abdurahmonov
+
+**Alternative name:** Veyrost
+
+**Founder online alias:** Veyrost Riley
+
+**Origin:** Tajikistan
+
+**Current technological focus:** Artificial intelligence and experimental technology
+
+**Long-term direction:** Technology, software, AI, hardware, mobility, education and other industries
+
+---
+
+## VEYROST
+
+**A technology project beginning with AI, designed for a much larger future.**
