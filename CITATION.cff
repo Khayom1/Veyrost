@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+title: "VEYROST"
+message: "If you use VEYROST in your work, please cite this project."
+type: software
+authors:
+  - family-names: "Abdurahmonov"
+    given-names: "Khayom"
+    affiliation: "Independent"
+    country: "TJ"
+repository-code: "https://github.com/Khayom1/Veyrost"
+url: "https://khayom1.github.io/Veyrost/"
+abstract: "VEYROST is a personal AI system and experimental technology project created by Khayom Abdurahmonov in Tajikistan. The project explores personal artificial intelligence, local language models, automation, software development, and mobile computing."
+keywords:
+  - artificial intelligence
+  - personal AI
+  - local AI
+  - language models
+  - automation
+  - software development
+  - mobile computing
+  - Tajikistan
+license: MIT
