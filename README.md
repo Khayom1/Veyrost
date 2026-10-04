@@ -2,7 +2,7 @@
 
 ## Technology. Intelligence. Innovation.
 
-VEYROST is an independent technology project and emerging technology company founded by **Khayom Abdurahmonov** in Tajikistan.
+VEYROST is an independent technology project and emerging technology initiative founded by **Khayom Abdurahmonov** in Tajikistan.
 
 VEYROST is designed as a long-term technology ecosystem rather than a single product.
 
