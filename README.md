@@ -60,6 +60,42 @@ Veyrost is an ongoing experiment in that direction.
 
 ---
 
+## Long-Term Vision
+
+VEYROST is designed to become more than a single AI model or chatbot.
+
+The long-term vision is to build a unified personal AI system that can combine frontier AI models, local language models, persistent memory, specialized models, automation, APIs, external tools, software agents, and device-level capabilities.
+
+The goal is not simply to create another model that competes with the largest AI models.
+
+Instead, VEYROST is intended to become a system built around intelligence — capable of combining different sources of intelligence and turning them into a persistent, personalized computing environment.
+
+### Intelligence Layer
+
+Future versions of VEYROST may use frontier AI models as an intelligence layer while extending their capabilities through additional systems such as:
+
+- Persistent memory
+- Local AI and language models
+- Specialized AI models
+- Tool and API integration
+- Autonomous workflows
+- Software agents
+- Device interaction
+- Personal context
+- Automation and decision systems
+
+In this architecture, the underlying model is the intelligence engine.
+
+**VEYROST is the system built around it.**
+
+This means VEYROST is not tied to one particular AI model. As frontier models become more capable, VEYROST can potentially integrate them while continuing to provide its own memory, tools, automation, local processing, and personalized capabilities.
+
+The long-term objective is therefore not to claim that VEYROST itself is a larger neural model than systems such as GPT.
+
+The objective is to build a broader AI system whose overall capabilities can extend beyond what any single underlying model provides on its own.
+
+> **A model provides intelligence. VEYROST is designed to turn intelligence into a system.**
+
 ## Built Under Constraints
 
 Veyrost was not created under ideal conditions.
