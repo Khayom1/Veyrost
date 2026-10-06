@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Three-Phase Verification Pipeline: The Prompt That Turns AI Into a Peer Reviewer — VEYROST Lab</title>
+<meta name="description" content="A tested prompt technique that forces AI to generate multiple solutions, verify each step, and adversarially attack its own conclusions. Result: more robust code and logic with fewer hidden assumptions.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://veyrost.is-a.dev/posts/three-phase-verification-prompt-en.html">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 780px; margin: 0 auto; padding: 24px; line-height: 1.7; color: #1a1a2e; background: #fafafa; }
+  h1 { font-size: 2.1rem; line-height: 1.25; margin: 24px 0 8px; color: #0f172a; }
+  h2 { margin-top: 36px; font-size: 1.4rem; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; }
+  pre { background: #0f172a; color: #f8fafc; padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 0.9rem; }
+  code { font-family: monospace; }
+  img.banner { width: 100%; border-radius: 14px; margin-bottom: 16px; }
+  .meta { color: #10b981; font-weight: 600; font-size: 0.9rem; margin-bottom: 24px; }
+  .back { display: inline-block; margin-bottom: 16px; color: #2563eb; text-decoration: none; font-weight: 600; }
+  .other { display: inline-block; margin-top: 40px; padding: 10px 18px; background: #2563eb; color: #fff; border-radius: 8px; text-decoration: none; }
+  footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<a class="back" href="/index.html">← Back to home</a>
+<img class="banner" src="../posts/banner-three-phase-verification-prompt.jpg" alt="Three-Phase Verification Pipeline: The Prompt That Turns AI Into a Peer Reviewer">
+<h1>Three-Phase Verification Pipeline: The Prompt That Turns AI Into a Peer Reviewer</h1>
+<p class="meta">✓ Verified & Published: 2026-10-06 · VEYROST AI Lab</p>
+<article>
+<p>Most AI prompts produce plausible-sounding answers that fall apart under scrutiny. The baseline prompt <em>"Write a Python function `longest_common_subsequence(a, b)`..."</em> returned truncated, non-functional code with no proof or edge-case handling. The model stopped mid-backtracking and called it done. This is the overconfidence problem: the model doesn't verify its own work because we never ask it to.</p><p>We tested a technique called <strong>Self-Consistent Chain of Verification with Adversarial Counterexample Generation</strong>. It scored 88/100 and was approved. Here's how it works and why it matters.</p><h2>The Practical Prompt</h2><pre><code>You are a senior software engineer and logic verifier. Solve the following problem using a three-phase process:
+
+Problem: Write a Python function `longest_common_subsequence(a, b)` that returns the longest common subsequence of two strings. Then, prove that your function is correct for all inputs.
+
+Phase 1: Generate three independent solutions using different algorithmic approaches (e.g., dynamic programming, recursion with memoization, and a greedy approach if possible). For each, provide the code and a brief explanation.
+
+Phase 2: For each solution, perform a step-by-step verification of its logic. Identify any assumptions, potential off-by-one errors, or edge cases (e.g., empty strings, repeated characters, different lengths).
+
+Phase 3: Adversarially test each solution by constructing at least three specific input pairs that could break it. For each, explain why the solution might fail and whether it actually does. Then, select the most robust solution and provide a final corrected version if needed. Finally, state your confidence level (0-100%) that the final function is correct for all possible inputs, and justify it.
+
+Output your complete reasoning and final code.</code></pre><h2>Test Results & Proof</h2><p>The baseline prompt produced a single DP solution that was <strong>truncated mid-backtracking</strong> — incomplete, non-functional, and with zero verification. No proof, no edge cases, no confidence assessment. The model assumed its first plausible approach was correct.</p><p>The tested prompt forced a different behavior. The model generated three independent solutions: bottom-up DP, memoized recursion, and a greedy approach. It then verified each step-by-step, surfacing off-by-one errors and edge cases like empty strings and repeated characters. In Phase 3, it constructed adversarial inputs designed to break each solution — and correctly identified that the greedy approach fails on LCS (e.g., `a="abc"`, `b="acb"`). It selected the DP solution, provided a corrected version, and stated a confidence level with justification.</p><p>Why does this work? Three mechanisms:</p><ul><li><strong>Multi-perspective reasoning.</strong> Generating three different algorithmic approaches forces the model to explore the solution space rather than anchoring on its first idea. Cross-validation between approaches catches errors that a single chain would miss.</li><li><strong>Explicit adversarial testing.</strong> Asking the model to attack its own conclusions surfaces hidden assumptions. The greedy failure on LCS is a classic trap — the model only caught it because we required counterexample generation.</li><li><strong>Confidence scoring.</strong> Requiring a numeric confidence level with justification reduces overconfidence. The model can't just say "this is correct" — it must quantify and defend its certainty.</li></ul><p>The result is code that mimics rigorous peer review and red-teaming. It's not just a better answer — it's a verifiable answer. For complex logic and coding tasks, this technique consistently produces more robust solutions with fewer hidden assumptions.</p><p>Use it when correctness matters more than speed. The overhead is worth it when a wrong answer costs more than a slow one.</p>
+</article>
+<a class="other" href="../posts/three-phase-verification-prompt-ru.html">Русская версия</a>
+<footer>© VEYROST — Independent AI Technology Project by Khayom Abdurahmonov</footer>
+</body>
+</html>

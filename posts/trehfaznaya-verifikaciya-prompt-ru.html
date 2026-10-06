@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Трёхфазная верификация: промпт, который превращает ИИ в рецензента — VEYROST Lab</title>
+<meta name="description" content="Протестированный промпт, который заставляет ИИ генерировать несколько решений, проверять каждый шаг и атаковать свои выводы. Результат: более надёжный код и логика без скрытых допущений.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://veyrost.is-a.dev/posts/trehfaznaya-verifikaciya-prompt-ru.html">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 780px; margin: 0 auto; padding: 24px; line-height: 1.7; color: #1a1a2e; background: #fafafa; }
+  h1 { font-size: 2.1rem; line-height: 1.25; margin: 24px 0 8px; color: #0f172a; }
+  h2 { margin-top: 36px; font-size: 1.4rem; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; }
+  pre { background: #0f172a; color: #f8fafc; padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 0.9rem; }
+  code { font-family: monospace; }
+  img.banner { width: 100%; border-radius: 14px; margin-bottom: 16px; }
+  .meta { color: #10b981; font-weight: 600; font-size: 0.9rem; margin-bottom: 24px; }
+  .back { display: inline-block; margin-bottom: 16px; color: #2563eb; text-decoration: none; font-weight: 600; }
+  .other { display: inline-block; margin-top: 40px; padding: 10px 18px; background: #2563eb; color: #fff; border-radius: 8px; text-decoration: none; }
+  footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<a class="back" href="/index.html">← На главную</a>
+<img class="banner" src="../posts/banner-three-phase-verification-prompt.jpg" alt="Трёхфазная верификация: промпт, который превращает ИИ в рецензента">
+<h1>Трёхфазная верификация: промпт, который превращает ИИ в рецензента</h1>
+<p class="meta">✓ Проверено и опубликовано: 2026-10-06 · VEYROST AI Lab</p>
+<article>
+<p>Большинство промптов дают правдоподобные ответы, которые разваливаются при проверке. Базовый промпт <em>«Напиши функцию Python `longest_common_subsequence(a, b)`...»</em> вернул обрезанный, нерабочий код без доказательств и обработки краевых случаев. Модель остановилась на середине бэктрекинга и посчитала задачу выполненной. Это проблема самоуверенности: модель не проверяет свою работу, потому что мы её об этом не просим.</p><p>Мы протестировали технику под названием <strong>Self-Consistent Chain of Verification with Adversarial Counterexample Generation</strong>. Она получила 88/100 и была одобрена. Вот как она работает и почему это важно.</p><h2>Практический промпт</h2><pre><code>You are a senior software engineer and logic verifier. Solve the following problem using a three-phase process:
+
+Problem: Write a Python function `longest_common_subsequence(a, b)` that returns the longest common subsequence of two strings. Then, prove that your function is correct for all inputs.
+
+Phase 1: Generate three independent solutions using different algorithmic approaches (e.g., dynamic programming, recursion with memoization, and a greedy approach if possible). For each, provide the code and a brief explanation.
+
+Phase 2: For each solution, perform a step-by-step verification of its logic. Identify any assumptions, potential off-by-one errors, or edge cases (e.g., empty strings, repeated characters, different lengths).
+
+Phase 3: Adversarially test each solution by constructing at least three specific input pairs that could break it. For each, explain why the solution might fail and whether it actually does. Then, select the most robust solution and provide a final corrected version if needed. Finally, state your confidence level (0-100%) that the final function is correct for all possible inputs, and justify it.
+
+Output your complete reasoning and final code.</code></pre><h2>Результаты теста</h2><p>Базовый промпт выдал одно DP-решение, <strong>обрезанное на середине бэктрекинга</strong> — неполное, нерабочее, без верификации. Ни доказательств, ни краевых случаев, ни оценки уверенности. Модель предположила, что первый правдоподобный подход верен.</p><p>Протестированный промпт заставил модель вести себя иначе. Она сгенерировала три независимых решения: восходящее DP, рекурсию с мемоизацией и жадный алгоритм. Затем проверила каждое пошагово, выявив ошибки на единицу и краевые случаи — пустые строки, повторяющиеся символы. В фазе 3 она построила состязательные входные данные, призванные сломать каждое решение, и корректно определила, что жадный подход не работает для LCS (например, `a="abc"`, `b="acb"`). Она выбрала DP-решение, предоставила исправленную версию и указала уровень уверенности с обоснованием.</p><p>Почему это работает? Три механизма:</p><ul><li><strong>Многоперспективное рассуждение.</strong> Генерация трёх разных алгоритмических подходов заставляет модель исследовать пространство решений, а не цепляться за первую идею. Перекрёстная проверка между подходами выявляет ошибки, которые одна цепочка пропустила бы.</li><li><strong>Явное состязательное тестирование.</strong> Просьба атаковать свои выводы вскрывает скрытые допущения. Провал жадного алгоритма на LCS — классическая ловушка, и модель поймала её только потому, что мы потребовали генерацию контрпримеров.</li><li><strong>Оценка уверенности.</strong> Требование числового уровня уверенности с обоснованием снижает самоуверенность. Модель не может просто сказать «это верно» — она должна количественно оценить и защитить свою уверенность.</li></ul><p>Результат — код, имитирующий строгое рецензирование и ред-тиминг. Это не просто лучший ответ — это проверяемый ответ. Для сложных логических и программных задач эта техника стабильно даёт более надёжные решения с меньшим числом скрытых допущений.</p><p>Используйте её, когда корректность важнее скорости. Накладные расходы оправданы, когда неправильный ответ стоит дороже медленного.</p>
+</article>
+<a class="other" href="../posts/trehfaznaya-verifikaciya-prompt-en.html">English version</a>
+<footer>© VEYROST — Independent AI Technology Project by Khayom Abdurahmonov</footer>
+</body>
+</html>

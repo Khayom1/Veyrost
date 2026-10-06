@@ -8,7 +8,7 @@ import requests
 import sys
 import time
 
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "REDACTED")
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
 DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions"
 SITE_URL = "https://veyrost.is-a.dev"
 SITE_PATH = os.path.expanduser("~/Veyrost")
