@@ -19,5 +19,17 @@
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://veyrost.is-a.dev/posts/counterfactual-adversarial-self-critique-prompt-en.html</loc>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://veyrost.is-a.dev/posts/kontrfakticheskaya-sostyazatelnaya-samokritika-pro-ru.html</loc>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
 
