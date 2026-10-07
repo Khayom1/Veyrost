@@ -255,13 +255,6 @@ display:flex;justify-content:space-between;align-items:center;color:#eee}
   .advBody{padding:11px}
 }
 
-
-.attachments{display:flex;gap:6px;flex-wrap:wrap;padding:0 14px 6px;max-height:84px;overflow:auto}
-.attachmentChip{display:inline-flex;align-items:center;gap:5px;max-width:240px;padding:5px 9px;border:1px solid var(--border,#333);border-radius:999px;background:var(--panel2,#17181c);font-size:12px;color:var(--text,#eee)}
-.attachmentChip button{border:0;background:transparent;color:inherit;cursor:pointer;padding:0 2px;font-size:14px}
-.composerRow{display:flex;align-items:flex-end;gap:8px;width:100%}
-.attachBtn{width:48px;height:48px;flex:0 0 48px;border-radius:50%;border:1px solid #333;background:#17181c;color:#eee;font-size:20px;cursor:pointer}
-.attachBtn:active{transform:scale(.96)}
 </style>
 </head>
 <body>
@@ -287,13 +280,8 @@ display:flex;justify-content:space-between;align-items:center;color:#eee}
 <div id="chat"></div>
 
 <footer>
-<div id="attachments" class="attachments" aria-live="polite"></div>
-<div class="composerRow">
-<button id="attachBtn" class="attachBtn" type="button" title="Бор кардани файл" aria-label="Бор кардани файл">📎</button>
 <textarea id="input" rows="1" placeholder="Нависед..."></textarea>
-<button id="send" type="button">➤</button>
-</div>
-<input id="fileInput" type="file" multiple hidden>
+<button id="send">➤</button>
 <button id="stop">■</button>
 </footer>
 </div>
@@ -1011,83 +999,31 @@ const t = Utils.safeText(text).trim();
 if (!t) return false;
 if (Utils.userQuestionLooksExplanatory(t)) return false;
 
-const low = t.toLocaleLowerCase();
+const looksNegated = /(?:\b(?:не|нафаҳмед|намехоҳам|нахоҳам)\b|\b(?:don't|do not|never)\b)[\p{L}\p{N}_\s,.'"-]{0,32}\b(?:delete|remove|write|create|save|update|modify|edit|commit|push|insert|append|replace|rename|add|удал(?:ить|и|ите)?|нест(?:кун| кунед|кардан)?|навис(?:ед|ем)?|соз(?:ед|ам)?|тағйир(?: диҳ| диҳед)?|иваз(?: кун| кунед)?|илова(?: кун| кунед)?|эҷод(?: кун| кунед)?|навсоз(?:ӣ)?|сохран(?:ить|и|ите)?|измен(?:ить|и|ите)?|созда(?:ть|й|йте)?|обнов(?:ить|и|ите)?|замен(?:ить|и|ите)?|добав(?:ить|ь|ьте)?|commit|push)\b/iu.test(t);
+if (looksNegated) return false;
 
-const writeVerbs = [
-"навис", "нависед", "нависем", "бинавис",
-"соз", "созед", "созам", "создан", "сохт", "созда",
-"тағйир", "тағйир деҳ", "тағйир диҳ", "тағйир диҳед",
-"иваз", "иваз кун", "иваз кунед",
-"навсоз", "навсозӣ",
-"илова кун", "илова кунед", "илова кардан",
-"эҷод кун", "эҷод кунед", "эҷод кардан",
-"сохтан",
-"напиш", "написать", "напиши",
-"создать", "создай", "создайте",
-"изменить", "измени", "измените",
-"обновить", "обнови", "обновите",
-"заменить", "замени", "замените",
-"добавить", "добавь", "добавьте",
-"сохранить", "сохрани", "сохраните",
-"write", "create", "save", "update", "modify",
-"edit", "commit", "push", "insert", "append",
-"replace", "rename", "add"
-];
-
-const deleteVerbs = [
-"нест кун", "нест кунед", "нест кардан",
-"удалить", "удали", "удалите",
-"delete", "remove"
-];
-
-function containsAnyWord(value, words) {
-return words.some(word => {
-const w = word.toLocaleLowerCase();
-if (w.includes(" ")) return value.includes(w);
-try {
-return new RegExp(
-"(?:^|[^\\p{L}\\p{N}_])" +
-w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") +
-"(?=$|[^\\p{L}\\p{N}_])",
-"iu"
-).test(value);
-} catch {
-return value.includes(w);
-}
+const tgRuVerb = Utils.hasWord(t, WRITE_INTENT.tgRuVerbs);
+const enVerb = WRITE_INTENT.enVerbs.some(v => {
+const escaped = v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+return new RegExp(`\\b${escaped}\\b`, "iu").test(t);
 });
-}
+const verb = tgRuVerb || enVerb;
 
-const isWrite = containsAnyWord(low, writeVerbs);
-const isDelete = containsAnyWord(low, deleteVerbs);
-
-/*
- * Detect actual file/path targets instead of requiring the literal
- * word "file" or "файл".
- */
-const hasFileTarget =
-/(?:^|[\s"'`(])(?:\.{0,2}\/)?[A-Za-z0-9_.@~-]+\/?[A-Za-z0-9_.@~/-]*\.(?:html?|css|js|mjs|cjs|json|md|txt|py|ts|tsx|jsx|java|kt|kts|c|cpp|h|hpp|rs|go|php|rb|sh|bash|yml|yaml|xml|csv|sql|env|gitignore|log)(?=$|[\s"'`,.):;!?])/iu.test(t) ||
-/(?:^|[\s"'`(])(?:\.gitignore|\.env|Dockerfile|Makefile|README|README\.md)(?=$|[\s"'`,.):;!?])/iu.test(t);
-
-/*
- * A generic path can also be a write target:
- * owner/repo, src/main.js, public/index.html, etc.
- */
-const hasPathTarget =
-/(?:^|[\s"'`])(?:\.{0,2}\/)?[\w.@~-]+(?:\/[\w.@~+-]+)+(?=$|[\s"'`,.):;!?])/u.test(t);
+if (!verb) return false;
 
 switch (toolName) {
-
 case "gh_create_repo":
-return isWrite && /\b(?:repo|repository|репо|репозитори|репозиторий)\b/iu.test(t);
+return Utils.hasWord(t, WRITE_INTENT.repoWords);
 
 case "gh_create_issue":
-return isWrite && /\b(?:issue|issues|ишью|ишю|тикет|ticket)\b/iu.test(t);
+return Utils.hasWord(t, WRITE_INTENT.issueWords);
 
 case "gh_delete_file":
-return isDelete && (hasFileTarget || hasPathTarget);
+return Utils.hasWord(t, WRITE_INTENT.fileWords) &&
+Utils.hasWord(t, WRITE_INTENT.deleteWords);
 
 case "gh_write_file":
-return isWrite && (hasFileTarget || hasPathTarget);
+return Utils.hasWord(t, WRITE_INTENT.fileWords) || Utils.hasWord(t, WRITE_INTENT.repoWords) || /\bproject\b/iu.test(t);
 
 default:
 return false;
@@ -5145,60 +5081,6 @@ UI.init();
 MD.init();
 UI.applyToolVisibility();
 
-const pendingFiles = [];
-const fileInput = document.getElementById("fileInput");
-const attachBtn = document.getElementById("attachBtn");
-const attachmentsEl = document.getElementById("attachments");
-
-function renderAttachments() {
-if (!attachmentsEl) return;
-attachmentsEl.replaceChildren();
-for (const item of pendingFiles) {
-const chip = document.createElement("span");
-chip.className = "attachmentChip";
-chip.title = `${item.file.name} · ${item.file.size} bytes`;
-const label = document.createElement("span");
-label.textContent = item.file.name;
-const remove = document.createElement("button");
-remove.type = "button";
-remove.textContent = "×";
-remove.setAttribute("aria-label", `Remove ${item.file.name}`);
-remove.onclick = () => {
-const i = pendingFiles.indexOf(item);
-if (i >= 0) pendingFiles.splice(i, 1);
-renderAttachments();
-};
-chip.append(label, remove);
-attachmentsEl.appendChild(chip);
-}
-}
-
-async function readAttachment(file) {
-const max = 8 * 1024 * 1024;
-if (file.size > max) throw new Error("Файл аз 8 MB калон аст");
-const type = String(file.type || "").toLowerCase();
-const name = file.name.toLowerCase();
-const textLike = type.startsWith("text/") || /\.(txt|md|markdown|json|js|mjs|cjs|ts|tsx|jsx|html|htm|css|scss|xml|yaml|yml|csv|sql|py|java|c|cpp|h|hpp|rs|go|php|rb|sh|kt|swift|vue|svelte)$/i.test(name);
-if (!textLike) return { file, text: "", readable: false };
-const text = await file.text();
-return { file, text: text.slice(0, 50000), readable: true };
-}
-
-if (attachBtn && fileInput) {
-attachBtn.onclick = () => { if (!Agent.isBusy()) fileInput.click(); };
-fileInput.onchange = async () => {
-for (const file of [...(fileInput.files || [])]) {
-try {
-if (pendingFiles.some(x => x.file.name === file.name && x.file.size === file.size && x.file.lastModified === file.lastModified)) continue;
-pendingFiles.push(await readAttachment(file));
-} catch (e) { UI.toast(String(e.message || e)); }
-}
-fileInput.value = "";
-renderAttachments();
-};
-}
-
-
 if (!state.chats.length) {
 newChat();
 } else {
@@ -5232,69 +5114,18 @@ if (Agent.isBusy()) return;
 if (newChat()) UI.closeSidebar();
 };
 
-if (UI.el.jumpLatest) {
 UI.el.jumpLatest.onclick = () => UI.scrollToBottom(true);
-}
 
-const sendCurrentMessage = () => {
-const t = Utils.safeText(UI.el.input?.value).trim();
-if ((!t && !pendingFiles.length) || Agent.isBusy()) return;
-
-let finalPrompt = t;
-
-if (pendingFiles.length) {
-const blocks = pendingFiles.map(item => {
-const header = `\n\n[ATTACHED FILE: ${item.file.name}]`;
-
-if (!item.readable) {
-return `${header}\nBinary/media file attached. The current text chat runtime cannot inspect this binary directly.`;
-}
-
-return `${header}\n${item.text}`;
-}).join("\n");
-
-finalPrompt =
-`${t || "Файлҳои замимашударо таҳлил кун."}${blocks}`;
-}
-
-pendingFiles.splice(0, pendingFiles.length);
-renderAttachments();
-
+UI.el.send.onclick = () => {
+const t = Utils.safeText(UI.el.input.value).trim();
+if (!t || Agent.isBusy()) return;
 UI.el.input.value = "";
 UI.resizeInput();
 UI.el.send.disabled = true;
-
-try {
-const result = Agent.run(finalPrompt);
-
-if (result && typeof result.catch === "function") {
-result.catch(error => {
-Debug.add("error", {
-at: "composer.Agent.run",
-msg: Utils.redactSecrets(String(error?.message || error))
-});
-
-if (UI && UI.toast) {
-UI.toast("Хатои иҷро: " + String(error?.message || error));
-}
-
-UI.setBusy(false);
-});
-}
-} catch (error) {
-Debug.add("error", {
-at: "composer.Agent.run.sync",
-msg: Utils.redactSecrets(String(error?.message || error))
-});
-
-UI.setBusy(false);
-if (UI && UI.toast) {
-UI.toast("Хатои иҷро: " + String(error?.message || error));
-}
-}
+void Agent.run(t);
 };
 
-UI.el.send.addEventListener("click", sendCurrentMessage);
+UI.el.stop.onclick = () => Agent.cancel();
 
 UI.el.input.addEventListener(
 "keydown",
@@ -5304,14 +5135,10 @@ e.key === "Enter" &&
 !e.shiftKey
 ) {
 e.preventDefault();
-sendCurrentMessage();
+UI.el.send.click();
 }
 }
 );
-
-UI.el.stop.onclick = () => Agent.cancel();
-
-
 
 UI.el.input.addEventListener("input", () => {
 UI.resizeInput();
@@ -7132,10 +6959,7 @@ const VXUI = (() => {
     input.click();
   }
 
-  let bound = false;
   function bind(){
-    if (bound) return;
-    bound = true;
     el("advLauncher")?.addEventListener("click",()=>open("overview"));
     el("advClose")?.addEventListener("click",close);
     el("advModal")?.addEventListener("click",e=>{if(e.target===el("advModal"))close();});

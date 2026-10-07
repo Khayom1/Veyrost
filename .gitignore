@@ -1,0 +1,15 @@
+blog.log
+
+# Local secrets
+.env
+.env.*
+*.secret
+*.token
+
+# Local backups
+*.backup
+*.backup-*
+*.bak
+
+# Logs
+*.log
