@@ -307,6 +307,8 @@ display:flex;justify-content:space-between;align-items:center;color:#eee}
 <input id="sDeep" type="password" placeholder="sk-...">
 <label>GitHub Token</label>
 <input id="sGh" type="password" placeholder="ghp_...">
+<button id="testGh" type="button" style="margin-top:7px;width:100%;padding:9px;border:1px solid var(--border);border-radius:8px;background:#111;color:var(--text);cursor:pointer">🔗 Санҷиши GitHub</button>
+<div id="ghStatus" class="hint"></div>
 <label>Google API Key (барои Drive/Gmail)</label>
 <input id="sGKey" type="password" placeholder="AIza...">
 <label>Google CX (Custom Search Engine ID)</label>
@@ -946,7 +948,7 @@ const t = Utils.safeText(text).trim();
 
 if (!t) return false;
 
-return /^(?:чӣ\s+тав[р]?|чи\s+тав[р]?|чӣ\s+гуна|чи\s+гуна|чӣ\s+маъно|чи\s+маъно|чист\b|как\b|что\s+такое|что\s+значит|как\s+это|how\b|what\s+is\b|how\s+to\b|explain\b|фаҳмон\b|объясни\b)/iu.test(t);
+return /(?:чӣ\s+тав[р]?|чи\s+тав[р]?|чӣ\s+гуна|чи\s+гуна|чӣ\s+маъно|чи\s+маъно|\bчаро\b|\bоё\b|\bчист\b|\bкак\b|\bчто\s+такое\b|\bчто\s+значит\b|\bкак\s+это\b|\bкак\s+мне\b|\bhow\b|\bwhat\s+is\b|\bhow\s+to\b|\bhow\s+do\s+i\b|\bhow\s+can\s+i\b|\bcan\s+i\b|\bexplain\b|фаҳмон|объясни)/iu.test(t);
 },
 
 hasWord(text, words) {
@@ -1006,88 +1008,46 @@ deleteWords: [
  ]
 };
 
-function userHasWriteIntent(text, toolName) {
+function userHasWriteIntent(text, toolName, args = {}) {
 const t = Utils.safeText(text).trim();
 if (!t) return false;
+
+// Questions/explanations must never authorize a mutation.
 if (Utils.userQuestionLooksExplanatory(t)) return false;
 
 const low = t.toLocaleLowerCase();
+const hasAny = re => re.test(t);
 
-const writeVerbs = [
-"навис", "нависед", "нависем", "бинавис",
-"соз", "созед", "созам", "создан", "сохт", "созда",
-"тағйир", "тағйир деҳ", "тағйир диҳ", "тағйир диҳед",
-"иваз", "иваз кун", "иваз кунед",
-"навсоз", "навсозӣ",
-"илова кун", "илова кунед", "илова кардан",
-"эҷод кун", "эҷод кунед", "эҷод кардан",
-"сохтан",
-"напиш", "написать", "напиши",
-"создать", "создай", "создайте",
-"изменить", "измени", "измените",
-"обновить", "обнови", "обновите",
-"заменить", "замени", "замените",
-"добавить", "добавь", "добавьте",
-"сохранить", "сохрани", "сохраните",
-"write", "create", "save", "update", "modify",
-"edit", "commit", "push", "insert", "append",
-"replace", "rename", "add"
-];
+// Explicit mutation language. Keep this broad enough for natural Tajik/Russian/English,
+// but require a concrete target before authorizing a write.
+const writeAction = hasAny(/(?:навис(?:ед|ем|ам)?|бинавис|соз(?:ед|ам)?|сохт(?:ан)?|тағйир(?: диҳ)?|иваз(?: кун| кунед)?|навсоз(?:ӣ)?|илова(?: кун| кунед| кардан)?|эҷод(?: кун| кунед| кардан)?|бор кун|гузор|фирист|сохран(?:ить|и|ите)?|напис(?:ать|и)|созда(?:ть|й|йте)|измен(?:ить|и|ите)|обнов(?:ить|и|ите)|замен(?:ить|и|ите)|добав(?:ить|ь|ьте)|write|create|save|update|modify|edit|commit|push|insert|append|replace|rename|add|upload|overwrite|apply)/iu);
+const deleteAction = hasAny(/(?:нест(?: кун| кунед| кардан)?|удал(?:ить|и|ите)|delete|remove|erase|purge)/iu);
 
-const deleteVerbs = [
-"нест кун", "нест кунед", "нест кардан",
-"удалить", "удали", "удалите",
-"delete", "remove"
-];
+if (!writeAction && !deleteAction) return false;
 
-function containsAnyWord(value, words) {
-return words.some(word => {
-const w = word.toLocaleLowerCase();
-if (w.includes(" ")) return value.includes(w);
-try {
-return new RegExp(
-"(?:^|[^\\p{L}\\p{N}_])" +
-w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") +
-"(?=$|[^\\p{L}\\p{N}_])",
-"iu"
-).test(value);
-} catch {
-return value.includes(w);
-}
-});
-}
+const hasFileTarget = hasAny(/(?:^|[\s"'`(])(?:\.\.?\/)?(?:[A-Za-z0-9_.@~-]+\/)*[A-Za-z0-9_.@+~-]+\.(?:html?|css|js|mjs|cjs|json|md|txt|py|ts|tsx|jsx|java|kt|kts|c|cpp|h|hpp|rs|go|php|rb|sh|bash|yml|yaml|xml|csv|sql|env|log)(?=$|[\s"'`,.):;!?])/iu)
+|| hasAny(/(?:^|[\s"'`(])(?:\.gitignore|\.env(?:\.[A-Za-z0-9_-]+)?|Dockerfile|Makefile|README(?:\.md)?)(?=$|[\s"'`,.):;!?])/iu);
 
-const isWrite = containsAnyWord(low, writeVerbs);
-const isDelete = containsAnyWord(low, deleteVerbs);
-
-/*
- * Detect actual file/path targets instead of requiring the literal
- * word "file" or "файл".
- */
-const hasFileTarget =
-/(?:^|[\s"'`(])(?:\.{0,2}\/)?[A-Za-z0-9_.@~-]+\/?[A-Za-z0-9_.@~/-]*\.(?:html?|css|js|mjs|cjs|json|md|txt|py|ts|tsx|jsx|java|kt|kts|c|cpp|h|hpp|rs|go|php|rb|sh|bash|yml|yaml|xml|csv|sql|env|gitignore|log)(?=$|[\s"'`,.):;!?])/iu.test(t) ||
-/(?:^|[\s"'`(])(?:\.gitignore|\.env|Dockerfile|Makefile|README|README\.md)(?=$|[\s"'`,.):;!?])/iu.test(t);
-
-/*
- * A generic path can also be a write target:
- * owner/repo, src/main.js, public/index.html, etc.
- */
-const hasPathTarget =
-/(?:^|[\s"'`])(?:\.{0,2}\/)?[\w.@~-]+(?:\/[\w.@~+-]+)+(?=$|[\s"'`,.):;!?])/u.test(t);
+const hasPathTarget = hasAny(/(?:^|[\s"'`])(?:\.\.?\/)?[A-Za-z0-9_.@~-]+(?:\/[A-Za-z0-9_.@+~-]+)+(?=$|[\s"'`,.):;!?])/u);
+const hasTextTarget = hasAny(/(?:\bfile\b|\bfiles\b|\bфайл\b|\bфайла\b|\bфайли\b|\bфайлов\b|\bpath\b|\breadme\b|\bрепо\b|\bрепозитори(?:й|я|и)?\b|\brepository\b|\brepo\b|\bgithub\b)/iu);
+const hasArgTarget = !!(args && (Utils.safeText(args.path).trim() || Utils.safeText(args.repo).trim()));
+const hasTarget = hasFileTarget || hasPathTarget || hasTextTarget || hasArgTarget;
 
 switch (toolName) {
-
 case "gh_create_repo":
-return isWrite && /\b(?:repo|repository|репо|репозитори|репозиторий)\b/iu.test(t);
+return writeAction && hasAny(/(?:\brepo(?:sitory)?\b|\bрепо\b|\bрепозитори(?:й|я|и)?\b)/iu);
 
 case "gh_create_issue":
-return isWrite && /\b(?:issue|issues|ишью|ишю|тикет|ticket)\b/iu.test(t);
+return writeAction && hasAny(/(?:\bissue(?:s)?\b|бишью|бишю|\bтикет\b|\bticket\b)/iu);
 
 case "gh_delete_file":
-return isDelete && (hasFileTarget || hasPathTarget);
+return deleteAction && hasTarget;
 
 case "gh_write_file":
-return isWrite && (hasFileTarget || hasPathTarget);
+// If the model already supplied a concrete path/repo, the user's explicit
+// mutation verb is enough. The old implementation incorrectly required the
+// literal word "file", causing legitimate GitHub writes to return no_write_intent.
+return writeAction && hasTarget;
 
 default:
 return false;
@@ -5382,6 +5342,30 @@ setTimeout(() => document.getElementById("sOwner").focus(), 0);
 document.getElementById(
 "settingsBtn"
 ).onclick = openSettings;
+
+document.getElementById("testGh").onclick = async () => {
+const status = document.getElementById("ghStatus");
+const token = (document.getElementById("sGh").value || "").trim();
+if (!token) { status.textContent = "❌ GitHub Token холӣ аст."; return; }
+status.textContent = "⏳ GitHub-ро месанҷам…";
+try {
+const r = await fetch(`${GH_BASE}/user`, {
+method: "GET",
+headers: {
+"Accept": "application/vnd.github+json",
+"X-GitHub-Api-Version": "2022-11-28",
+"Authorization": `Bearer ${token}`,
+"Cache-Control": "no-store"
+}
+});
+if (!r.ok) throw new Error(`HTTP ${r.status}`);
+const d = await r.json();
+status.textContent = `✅ GitHub пайваст аст: ${d.login || "authenticated user"}`;
+} catch (e) {
+status.textContent = `❌ GitHub дастрас нест: ${Utils.redactSecrets(e.message || String(e))}`;
+}
+};
+
 
 function closeSettings() {
 settingsModal.classList.remove("show");
