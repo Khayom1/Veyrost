@@ -1,2 +1,3 @@
 VEYROST GitHub integration test
-Stage: CREATE
+Stage: UPDATE
+Create, read, and update operations succeeded.
