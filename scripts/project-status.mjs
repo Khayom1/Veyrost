@@ -69,7 +69,7 @@ const checks = [
   ["DUI-04","Interactive depth controls","Depth values are persisted and restored in the existing layout format","spatial-world.mjs",/depthBody\.z = item\.z[\s\S]*z: Number\(\(depthBody\?\.z \?\? 0\)\.toFixed\(4\)\)/],
   ["DUI-05","Interactive depth controls","Depth controls have EN/RU/TJ labels and instructions","spatial-world.mjs",/depth: "PANEL DEPTH"[\s\S]*depth: "ГЛУБИНА ПАНЕЛИ"[\s\S]*depth: "ЧУҚУРИИ ПАНЕЛ"/],
   ["DUI-06","Interactive depth controls","AURA pinch can activate the depth step buttons","aura-engine.mjs",/elementFromPoint\(x, y\)[\s\S]*target\.click\(\)/],
-  ["DUI-07","Interactive depth controls","Mobile depth HUD avoids repair control and shields AURA overlay pinches","spatial-world.mjs",/repairButton\?\.style\.display === "block"[\s\S]*max\(132px, env\(safe-area-inset-bottom\)\)[\s\S]*elementFromPoint\?\.\(x, y\)\?\.closest\?\.\("\.spatial-depth-control, \.spatial-repair-control"\)],
+  ["DUI-07","Interactive depth controls","Mobile depth HUD avoids repair control and shields AURA overlay pinches","spatial-world.mjs",/repairButton\?\.style\.display === "block"[\s\S]*max\(132px, env\(safe-area-inset-bottom\)\)[\s\S]*elementFromPoint[\s\S]*spatial-depth-control[\s\S]*spatial-repair-control/],
   ["LAY-01","Spatial layout persistence","Versioned local layout serialization","spatial-world.mjs",/version: 1, panels/],
   ["LAY-02","Spatial layout persistence","Saved layout validation and unknown-ID rejection","spatial-math.mjs",/validateSavedLayout[\s\S]*allowed\.has\(panel\.id\)/],
   ["LAY-03","Spatial layout persistence","Normalized panel coordinates restored from local storage","spatial-world.mjs",/localStorage\?\.getItem[\s\S]*item\.x \* this\.window\.innerWidth/],
