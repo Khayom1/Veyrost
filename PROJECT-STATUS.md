@@ -3,7 +3,7 @@
 **Audit date:** 2026-11-11  
 **Branch:** `feat/spatial-persistence-hardening`  
 **Audit source:** `node scripts/project-status.mjs`  
-**Validation:** GitHub Actions was not used for this continuation, per instruction. The source-evidence patterns for the five new protected-control criteria were checked against the committed files. No full regression run was performed after these changes. The five depth-physics source-evidence patterns were checked directly; the Node test cases were added but not executed in this environment.
+**Validation:** GitHub Actions was not used for this continuation, per instruction. The five protected-control criteria, six depth-physics criteria, and six interactive-depth criteria were checked directly against committed source. No full Node regression run or physical-device test was performed for this continuation.
 
 ## Current source-evidence result
 
@@ -15,17 +15,18 @@
 | Main-site AURA integration | 7 | 7 | 100.00% |
 | Spatial rendered interface (perspective depth-rendered scope) | 8 | 8 | 100.00% |
 | Depth-axis collision physics (hybrid 2.5D) | 6 | 6 | 100.00% |
+| Interactive depth controls | 6 | 6 | 100.00% |
 | Spatial layout persistence | 4 | 4 | 100.00% |
 | Protected control lifecycle | 5 | 5 | 100.00% |
 | Technician service sequence | 0 | 8 | 0.00% |
 | Dialogue and spatial audio | 0 | 5 | 0.00% |
 | Validation and release | 4 | 6 | 66.67% |
-| **Total** | **64** | **79** | **81.01%** |
+| **Total** | **70** | **85** | **82.35%** |
 
-- Implemented source criteria: **64 / 79**
-- Pending source criteria: **15 / 79**
-- New protected-control evidence mismatches: **0 / 5** (direct source-pattern verification; not a runtime test)
-- The last full CI pass (`43058327625`) predates the perspective-depth, protected-control, and depth-physics changes; it is not validation of the latest branch head.
+- Implemented source criteria: **70 / 85**
+- Pending source criteria: **15 / 85**
+- Protected-control, depth-physics and interactive-depth source-evidence checks: **17 / 17** matched (static source verification; not a runtime test)
+- The last full CI pass (`43058327625`) predates the perspective-depth, protected-control, depth-physics and interactive-depth changes; it is not validation of the latest branch head.
 
 ## Scope and limitations
 
@@ -39,7 +40,7 @@ The protected-control lifecycle is implemented for HOME and AI SYSTEMS: first-pu
 
 The spatial interface now uses a Three.js **perspective camera** and six independently layered panel depths, with per-panel tilt and floating motion. Matter handles panel movement and collision in X/Y; the new depth solver adds Z-axis collision resolution for panels whose X/Y projections overlap. The combined system is hybrid **2.5D**, not a full 6-DoF rigid-body engine.
 
-Depth-axis collision is now integrated: projected X/Y overlap checks, mass-weighted positional correction, restitution impulses, anchored-body handling, synchronization with Matter panel positions, and deterministic depth reset. This has not yet been confirmed by a full runtime regression or on a physical phone.
+Depth-axis collision is now integrated: projected X/Y overlap checks, mass-weighted positional correction, restitution impulses, anchored-body handling, synchronization with Matter panel positions, and deterministic depth reset. Interactive depth editing now includes a touch-friendly slider, AURA-clickable step buttons, mouse wheel and Shift+wheel precision control. Depth is clamped to `-1.25..1.25`, persists in the existing version-1 layout format, and is backward-compatible with records that contain only X/Y. This has not yet been confirmed by a full runtime regression or on a physical phone.
 
 Layout persistence is now implemented:
 - Versioned localStorage payload.
