@@ -3,7 +3,7 @@ name: AURA engine checks
 on:
   push:
     branches:
-      - feat/aura-hand-control
+      - 'feat/aura-*'
   pull_request:
     branches:
       - main
@@ -27,5 +27,9 @@ jobs:
         run: |
           node -e 'const fs=require("node:fs"); const html=fs.readFileSync("aura-lab.html","utf8"); const match=html.match(/<script type="module">([\s\S]*?)<\/script>/i); if(!match) throw new Error("AURA lab module not found"); fs.writeFileSync("/tmp/aura-lab.mjs",match[1]);'
           node --check /tmp/aura-lab.mjs
+      - name: Check main website AURA module syntax
+        run: |
+          node -e 'const fs=require("node:fs"); const html=fs.readFileSync("index.html","utf8"); const scripts=[...html.matchAll(/<script type="module">([\s\S]*?)<\/script>/gi)]; if(!scripts.length) throw new Error("Main AURA module not found"); fs.writeFileSync("/tmp/index-aura.mjs",scripts[scripts.length-1][1]);'
+          node --check /tmp/index-aura.mjs
       - name: Run project regression tests
         run: node --test tests/*.test.cjs
