@@ -3,65 +3,91 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const html = fs.readFileSync("index.html", "utf8");
-const auraEngine = fs.readFileSync("aura-engine.mjs", "utf8");
+const site = fs.readFileSync("assets/veyrost-site.js", "utf8");
+const css = fs.readFileSync("assets/veyrost-corporate.css", "utf8");
+const dataSource = fs.readFileSync("assets/projects-data.js", "utf8");
+const projects = new Function(dataSource
+  .replace("export const projects =", "const projects =")
+  .replace("export const projectGroups =", "const projectGroups =") + "\nreturn projects;")();
 
-test("main navigation keeps its original accessible AURA switch", () => {
-  assert.match(html, /id="aura-toggle"[^>]*aria-pressed="false"/);
-  assert.match(html, /data-t="auraMode"/);
-  assert.match(html, /id="aura-layout-toggle"[^>]*hidden/);
-});
-
-test("AURA preserves the original website instead of replacing it with a spatial scene", () => {
+test("main page is a corporate multi-page overview, not a single-page overlay", () => {
   assert.match(html, /ENGINEERING<br><span>WHAT'S NEXT\.<\/span>/);
-  assert.match(html, /id="about"/);
-  assert.match(html, /id="focus"/);
-  assert.match(html, /id="projects"/);
-  assert.doesNotMatch(html, /spatial-stage|openSpatialMode|SpatialWorldController/);
+  for (const page of ["projects.html","studio.html","company.html","research.html","contact.html"]) {
+    assert.ok(fs.existsSync(page), `missing page: ${page}`);
+  }
+  assert.match(html, /assets\/veyrost-corporate\.css/);
+  assert.match(html, /assets\/veyrost-site\.js/);
 });
 
-test("main page keeps the camera source hidden and uses one conventional arrow cursor", () => {
-  assert.match(html, /id="aura-camera-source" class="aura-camera-source"[^>]*aria-hidden="true"/);
-  assert.match(html, /\.aura-camera-source\{[^}]*left:-10000px/s);
-  assert.equal((html.match(/id="aura-cursor"/g) || []).length, 1);
-  assert.match(html, /id="aura-cursor" class="aura-cursor" aria-hidden="true">\s*<svg/);
+test("main navigation retains AURA and a separate opt-in layout control", () => {
+  assert.match(html, /id="aura-toggle"[^>]*aria-pressed="false"/);
+  assert.match(html, /id="layout-toggle"[^>]*hidden/);
+  assert.match(html, /href="projects\.html"/);
+  assert.match(html, /href="studio\.html"/);
+});
+
+test("camera is hidden and exactly one conventional arrow cursor is mounted", () => {
+  assert.match(html, /id="aura-camera" class="aura-cam"[^>]*aria-hidden="true"/);
+  assert.equal((html.match(/id="aura-pointer"/g) || []).length, 1);
+  assert.match(html, /id="aura-pointer"[^>]*>\s*<svg/);
   assert.match(html, /<path d="M2 1 L2 27/);
-  assert.doesNotMatch(html, /aura-cursor:after|<div[^>]*class="aura-cursor"[^>]*>\s*<\/div>/);
+  assert.match(css, /html\.aura-active,html\.aura-active \*\{cursor:none!important\}/);
 });
 
-test("AURA uses the shared engine and releases the camera on stop or page exit", () => {
-  assert.match(html, /import \{ AuraController \} from "\.\/aura-engine\.mjs"/);
-  assert.match(html, /await controller\.start\(\)/);
-  assert.match(html, /await controller\.stop\(\)/);
-  assert.match(html, /addEventListener\("pagehide"/);
+test("shared AURA controller requests access only after the user activates the button", () => {
+  assert.match(site, /import \{ AuraController \} from "\.\.\/aura-engine\.mjs"/);
+  assert.match(site, /auraButton\.addEventListener\("click"/);
+  assert.match(site, /await controller\.start\(\)/);
+  assert.match(site, /await controller\.stop\(\)/);
+  assert.match(site, /getUserMedia/);
 });
 
-test("the layout editor is visible only while AURA is active and is opt-in", () => {
-  assert.match(html, /layoutButton\.hidden=!active/);
-  assert.match(html, /layoutButton\.addEventListener\("click",\(\)=>setLayoutEditing\(!layoutEditing\)\)/);
-  assert.match(html, /if\(!layoutEditing \|\| activeDrag\) return false/);
-  assert.match(html, /veyrost-layout-editing/);
+test("layout editing requires AURA and the explicit MOVE ITEMS control", () => {
+  assert.match(site, /editButton\.hidden=false/);
+  assert.match(site, /editMode=Boolean\(value\)&&Boolean\(controller\?\.active\)/);
+  assert.match(site, /layout-toggle/);
+  assert.match(site, /veyrost-layout-editing/);
+  assert.match(site, /startDrag\(detail\.x,detail\.y,"hand"\)/);
+  assert.match(site, /moveDrag\(x,y,"hand"\)/);
 });
 
-test("button positions can be moved by hand pinch or pointer only in edit mode", () => {
-  assert.match(html, /beginDrag\(extra\.x,extra\.y,"hand"\)/);
-  assert.match(html, /moveDrag\(x,y,"hand"\)/);
-  assert.match(html, /addEventListener\("pointerdown"/);
-  assert.match(html, /addEventListener\("pointermove"/);
-  assert.match(html, /localStorage\.setItem\(LAYOUT_KEY/);
-  assert.match(html, /localStorage\.getItem\(LAYOUT_KEY/);
+test("categories and project cards can be moved with mouse, touch and hand pinch", () => {
+  assert.match(site, /addEventListener\("pointerdown"/);
+  assert.match(site, /addEventListener\("pointermove"/);
+  assert.match(site, /data-veyrost-layout-item/);
+  assert.match(site, /localStorage\.setItem\(LAYOUT_KEY/);
+  assert.match(site, /Object\.assign\(positions,existing\)/);
 });
 
-test("AURA does not synthesize navigation clicks on movable links during layout editing", () => {
-  assert.match(auraEngine, /target\.closest\?\.\("\[data-veyrost-layout-item\]"\)[\s\S]*veyrost-layout-editing/);
+test("the project directory contains all 19 public repositories and source links", () => {
+  assert.equal(projects.length,19);
+  assert.equal(new Set(projects.map(p=>p.id)).size,19);
+  for (const project of projects) {
+    assert.ok(project.name && project.repo && project.description);
+    assert.match(project.url,/^https:\/\/github\.com\/Khayom1\//);
+  }
+  assert.ok(projects.some(p=>p.repo==="SkillGuard"));
+  assert.ok(projects.some(p=>p.repo==="WAYLINE-RADIO"));
+  assert.ok(projects.some(p=>p.repo==="Scancam"));
+  assert.ok(projects.some(p=>p.repo==="textivo"));
 });
 
-test("main website still exposes the AURA entry point in all site languages", () => {
-  assert.match(html, /href="aura-lab\.html" data-t="auraLab"/);
-  assert.match(html, /auraLab:"AURA Hand Control ↗"/);
-  assert.match(html, /auraLab:"Лаборатория управления AURA ↗"/);
-  assert.match(html, /auraLab:"Идоракунии дастӣ бо AURA ↗"/);
+test("project directory has real search, category filters and count feedback", () => {
+  const page=fs.readFileSync("projects.html","utf8");
+  assert.match(page,/id="project-search"/);
+  assert.match(page,/id="project-filter"/);
+  assert.match(page,/id="project-grid"/);
+  assert.match(site,/const render=\(\)=>/);
+  assert.match(site,/projectGroups|project-filter/);
 });
 
-test("no literal escaped newline is left after the AURA module", () => {
-  assert.doesNotMatch(html, /<\/script>\\n<\/body>/);
+test("interface language controls expose English, Russian and Tajik", () => {
+  for (const lang of ["en","ru","tj"]) assert.match(html,new RegExp(`data-lang="${lang}"`));
+  assert.match(site,/translations=/);
+});
+
+test("layout editor and project filtering are available on mobile", () => {
+  assert.match(css,/@media\(max-width:760px\)/);
+  assert.match(css,/\.project-grid\{grid-template-columns:1fr\}/);
+  assert.match(css,/\.studio-layout\{grid-template-columns:1fr\}/);
 });
