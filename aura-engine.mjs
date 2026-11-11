@@ -39,10 +39,7 @@ export function classifyHand(landmarks, pinchThreshold = AURA_CONFIG.pinchThresh
 
   const extended = [8, 12, 16, 20].map((tip, index) => {
     const pip = [6, 10, 14, 18][index];
-    const mcp = [5, 9, 13, 17][index];
-    const baseDistance = distance2d(landmarks[mcp], landmarks[pip]);
-    const tipDistance = distance2d(landmarks[mcp], landmarks[tip]);
-    return tipDistance > baseDistance * 1.12;
+    return Number(landmarks[tip]?.y) < Number(landmarks[pip]?.y) - 0.015;
   });
   const count = extended.filter(Boolean).length;
 
