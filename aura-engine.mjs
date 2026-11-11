@@ -184,7 +184,7 @@ export class AuraController {
     const landmarks = result?.landmarks?.[0];
     if (!landmarks || landmarks.length < 21) {
       if (this.lastGesture === "pinch") {
-        this._gesture("pinch-end", this.lastPosition || {});
+        this._gesture("pinch-cancel", this.lastPosition || {});
       }
       if (this.lastPosition) this._gesture("hand-lost");
       if (this.cursor) this.cursor.style.visibility = "hidden";
@@ -218,7 +218,8 @@ export class AuraController {
     if (gesture === "pinch" && this.lastGesture !== "pinch") {
       this._gesture("pinch-start", { x: point.x, y: point.y });
     } else if (gesture !== "pinch" && this.lastGesture === "pinch") {
-      this._gesture("pinch-end", { x: point.x, y: point.y });
+      const eventName = gesture === "open_palm" || gesture === "fist" ? "pinch-cancel" : "pinch-end";
+      this._gesture(eventName, { x: point.x, y: point.y });
     }
     if (gesture !== this.lastGesture) this._gesture(gesture, { x: point.x, y: point.y });
 
