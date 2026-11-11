@@ -56,8 +56,8 @@ const checks = [
   ["3D-05","3D spatial environment","Raycast selection and hand-driven object control","spatial-world.mjs",/new THREE\.Raycaster[\s\S]*beginHandPress\(x, y\)[\s\S]*onHandMove\(x, y\)/],
   ["3D-06","3D spatial environment","Mobile pixel-ratio cap and responsive layout","spatial-world.mjs",/setPixelRatio\(Math\.min[\s\S]*width < 680 \? 1\.2 : 1\.5/],
   ["LAY-01","Spatial layout persistence","Versioned local layout serialization","spatial-world.mjs",/version: 1, panels/],
-  ["LAY-02","Spatial layout persistence","Saved layout validation and unknown-ID rejection","spatial-math.mjs",/validateSavedLayout[\\s\\S]*allowed\\.has\\(panel\\.id\\)/],
-  ["LAY-03","Spatial layout persistence","Normalized panel coordinates restored from local storage","spatial-world.mjs",/localStorage\\?\\.getItem[\\s\\S]*item\\.x \\* this\\.window\\.innerWidth/],
+  ["LAY-02","Spatial layout persistence","Saved layout validation and unknown-ID rejection","spatial-math.mjs",/validateSavedLayout[\s\S]*allowed\.has\(panel\.id\)/],
+  ["LAY-03","Spatial layout persistence","Normalized panel coordinates restored from local storage","spatial-world.mjs",/localStorage\?\.getItem[\s\S]*item\.x \* this\.window\.innerWidth/],
   ["LAY-04","Spatial layout persistence","Reset clears saved layout and restores initial layout","spatial-world.mjs",/removeItem\\(this\\.storageKey\\)[\\s\\S]*this\\.physics\\.reset\\(\\)/],
 
 
