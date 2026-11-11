@@ -3,6 +3,7 @@ import "./matter-engine.js";
 import {
   computeSpatialLayout,
   screenToWorld,
+  validateSavedLayout,
   SPATIAL_UNITS_PER_PIXEL
 } from "./spatial-math.mjs";
 
@@ -704,7 +705,7 @@ export class SpatialWorldController {
       const raw = this.window.localStorage?.getItem(this.storageKey);
       if (!raw) return;
       const parsed = JSON.parse(raw);
-      const saved = globalThis.VEYROST_SPATIAL_MATH?.validateSavedLayout?.(parsed);
+      const saved = validateSavedLayout(parsed);
       if (!saved) return;
       for (const item of saved) {
         const body = this.physics.get(item.id);
