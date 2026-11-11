@@ -37,7 +37,7 @@ The spatial layout is stored in browser `localStorage` under `veyrost:spatial-la
 
 ## Protected controls and mount repair
 
-Two navigation panels (`HOME` and `AI SYSTEMS`) are mounted as protected controls. The first pull is resisted; the second pull releases the mount. The detached control can then be moved, while a fixed amber socket remains at its original mount position. A repair action appears only while at least one protected control is detached. Repair returns the control to its original coordinates, re-anchors its Matter body, hides the socket, and removes the repair action when all protected controls are restored. The lifecycle is isolated in `protected-control.mjs` and covered by deterministic Node tests. The repair is currently a direct user-triggered restoration; technician characters, cable animation, vehicle/ladder sequence, and audio are not part of this implementation.
+Two navigation panels (`HOME` and `AI SYSTEMS`) are mounted as protected controls. The first pull is resisted; the second pull releases the mount. The detached control can then be moved, while a fixed amber socket remains at its original mount position. A repair action appears only while at least one protected control is detached. Repair returns the control to its original X/Y coordinates and initial Z layer, re-anchors both physics representations, hides the socket, and removes the repair action when all protected controls are restored. The lifecycle is isolated in `protected-control.mjs` and covered by deterministic Node tests. The repair is currently a direct user-triggered restoration; technician characters, cable animation, vehicle/ladder sequence, and audio are not part of this implementation.
 
 ## Honest scope boundary
 
