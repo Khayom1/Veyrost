@@ -62,6 +62,7 @@ const checks = [
   ["DPH-03","Depth-axis collision physics","Mass-weighted positional correction","spatial-depth-physics.mjs",/1 \/ a\.mass[\s\S]*correction \* invA[\s\S]*correction \* invB/],
   ["DPH-04","Depth-axis collision physics","Restitution-based depth impulse response","spatial-depth-physics.mjs",/1 \+ this\.restitution[\s\S]*velocityZ/],
   ["DPH-05","Depth-axis collision physics","Matter X/Y synchronization and depth-render integration","spatial-world.mjs",/depthBody\.x = planar\.x \+ planar\.width \/ 2[\s\S]*this\.depthPhysics\.step\(delta\)[\s\S]*panel\.group\.position\.z = depthBody\.z/],
+  ["DPH-06","Depth-axis collision physics","Layout reset restores initial depth and clears Z velocity","spatial-world.mjs",/this\.physics\.reset\(\)[\s\S]*this\.depthPhysics\?\.reset\(\)/],
   ["LAY-01","Spatial layout persistence","Versioned local layout serialization","spatial-world.mjs",/version: 1, panels/],
   ["LAY-02","Spatial layout persistence","Saved layout validation and unknown-ID rejection","spatial-math.mjs",/validateSavedLayout[\s\S]*allowed\.has\(panel\.id\)/],
   ["LAY-03","Spatial layout persistence","Normalized panel coordinates restored from local storage","spatial-world.mjs",/localStorage\?\.getItem[\s\S]*item\.x \* this\.window\.innerWidth/],
