@@ -72,3 +72,56 @@ test("viewport mapping mirrors the selfie camera and clamps coordinates", async 
   assert.deepEqual(mapHandToViewport({x:0.2,y:0.3},200,100),{x:160,y:30});
   assert.deepEqual(mapHandToViewport({x:2,y:-1},200,100),{x:0,y:0});
 });
+
+test("pinch emits start and end events for draggable spatial objects", async () => {
+  const { AuraController } = await apiPromise;
+  const events = [];
+  const controller = new AuraController({
+    video: {},
+    cursor: { style: {} },
+    windowRef: { innerWidth: 200, innerHeight: 100, scrollBy() {} },
+    documentRef: { elementFromPoint: () => null, dispatchEvent() {} },
+    navigatorRef: {},
+    onGesture: (name, detail) => events.push({ name, detail })
+  });
+  controller.active = true;
+  const pinched = hand();
+  pinched[8] = { x: 0.52, y: 0.25 };
+  pinched[4] = { x: 0.51, y: 0.25 };
+  setFinger(pinched, 8, 6, true);
+  controller._consume({ landmarks: [pinched] });
+
+  const pointing = hand();
+  setFinger(pointing, 8, 6, true);
+  setFinger(pointing, 12, 10, false);
+  setFinger(pointing, 16, 14, false);
+  setFinger(pointing, 20, 18, false);
+  pointing[4] = { x: 0.1, y: 0.1 };
+  controller._consume({ landmarks: [pointing] });
+
+  assert.ok(events.some(event => event.name === "pinch-start"));
+  assert.ok(events.some(event => event.name === "pinch-end"));
+});
+
+test("losing the hand releases an active pinch", async () => {
+  const { AuraController } = await apiPromise;
+  const events = [];
+  const controller = new AuraController({
+    video: {},
+    cursor: { style: {} },
+    windowRef: { innerWidth: 200, innerHeight: 100, scrollBy() {} },
+    documentRef: { elementFromPoint: () => null, dispatchEvent() {} },
+    navigatorRef: {},
+    onGesture: name => events.push(name)
+  });
+  controller.active = true;
+  const pinched = hand();
+  pinched[8] = { x: 0.52, y: 0.25 };
+  pinched[4] = { x: 0.51, y: 0.25 };
+  setFinger(pinched, 8, 6, true);
+  controller._consume({ landmarks: [pinched] });
+  controller._consume({ landmarks: [] });
+  assert.ok(events.includes("pinch-end"));
+  assert.equal(controller.lastGesture, "none");
+  assert.equal(controller.cursor.style.visibility, "hidden");
+});
