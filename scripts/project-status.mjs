@@ -6,12 +6,12 @@ const checks = [
   // Website foundation: exact source-level acceptance checks.
   ["WEB-01","Website foundation","Canonical production URL","index.html",/<link rel="canonical"/],
   ["WEB-02","Website foundation","Open Graph metadata","index.html",/<meta property="og:title"/],
-  ["WEB-03","Website foundation","Mobile responsive breakpoint","index.html",/@media\(max-width:650px\)/],
+  ["WEB-03","Website foundation","Responsive mobile layout","assets/veyrost-corporate.css",/@media\(max-width:760px\)/],
   ["WEB-04","Website foundation","EN/RU/TJ language selectors","index.html",/data-lang="en"[\s\S]*data-lang="ru"[\s\S]*data-lang="tj"/],
-  ["WEB-05","Website foundation","Primary section navigation","index.html",/href="#about"[\s\S]*href="#focus"[\s\S]*href="#projects"/],
-  ["WEB-06","Website foundation","Core content sections exist","index.html",/id="about"[\s\S]*id="focus"[\s\S]*id="projects"/],
-  ["WEB-07","Website foundation","Matter Engine lab linked from home","index.html",/href="matter-lab\.html"/],
-  ["WEB-08","Website foundation","AURA hand-control lab linked from home","index.html",/href="aura-lab\.html"/],
+  ["WEB-05","Website foundation","Multi-page navigation includes projects, workspace and company","index.html",/href="projects\.html"[\s\S]*href="studio\.html"[\s\S]*href="company\.html"/],
+  ["WEB-06","Website foundation","Corporate overview includes modular engineering categories","index.html",/Many systems\. One engineering direction[\s\S]*data-veyrost-layout-item/],
+  ["WEB-07","Website foundation","Project directory and source inventory page","projects.html",/id="project-grid"[\s\S]*project-filter/],
+  ["WEB-08","Website foundation","Dedicated contact and collaboration page","contact.html",/mailto:prafessorittiloot@gmail\.com/],
 
   // Matter Engine: prototype behavior present in source.
   ["MAT-01","Matter Engine 2D","Physics world implementation","matter-engine.js",/class MatterWorld/],
@@ -43,7 +43,7 @@ const checks = [
   ["INT-01","Main-site AURA integration","AURA toggle embedded in main navigation","index.html",/id="aura-toggle"/],
   ["INT-02","Main-site AURA integration","Main page imports shared AURA controller","index.html",/import \{ AuraController \} from "\.\/aura-engine\.mjs"/],
   ["INT-03","Main-site AURA integration","Camera source is hidden from the page","index.html",/class="aura-camera-source"[\s\S]*aria-hidden="true"/],
-  ["INT-04","Main-site AURA integration","Hand cursor overlay is mounted","index.html",/id="aura-cursor"/],
+  ["INT-04","Main-site AURA integration","Single conventional arrow cursor is mounted","index.html",/id="aura-pointer"[^>]*<svg/],
   ["INT-05","Main-site AURA integration","AURA status HUD is mounted","index.html",/id="aura-status"/],
   ["INT-06","Main-site AURA integration","Opt-in layout MOVE control appears only while AURA is active","index.html",/id="aura-layout-toggle"[\s\S]*layoutButton\.hidden=!active[\s\S]*setLayoutEditing\(!layoutEditing\)/],
   ["INT-07","Main-site AURA integration","EN/RU/TJ AURA interface labels","index.html",/auraMode:"AURA OFF"[\s\S]*auraMode:"AURA ВЫКЛ"[\s\S]*auraMode:"AURA ХОМӮШ"/],
