@@ -16,6 +16,8 @@ const COPY = {
     reset: "RESET LAYOUT",
     exit: "AURA OFF",
     repair: "REPAIR MOUNT",
+    depth: "PANEL DEPTH",
+    depthHint: "Wheel or adjust to move the selected panel in depth.",
     status: "3D SPATIAL MODE ACTIVE",
     panels: {
       home: ["HOME", "Overview and direction"],
@@ -32,6 +34,8 @@ const COPY = {
     reset: "СБРОСИТЬ РАСКЛАДКУ",
     exit: "ВЫКЛЮЧИТЬ AURA",
     repair: "ВОССТАНОВИТЬ КРЕПЛЕНИЕ",
+    depth: "ГЛУБИНА ПАНЕЛИ",
+    depthHint: "Колесо мыши или ползунок меняют глубину выбранной панели.",
     status: "АКТИВЕН 3D-РЕЖИМ",
     panels: {
       home: ["ГЛАВНАЯ", "Обзор и направление"],
@@ -48,6 +52,8 @@ const COPY = {
     reset: "БАРҚАРОРИ ЧИДАШ",
     exit: "AURA-РО ХОМӮШ КУН",
     repair: "ПАЙВАСТКУНИРО БАРҚАРОР КУН",
+    depth: "ЧУҚУРИИ ПАНЕЛ",
+    depthHint: "Бо чархи муш ё лағжонак чуқурии панели интихобшударо тағйир деҳ.",
     status: "ҲОЛАТИ ФАЗОИИ 3D ФАЪОЛ АСТ",
     panels: {
       home: ["АСОСӢ", "Шарҳ ва самт"],
@@ -129,6 +135,12 @@ export class SpatialWorldController {
     this.protectedControls = createProtectedControlRegistry(this.protectedIds);
     this.protectedSockets = new Map();
     this.repairButton = null;
+    this.depthControl = null;
+    this.depthRange = null;
+    this.depthValue = null;
+    this.depthMinus = null;
+    this.depthPlus = null;
+    this.selectedId = null;
     this.hoveredId = null;
     this.activeDrag = null;
     this.pointer = { x: 0, y: 0 };
@@ -143,6 +155,7 @@ export class SpatialWorldController {
     this._pointerDown = this._pointerDown.bind(this);
     this._pointerUp = this._pointerUp.bind(this);
     this._pointerCancel = this._pointerCancel.bind(this);
+    this._wheel = this._wheel.bind(this);
   }
 
   start() {
@@ -193,6 +206,7 @@ export class SpatialWorldController {
     this._buildEnvironment();
     this._buildPanels();
     this._buildProtectedRepairControl();
+    this._buildDepthControl();
     this._restoreLayout();
     this._buildCursor();
     this._bindEvents();
@@ -478,6 +492,143 @@ export class SpatialWorldController {
     this.repairButton = button;
   }
 
+
+  _buildDepthControl() {
+    const panel = this.document.createElement("section");
+    panel.className = "spatial-depth-control";
+    panel.setAttribute("aria-label", "Spatial panel depth controls");
+    Object.assign(panel.style, {
+      position: "absolute",
+      left: "max(14px, env(safe-area-inset-left))",
+      bottom: "max(72px, env(safe-area-inset-bottom))",
+      zIndex: "19",
+      display: "none",
+      width: "min(276px, calc(100vw - 28px))",
+      boxSizing: "border-box",
+      padding: "12px 14px",
+      border: "1px solid rgba(111,231,255,.34)",
+      borderRadius: "16px",
+      background: "rgba(5,16,29,.92)",
+      color: "#e9f8ff",
+      font: "600 11px system-ui,sans-serif",
+      letterSpacing: ".08em",
+      boxShadow: "0 10px 32px rgba(0,0,0,.32)",
+      backdropFilter: "blur(12px)",
+      pointerEvents: "auto"
+    });
+
+    const heading = this.document.createElement("div");
+    heading.style.display = "flex";
+    heading.style.alignItems = "center";
+    heading.style.justifyContent = "space-between";
+    heading.style.gap = "8px";
+    const title = this.document.createElement("span");
+    title.textContent = COPY[this.language]?.depth ?? COPY.en.depth;
+    const value = this.document.createElement("output");
+    value.textContent = "0.00";
+    value.setAttribute("aria-live", "polite");
+    value.style.color = "#73e5ff";
+    value.style.fontVariantNumeric = "tabular-nums";
+    heading.append(title, value);
+
+    const row = this.document.createElement("div");
+    row.style.display = "grid";
+    row.style.gridTemplateColumns = "36px minmax(0,1fr) 36px";
+    row.style.alignItems = "center";
+    row.style.gap = "8px";
+    const makeStepButton = (label, ariaLabel) => {
+      const button = this.document.createElement("button");
+      button.type = "button";
+      button.textContent = label;
+      button.setAttribute("aria-label", ariaLabel);
+      Object.assign(button.style, {
+        minHeight: "36px",
+        border: "1px solid rgba(111,231,255,.35)",
+        borderRadius: "10px",
+        background: "rgba(26,55,76,.9)",
+        color: "#c7f5ff",
+        font: "700 18px system-ui,sans-serif",
+        touchAction: "manipulation",
+        cursor: "pointer"
+      });
+      return button;
+    };
+    const minus = makeStepButton("−", "Move selected panel farther away");
+    const plus = makeStepButton("+", "Move selected panel closer");
+    const range = this.document.createElement("input");
+    range.type = "range";
+    range.min = "-1.25";
+    range.max = "1.25";
+    range.step = "0.01";
+    range.value = "0";
+    range.setAttribute("aria-label", "Selected panel depth");
+    range.style.width = "100%";
+    range.style.accentColor = "#69dff9";
+    row.append(minus, range, plus);
+
+    const hint = this.document.createElement("div");
+    hint.textContent = COPY[this.language]?.depthHint ?? COPY.en.depthHint;
+    hint.style.marginTop = "7px";
+    hint.style.color = "#91a9bd";
+    hint.style.font = "500 10px/1.4 system-ui,sans-serif";
+    panel.append(heading, row, hint);
+
+    const stop = event => event.stopPropagation();
+    panel.addEventListener("pointerdown", stop);
+    panel.addEventListener("pointerup", stop);
+    panel.addEventListener("wheel", stop, { passive: true });
+    range.addEventListener("input", () => {
+      if (this.selectedId) this.setPanelDepth(this.selectedId, Number(range.value), false);
+    });
+    range.addEventListener("change", () => this.saveLayout());
+    minus.addEventListener("click", () => this.adjustSelectedDepth(-0.05, true));
+    plus.addEventListener("click", () => this.adjustSelectedDepth(0.05, true));
+
+    this.mount.appendChild(panel);
+    this.depthControl = panel;
+    this.depthRange = range;
+    this.depthValue = value;
+    this.depthMinus = minus;
+    this.depthPlus = plus;
+    this._refreshDepthControl();
+  }
+
+  setPanelDepth(id, value, persist = false) {
+    const body = this.depthPhysics?.get(id);
+    if (!body || body.anchored || !Number.isFinite(Number(value))) return false;
+    const next = Math.max(-1.25, Math.min(1.25, Number(value)));
+    body.z = next;
+    body.velocityZ = 0;
+    const panel = this.panelGroups.get(id);
+    if (panel) panel.group.userData.depth = next;
+    if (this.selectedId === id || this.hoveredId === id) this._refreshDepthControl();
+    if (persist) this.saveLayout();
+    return true;
+  }
+
+  adjustSelectedDepth(delta, persist = false) {
+    const id = this.selectedId ?? this.hoveredId;
+    const body = id ? this.depthPhysics?.get(id) : null;
+    if (!body) return false;
+    return this.setPanelDepth(id, body.z + delta, persist);
+  }
+
+  _refreshDepthControl() {
+    if (!this.depthControl) return;
+    const id = this.selectedId ?? this.hoveredId;
+    const body = id ? this.depthPhysics?.get(id) : null;
+    const available = Boolean(body && !body.anchored);
+    this.depthControl.style.display = available ? "block" : "none";
+    if (!body) return;
+    if (this.depthRange) {
+      this.depthRange.value = String(body.z);
+      this.depthRange.disabled = !available;
+    }
+    if (this.depthValue) this.depthValue.textContent = body.z.toFixed(2);
+    if (this.depthMinus) this.depthMinus.disabled = !available;
+    if (this.depthPlus) this.depthPlus.disabled = !available;
+  }
+
   repairDetachedControls() {
     let repaired = 0;
     for (const [id, control] of this.protectedControls) {
@@ -541,6 +692,7 @@ export class SpatialWorldController {
     this.canvas.addEventListener("pointerdown", this._pointerDown);
     this.canvas.addEventListener("pointerup", this._pointerUp);
     this.canvas.addEventListener("pointercancel", this._pointerCancel);
+    this.canvas.addEventListener("wheel", this._wheel, { passive: false });
     this.canvas.addEventListener("contextmenu", event => event.preventDefault());
     if (typeof ResizeObserver !== "undefined") {
       this.resizeObserver = new ResizeObserver(this._resize);
@@ -620,6 +772,17 @@ export class SpatialWorldController {
     this._movePointer(event.clientX, event.clientY, "mouse");
   }
 
+  _wheel(event) {
+    if (!this.running || this.paused) return;
+    const id = this.hoveredId ?? this.selectedId;
+    const body = id ? this.depthPhysics?.get(id) : null;
+    if (!body || body.anchored) return;
+    event.preventDefault();
+    const fine = event.shiftKey ? 0.01 : 0.035;
+    const direction = event.deltaY > 0 ? -1 : 1;
+    this.setPanelDepth(id, body.z + direction * fine, true);
+  }
+
   _pointerDown(event) {
     if (event.button !== 0 && event.pointerType === "mouse") return;
     this.canvas.setPointerCapture?.(event.pointerId);
@@ -670,7 +833,11 @@ export class SpatialWorldController {
   _beginPress(x, y, source) {
     if (!this.running || this.paused || this.activeDrag) return false;
     const id = this._raycastPanel(x, y);
-    if (!id) return false;
+    if (!id) {
+      this.selectedId = null;
+      this._refreshDepthControl();
+      return false;
+    }
     const body = this.physics.get(id);
     if (!body) return false;
     if (this.protectedIds.has(id) && body.anchored) {
@@ -695,6 +862,8 @@ export class SpatialWorldController {
       this._emitStatus("protected-detached");
     }
     if (!this.physics.beginDrag(id, x, y)) return false;
+    this.selectedId = id;
+    this._refreshDepthControl();
     this.activeDrag = {
       id,
       source,
@@ -785,6 +954,7 @@ export class SpatialWorldController {
       if (current) current.bodyMaterial.emissiveIntensity = 1.12;
     }
     if (this.canvas) this.canvas.style.cursor = id ? "grab" : "default";
+    this._refreshDepthControl();
   }
 
   _syncPanel(body, panel) {
@@ -851,6 +1021,12 @@ export class SpatialWorldController {
     setText("spatial-reset", copy.reset);
     setText("spatial-exit", copy.exit);
     if (this.repairButton) this.repairButton.textContent = copy.repair;
+    if (this.depthControl) {
+      const title = this.depthControl.querySelector("div > span");
+      const hint = this.depthControl.querySelector("div + div + div");
+      if (title) title.textContent = copy.depth;
+      if (hint) hint.textContent = copy.depthHint;
+    }
     for (const [id, panel] of this.panelGroups) {
       const texture = makeLabelTexture(
         this.document,
@@ -879,6 +1055,8 @@ export class SpatialWorldController {
         if (!body || body.detached) continue;
         body.x = Math.max(0, Math.min(this.physics.width - body.width, item.x * this.window.innerWidth));
         body.y = Math.max(0, Math.min(this.physics.height - body.height, item.y * this.window.innerHeight));
+        const depthBody = this.depthPhysics?.get(item.id);
+        if (depthBody && Number.isFinite(item.z)) depthBody.z = item.z;
       }
       this.hasCustomLayout = true;
     } catch (_) {
@@ -893,10 +1071,12 @@ export class SpatialWorldController {
       for (const definition of this.layout.panels) {
         const body = this.physics.get(definition.id);
         if (!body || body.detached) continue;
+        const depthBody = this.depthPhysics?.get(definition.id);
         panels.push({
           id: definition.id,
           x: Number((body.x / Math.max(1, this.physics.width)).toFixed(6)),
-          y: Number((body.y / Math.max(1, this.physics.height)).toFixed(6))
+          y: Number((body.y / Math.max(1, this.physics.height)).toFixed(6)),
+          z: Number((depthBody?.z ?? 0).toFixed(4))
         });
       }
       this.window.localStorage?.setItem(this.storageKey, JSON.stringify({ version: 1, panels }));
@@ -913,6 +1093,8 @@ export class SpatialWorldController {
     this.hasCustomLayout = false;
     this.physics.reset();
     this.depthPhysics?.reset();
+    this.selectedId = null;
+    this._refreshDepthControl();
     for (const control of this.protectedControls.values()) control.reset();
     for (const socket of this.protectedSockets.values()) socket.visible = false;
     for (const panel of this.panelGroups.values()) panel.group.visible = true;
@@ -933,6 +1115,7 @@ export class SpatialWorldController {
       this.canvas.removeEventListener("pointerdown", this._pointerDown);
       this.canvas.removeEventListener("pointerup", this._pointerUp);
       this.canvas.removeEventListener("pointercancel", this._pointerCancel);
+      this.canvas.removeEventListener("wheel", this._wheel);
     }
     if (this.scene) {
       this.scene.traverse(object => {
@@ -952,6 +1135,10 @@ export class SpatialWorldController {
     this.renderer?.domElement?.remove();
     this.repairButton?.remove();
     this.repairButton = null;
+    this.depthControl?.remove();
+    this.depthControl = null;
+    this.depthRange = null;
+    this.depthValue = null;
     this.protectedSockets.clear();
     this.panelGroups.clear();
     this.panelMeshes = [];
