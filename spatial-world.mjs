@@ -575,6 +575,18 @@ export class SpatialWorldController {
           body.initial.y = Math.max(0, Math.min(height - body.height, body.initial.y * sy));
         }
         this._syncPanel(body, this.panelGroups.get(definition.id));
+        const socket = this.protectedSockets.get(definition.id);
+        if (socket) {
+          const mountPoint = screenToWorld(
+            body.initial.x + body.width / 2,
+            body.initial.y + body.height / 2,
+            width,
+            height,
+            this.units
+          );
+          socket.position.x = mountPoint.x;
+          socket.position.y = mountPoint.y;
+        }
       }
       this.physics.setBounds(width, height);
       this.physics.draggedId = null;
