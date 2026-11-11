@@ -12,6 +12,9 @@ const checks = [
   ["WEB-06","Website foundation","Corporate overview includes modular engineering categories","index.html",/Many systems\. One engineering direction[\s\S]*data-veyrost-layout-item/],
   ["WEB-07","Website foundation","Project directory has category filters and an inventory grid","projects.html",/project-filter[\s\S]*id="project-grid"/],
   ["WEB-08","Website foundation","Dedicated contact and collaboration page","contact.html",/mailto:prafessorittiloot@gmail\.com/],
+  ["WEB-09","Website foundation","Complete inventory distinguishes 19 public repositories and one private project record","projects.html",/19 public repositories and one private project record/],
+  ["WEB-10","Website foundation","Private systems has its own draggable workspace category","studio.html",/data-layout-id="workspace-private"[\\s\\S]*1 PRIVATE PROJECT/],
+  ["WEB-11","Website foundation","Private project entries never expose a public source link","assets/veyrost-site.js",/p\\.visibility==="private"\\?'<span class="tag">OWNER ACCESS ONLY/],
 
   // Matter Engine: prototype behavior present in source.
   ["MAT-01","Matter Engine 2D","Physics world implementation","matter-engine.js",/class MatterWorld/],
@@ -47,6 +50,7 @@ const checks = [
   ["INT-05","Main-site AURA integration","AURA status HUD is mounted","index.html",/id="aura-status"/],
   ["INT-06","Main-site AURA integration","Opt-in MOVE control is gated by AURA state","assets/veyrost-site.js",/editButton.hidden=false/],
   ["INT-07","Main-site AURA integration","Shared UI exposes EN/RU/TJ labels","assets/veyrost-site.js",/translations=/],
+  ["INT-08","Main-site AURA integration","Language and settings controls tolerate unavailable browser storage","assets/veyrost-site.js",/let language="en";[\\s\\S]*try\\{language=localStorage\\.getItem[\\s\\S]*try\\{saved=localStorage\\.getItem\\(key\\)/],
 
   // Not yet implemented: each row is a specific acceptance requirement.
   ["3D-01","3D spatial environment","Three.js WebGL scene renderer","spatial-world.mjs",/new THREE\.WebGLRenderer/],
