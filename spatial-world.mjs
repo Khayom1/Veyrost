@@ -450,7 +450,6 @@ export class SpatialWorldController {
     const layout = computeSpatialLayout(width, height);
     this.layout = layout;
     if (this.physics) {
-      this.physics.setBounds(width, height);
       const sx = width / Math.max(1, previousWidth);
       const sy = height / Math.max(1, previousHeight);
       for (const definition of layout.panels) {
@@ -476,6 +475,7 @@ export class SpatialWorldController {
         }
         this._syncPanel(body, this.panelGroups.get(definition.id));
       }
+      this.physics.setBounds(width, height);
       this.physics.draggedId = null;
       this.activeDrag = null;
     }
