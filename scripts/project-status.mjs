@@ -77,7 +77,7 @@ const checks = [
   ["PRO-01","Protected control lifecycle","Protected navigation controls are anchored on mount","spatial-world.mjs",/protectedIds = new Set\(\["home", "ai-systems"\]\)[\s\S]*anchored: isProtected/],
   ["PRO-02","Protected control lifecycle","First pull resists and second pull detaches","protected-control.mjs",/first-pull-resisted[\s\S]*mount-released/],
   ["PRO-03","Protected control lifecycle","Detached control reveals fixed 3D mount socket","spatial-world.mjs",/_buildProtectedSocket[\s\S]*socket\.visible = true/],
-  ["PRO-04","Protected control lifecycle","Repair restores the mounted control and hides socket","spatial-world.mjs",/control\.beginRepair\(\)[\s\S]*this\.physics\.repair\(id\)[\s\S]*control\.completeRepair\(\)[\s\S]*socket\.visible = false/],
+  ["PRO-04","Protected control lifecycle","Repair restores mount, original depth and hides socket","spatial-world.mjs",/control\.beginRepair\(\)[\s\S]*this\.physics\.repair\(id\)[\s\S]*depthBody\.z = depthBody\.initialZ[\s\S]*control\.completeRepair\(\)[\s\S]*socket\.visible = false/],
   ["PRO-05","Protected control lifecycle","Repair action is localized in EN/RU/TJ","spatial-world.mjs",/repair: "REPAIR MOUNT"[\s\S]*repair: "ВОССТАНОВИТЬ КРЕПЛЕНИЕ"[\s\S]*repair: "ПАЙВАСТКУНИРО БАРҚАРОР КУН"/],
 
 
