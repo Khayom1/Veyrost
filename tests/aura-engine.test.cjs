@@ -90,6 +90,7 @@ test("pinch emits start and end events for draggable spatial objects", async () 
   pinched[4] = { x: 0.51, y: 0.25 };
   setFinger(pinched, 8, 6, true);
   controller._consume({ landmarks: [pinched] });
+  controller._consume({ landmarks: [pinched] });
 
   const pointing = hand();
   setFinger(pointing, 8, 6, true);
@@ -97,6 +98,7 @@ test("pinch emits start and end events for draggable spatial objects", async () 
   setFinger(pointing, 16, 14, false);
   setFinger(pointing, 20, 18, false);
   pointing[4] = { x: 0.1, y: 0.1 };
+  controller._consume({ landmarks: [pointing] });
   controller._consume({ landmarks: [pointing] });
 
   assert.ok(events.some(event => event.name === "pinch-start"));
@@ -120,9 +122,44 @@ test("losing the hand releases an active pinch", async () => {
   pinched[4] = { x: 0.51, y: 0.25 };
   setFinger(pinched, 8, 6, true);
   controller._consume({ landmarks: [pinched] });
+  controller._consume({ landmarks: [pinched] });
   controller._consume({ landmarks: [] });
   assert.ok(events.includes("pinch-cancel"));
   assert.ok(events.includes("hand-lost"));
   assert.equal(controller.lastGesture, "none");
   assert.equal(controller.cursor.style.visibility, "hidden");
+});
+
+
+test("pinch recognition scales with hand size and uses a wider release threshold", async () => {
+  const { classifyHand } = await apiPromise;
+  const points = hand();
+  points[0] = {x:0.5,y:0.9};
+  points[9] = {x:0.5,y:0.5};
+  points[4] = {x:0.5,y:0.34};
+  points[8] = {x:0.5,y:0.38};
+  assert.equal(classifyHand(points), "pinch");
+  points[4] = {x:0.5,y:0.24};
+  points[8] = {x:0.5,y:0.38};
+  assert.equal(classifyHand(points, undefined, "pinch"), "pinch");
+  points[4] = {x:0.5,y:0.18};
+  assert.equal(classifyHand(points), "move");
+});
+
+test("pinch must be stable for two frames before a click begins", async () => {
+  const { AuraController } = await apiPromise;
+  const events = [];
+  const controller = new AuraController({
+    video: {}, cursor: {style:{}},
+    windowRef: {innerWidth:200,innerHeight:100,scrollBy(){}},
+    documentRef: {elementFromPoint:()=>null,dispatchEvent(){}},
+    navigatorRef: {}, onGesture:name=>events.push(name)
+  });
+  controller.active = true;
+  const pinched = hand();
+  pinched[8]={x:0.52,y:0.25}; pinched[4]={x:0.51,y:0.25};
+  controller._consume({landmarks:[pinched]});
+  assert.equal(events.includes("pinch-start"),false);
+  controller._consume({landmarks:[pinched]});
+  assert.equal(events.includes("pinch-start"),true);
 });
