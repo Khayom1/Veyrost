@@ -32,6 +32,10 @@ The spatial layout is stored in browser `localStorage` under `veyrost:spatial-la
 - Emergency pause stops spatial interaction until resumed.
 - Selecting a panel without moving opens its destination; dragging moves the panel.
 
+## Protected controls and mount repair
+
+Two navigation panels (`HOME` and `AI SYSTEMS`) are mounted as protected controls. The first pull is resisted; the second pull releases the mount. The detached control can then be moved, while a fixed amber socket remains at its original mount position. A repair action appears only while at least one protected control is detached. Repair returns the control to its original coordinates, re-anchors its Matter body, hides the socket, and removes the repair action when all protected controls are restored. The lifecycle is isolated in `protected-control.mjs` and covered by deterministic Node tests. The repair is currently a direct user-triggered restoration; technician characters, cable animation, vehicle/ladder sequence, and audio are not part of this implementation.
+
 ## Honest scope boundary
 
 The current scene is a 3D-rendered perspective scene with independent depth layers, beveled physical panel meshes, animated tilt and a responsive perspective camera. Panel movement and collision still use a 2D Matter physics world; the interface is therefore depth-rendered but not a full 3D rigid-body simulation. It does **not** yet provide:
