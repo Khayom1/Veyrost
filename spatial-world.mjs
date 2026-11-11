@@ -987,6 +987,13 @@ export class SpatialWorldController {
         depthBody.height = planar.height;
       }
       this.depthPhysics.step(delta);
+      for (const depthBody of this.depthPhysics.bodies.values()) {
+        const boundedZ = Math.max(-1.25, Math.min(1.25, depthBody.z));
+        if (boundedZ !== depthBody.z) {
+          depthBody.z = boundedZ;
+          depthBody.velocityZ = 0;
+        }
+      }
     }
 
     for (const [id, panel] of this.panelGroups) {
