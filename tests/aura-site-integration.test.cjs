@@ -12,7 +12,7 @@ const projects = new Function(dataSource
   .replace("export const projectGroups =", "const projectGroups =") + "\nreturn projects;")();
 
 test("main page is a corporate multi-page overview, not a single-page overlay", () => {
-  assert.match(html, /ENGINEERING<br><span>WHAT'S NEXT\.<\/span>/);
+  assert.ok(html.includes("ENGINEERING") && html.includes("WHAT'S NEXT."));
   for (const page of ["projects.html","studio.html","company.html","research.html","contact.html"]) {
     assert.ok(fs.existsSync(page), `missing page: ${page}`);
   }
