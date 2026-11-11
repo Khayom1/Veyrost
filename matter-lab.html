@@ -173,7 +173,12 @@ body.aura-visual .workspace{background-image:linear-gradient(#74e8ff0d 1px,trans
   window.addEventListener("pointermove",moveItemDrag);
   window.addEventListener("pointerup",endItemDrag);
   window.addEventListener("pointercancel",endItemDrag);
+  function createProtectedBody(id){
+    const label=id.toUpperCase();
+    return world.add({id:"protected-"+id,x:0,y:0,width:label==="SETTINGS"?112:96,height:42,mass:3.6,elasticity:.12,friction:.62,maxCompression:.08,material:"metal",anchored:true,collisionEnabled:false});
+  }
   function addDefaultItems(){
+    createProtectedBody("menu");createProtectedBody("settings");
     const w=items.clientWidth,h=items.clientHeight;
     createItem("projects","PROJECTS",Math.max(26,w*.16),Math.max(115,h*.42),{mass:1.5,material:"hybrid"});
     createItem("contact","CONTACT",Math.max(170,w*.42),Math.max(170,h*.56),{mass:2.1,material:"metal",elasticity:.24});
@@ -198,8 +203,9 @@ body.aura-visual .workspace{background-image:linear-gradient(#74e8ff0d 1px,trans
     const state=protectedState[id],button=$(id==="menu"?"menuLock":"settingsLock");
     if(!editMode){showToast(t("press"));return;}
     const dx=event.clientX,dy=event.clientY;
-    state.attempts+=1;
-    if(state.attempts===1){
+    const bodyId="protected-"+id;
+    const release=world.tryDetach(bodyId);
+    if(!release.detached){
       button.classList.add("shake");setTimeout(()=>button.classList.remove("shake"),550);
       showToast(t("heavy"));return;
     }
@@ -208,9 +214,13 @@ body.aura-visual .workspace{background-image:linear-gradient(#74e8ff0d 1px,trans
     socket.id=id+"Socket";button.replaceWith(socket);state.socket=true;
     const startX=clamp(dx-wr.left-54,0,Math.max(0,items.clientWidth-122));
     const startY=clamp(dy-wr.top-25,0,Math.max(0,items.clientHeight-58));
-    const b=createItem("detached-"+id,id.toUpperCase(),startX,startY,{mass:3.6,material:"metal",elasticity:.12,friction:.62,maxCompression:.08});
-    b.detached=true;render();
-    const item=bodies.get(b.id);item.classList.add("detached");
+    const b=world.get(bodyId);
+    b.x=startX;b.y=startY;b.collisionEnabled=true;
+    const item=document.createElement("button");
+    item.type="button";item.className="matter-item metal detached";item.textContent=id.toUpperCase();
+    item.dataset.body=bodyId;item.setAttribute("aria-label",id.toUpperCase()+" detached physical control");
+    items.appendChild(item);bodies.set(bodyId,item);bindItem(item);
+    render();
     $("detachedCallout").classList.add("show");
     const p=pointerPos(event);world.beginDrag(b.id,p.x,p.y);activePointer=event.pointerId;
     dragSample={x:event.clientX,y:event.clientY,time:performance.now(),vx:0,vy:0};
@@ -252,10 +262,12 @@ body.aura-visual .workspace{background-image:linear-gradient(#74e8ff0d 1px,trans
   });
   function restoreAll(){
     for(const [id,state] of Object.entries(protectedState)){
-      state.attempts=0;
+      const bodyId="protected-"+id;
+      if(world.get(bodyId)){world.remove(bodyId);bodies.get(bodyId)?.remove();bodies.delete(bodyId);}
       const socket=$(id+"Socket");
       if(socket){const btn=document.createElement("button");btn.className="protected";btn.id=id==="menu"?"menuLock":"settingsLock";btn.dataset.protected=id;btn.textContent=state.label;socket.replaceWith(btn);bindProtected(id);}
       state.socket=false;
+      createProtectedBody(id);
     }
     for(const [id] of Array.from(bodies)){if(id.startsWith("detached-")){world.remove(id);bodies.get(id)?.remove();bodies.delete(id);}}
     $("detachedCallout").classList.remove("show");
