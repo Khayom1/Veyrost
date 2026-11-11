@@ -40,3 +40,30 @@ test("main website exposes the AURA entry point in all site languages", () => {
 test("no literal escaped newline is left after the AURA module", () => {
   assert.doesNotMatch(html, /<\/script>\\n<\/body>/);
 });
+
+test("AURA activation opens the integrated spatial scene", () => {
+  assert.match(html, /id="spatial-stage"/);
+  assert.match(html, /id="spatial-canvas-mount"/);
+  assert.match(html, /import\("\.\/spatial-world\.mjs"\)/);
+  assert.match(html, /new SpatialWorldController/);
+});
+
+test("3D controls expose reset and camera-safe exit actions", () => {
+  assert.match(html, /id="spatial-reset"/);
+  assert.match(html, /id="spatial-exit"/);
+  assert.match(html, /spatialWorld\?\.resetLayout\(\)/);
+  assert.match(html, /spatialWorld\?\.destroy\(\)/);
+});
+
+test("AURA pinch lifecycle is connected to 3D drag and release", () => {
+  assert.match(html, /name === "pinch-start"[\s\S]*beginHandPress/);
+  assert.match(html, /name === "pinch-end"[\s\S]*endHandPress/);
+  assert.match(html, /name === "pinch-cancel"/);
+  assert.match(html, /spatialWorld\?\.onHandMove/);
+});
+
+test("spatial navigation maps cards back to site sections and Matter Lab", () => {
+  assert.match(html, /function navigateFromSpatial/);
+  assert.match(html, /document\.querySelector\(target\)/);
+  assert.match(html, /window\.location\.href = target/);
+});
