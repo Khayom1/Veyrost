@@ -69,10 +69,15 @@ function restorePositions(){
 }
 function savePositions(){
   const positions={};
+  try {
+    const existing=JSON.parse(localStorage.getItem(LAYOUT_KEY)||"{}");
+    if(existing&&typeof existing==="object")Object.assign(positions,existing);
+  } catch (_) {}
   movable().forEach(el=>{
-    const value=(el.style.translate||"0px 0px").split(/\s+/);
+    const value=(el.style.translate||"0px 0px").split(/\\s+/);
     const x=Number.parseFloat(value[0])||0,y=Number.parseFloat(value[1])||0;
     if(x||y)positions[el.dataset.layoutId]={x,y};
+    else delete positions[el.dataset.layoutId];
   });
   try{localStorage.setItem(LAYOUT_KEY,JSON.stringify(positions));toast((translations[language]||translations.en).saved)}catch(_){toast("Could not save this layout on the device.")};
 }
