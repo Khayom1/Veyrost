@@ -409,6 +409,7 @@ export class SpatialWorldController {
     );
     this.cursor3D.add(ring, dot);
     this.cursor3D.position.z = 1.4;
+    this.cursor3D.visible = false;
     this.scene.add(this.cursor3D);
   }
 
@@ -466,7 +467,6 @@ export class SpatialWorldController {
 
   _pointerMove(event) {
     this._movePointer(event.clientX, event.clientY, "mouse");
-    if (this.activeDrag?.source === "mouse") this._updateDrag(event.clientX, event.clientY);
   }
 
   _pointerDown(event) {
@@ -573,7 +573,16 @@ export class SpatialWorldController {
   }
 
   onHandMove(x, y) {
+    if (this.cursor3D) this.cursor3D.visible = true;
     this._movePointer(x, y, "hand");
+  }
+
+  onHandLost() {
+    if (this.activeDrag?.source === "hand") {
+      this.physics.endDrag(0, 0);
+      this.activeDrag = null;
+    }
+    if (this.cursor3D) this.cursor3D.visible = false;
   }
 
   setPaused(paused) {
