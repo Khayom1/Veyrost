@@ -27,10 +27,14 @@ jobs:
         run: |
           node -e 'const fs=require("node:fs"); const html=fs.readFileSync("aura-lab.html","utf8"); const match=html.match(/<script type="module">([\s\S]*?)<\/script>/i); if(!match) throw new Error("AURA lab module not found"); fs.writeFileSync("/tmp/aura-lab.mjs",match[1]);'
           node --check /tmp/aura-lab.mjs
-      - name: Check main website AURA module syntax
+      - name: Check shared website modules
         run: |
-          node -e 'const fs=require("node:fs"); const html=fs.readFileSync("index.html","utf8"); const scripts=[...html.matchAll(/<script type="module">([\s\S]*?)<\/script>/gi)]; if(!scripts.length) throw new Error("Main AURA module not found"); fs.writeFileSync("/tmp/index-aura.mjs",scripts[scripts.length-1][1]);'
-          node --check /tmp/index-aura.mjs
+          cp assets/veyrost-site.js /tmp/veyrost-site.mjs
+          cp assets/projects-data.js /tmp/veyrost-projects.mjs
+          node --check /tmp/veyrost-site.mjs
+          node --check /tmp/veyrost-projects.mjs
+          node -e 'const fs=require("node:fs"); for (const file of ["projects.html","studio.html"]) { const html=fs.readFileSync(file,"utf8"); const scripts=[...html.matchAll(/<script type="module">([\s\S]*?)<\/script>/gi)]; scripts.forEach((match,index)=>fs.writeFileSync("/tmp/"+file.replace(".html","")+"-"+index+".mjs",match[1])); }'
+          for file in /tmp/projects-*.mjs /tmp/studio-*.mjs; do [ -f "$file" ] && node --check "$file"; done
       - name: Check 3D spatial engine syntax
         run: |
           node --check spatial-math.mjs
