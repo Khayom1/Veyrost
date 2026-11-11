@@ -4,6 +4,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const html = fs.readFileSync("index.html", "utf8");
 const site = fs.readFileSync("assets/veyrost-site.js", "utf8");
+const auraEngine = fs.readFileSync("aura-engine.mjs", "utf8");
 const css = fs.readFileSync("assets/veyrost-corporate.css", "utf8");
 const dataSource = fs.readFileSync("assets/projects-data.js", "utf8");
 const projects = new Function(dataSource
@@ -39,7 +40,7 @@ test("shared AURA controller requests access only after the user activates the b
   assert.match(site, /auraButton\.addEventListener\("click"/);
   assert.match(site, /await controller\.start\(\)/);
   assert.match(site, /await controller\.stop\(\)/);
-  assert.match(site, /getUserMedia/);
+  assert.match(auraEngine, /getUserMedia/);
 });
 
 test("layout editing requires AURA and the explicit MOVE ITEMS control", () => {
