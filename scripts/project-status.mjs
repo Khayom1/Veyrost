@@ -10,7 +10,7 @@ const checks = [
   ["WEB-04","Website foundation","EN/RU/TJ language selectors","index.html",/data-lang="en"[\s\S]*data-lang="ru"[\s\S]*data-lang="tj"/],
   ["WEB-05","Website foundation","Multi-page navigation includes projects, workspace and company","index.html",/href="projects\.html"[\s\S]*href="studio\.html"[\s\S]*href="company\.html"/],
   ["WEB-06","Website foundation","Corporate overview includes modular engineering categories","index.html",/Many systems\. One engineering direction[\s\S]*data-veyrost-layout-item/],
-  ["WEB-07","Website foundation","Project directory and source inventory page","projects.html",/id="project-grid"[\s\S]*project-filter/],
+  ["WEB-07","Website foundation","Project directory has category filters and an inventory grid","projects.html",/project-filter[\s\S]*id="project-grid"/],
   ["WEB-08","Website foundation","Dedicated contact and collaboration page","contact.html",/mailto:prafessorittiloot@gmail\.com/],
 
   // Matter Engine: prototype behavior present in source.
