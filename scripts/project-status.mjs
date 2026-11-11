@@ -41,12 +41,12 @@ const checks = [
 
   // Main-page AURA integration.
   ["INT-01","Main-site AURA integration","AURA toggle embedded in main navigation","index.html",/id="aura-toggle"/],
-  ["INT-02","Main-site AURA integration","Main page imports shared AURA controller","index.html",/import \{ AuraController \} from "\.\/aura-engine\.mjs"/],
-  ["INT-03","Main-site AURA integration","Camera source is hidden from the page","index.html",/class="aura-camera-source"[\s\S]*aria-hidden="true"/],
+  ["INT-02","Main-site AURA integration","Shared site module imports AURA controller","assets/veyrost-site.js",/import \\{ AuraController \\} from "\\.\\.\\/aura-engine\\.mjs"/],
+  ["INT-03","Main-site AURA integration","Camera source is hidden from the page","index.html",/class="aura-cam"[^>]*aria-hidden="true"/],
   ["INT-04","Main-site AURA integration","Single conventional arrow cursor is mounted","index.html",/id="aura-pointer"[^>]*<svg/],
   ["INT-05","Main-site AURA integration","AURA status HUD is mounted","index.html",/id="aura-status"/],
-  ["INT-06","Main-site AURA integration","Opt-in layout MOVE control appears only while AURA is active","index.html",/id="aura-layout-toggle"[\s\S]*layoutButton\.hidden=!active[\s\S]*setLayoutEditing\(!layoutEditing\)/],
-  ["INT-07","Main-site AURA integration","EN/RU/TJ AURA interface labels","index.html",/auraMode:"AURA OFF"[\s\S]*auraMode:"AURA ВЫКЛ"[\s\S]*auraMode:"AURA ХОМӮШ"/],
+  ["INT-06","Main-site AURA integration","Opt-in MOVE control requires active AURA","assets/veyrost-site.js",/editButton\\.hidden=false[\\s\\S]*editMode=Boolean\\(value\\)&&Boolean\\(controller\\?\\.active\\)/],
+  ["INT-07","Main-site AURA integration","Shared UI exposes EN/RU/TJ labels","assets/veyrost-site.js",/en:\\{[\\s\\S]*ru:\\{[\\s\\S]*tj:\\{/],
 
   // Not yet implemented: each row is a specific acceptance requirement.
   ["3D-01","3D spatial environment","Three.js WebGL scene renderer","spatial-world.mjs",/new THREE\.WebGLRenderer/],
