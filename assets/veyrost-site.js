@@ -196,7 +196,9 @@ if(projectGrid&&Array.isArray(window.VEYROST_PROJECTS)){
         <div class="project-meta"><span class="tag">${escapeHTML(p.type)}</span><span class="tag">${escapeHTML(p.updated)}</span></div>
         <div class="card-foot"><span class="project-repo">${p.visibility==="private"?"PRIVATE REPOSITORY":"★ "+p.stars}</span>${p.visibility==="private"?'<span class="tag">OWNER ACCESS ONLY</span>':`<a class="arrow-link" href="${p.url}" target="_blank" rel="noopener">SOURCE REPOSITORY ↗</a>`}</div>
       </article>`).join(""):'<div class="empty-state">No projects match this search. Try another term or category.</div>';
-    if(count)count.textContent=`${list.length} / ${all.length} PROJECTS`;
+    const publicMatches=list.filter(p=>p.visibility!=="private").length;
+    const privateMatches=list.length-publicMatches;
+    if(count)count.textContent=`${publicMatches} PUBLIC + ${privateMatches} PRIVATE`;
     registerMovable();restorePositions();
   };
   function escapeHTML(value){return String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]))}
