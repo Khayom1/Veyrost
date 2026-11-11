@@ -483,11 +483,13 @@ export class SpatialWorldController {
     for (const [id, control] of this.protectedControls) {
       if (!control.beginRepair()) continue;
       const body = this.physics?.get(id);
+      const depthBody = this.depthPhysics?.get(id);
       if (body) {
         body.vx = 0;
         body.vy = 0;
         body.dragging = false;
         this.physics.repair(id);
+        if (depthBody) { depthBody.anchored = true; depthBody.velocityZ = 0; }
         control.completeRepair();
         const socket = this.protectedSockets.get(id);
         if (socket) socket.visible = false;
@@ -685,6 +687,8 @@ export class SpatialWorldController {
         this._emitStatus("protected-resisting");
         return false;
       }
+      const depthBody = this.depthPhysics?.get(id);
+      if (depthBody) depthBody.anchored = false;
       const socket = this.protectedSockets.get(id);
       if (socket) socket.visible = true;
       if (this.repairButton) this.repairButton.style.display = "block";
@@ -803,7 +807,17 @@ export class SpatialWorldController {
     const delta = Math.min(this.clock.getDelta(), 1 / 30);
     const elapsed = this.clock.elapsedTime;
     this.physics.step(delta);
-    this.depthPhysics?.step(delta);
+    if (this.depthPhysics) {
+      for (const [id, depthBody] of this.depthPhysics.bodies) {
+        const planar = this.physics.get(id);
+        if (!planar) continue;
+        depthBody.x = planar.x + planar.width / 2;
+        depthBody.y = planar.y + planar.height / 2;
+        depthBody.width = planar.width;
+        depthBody.height = planar.height;
+      }
+      this.depthPhysics.step(delta);
+    }
 
     for (const [id, panel] of this.panelGroups) {
       const body = this.physics.get(id);
