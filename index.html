@@ -312,7 +312,7 @@ const controller = new AuraController({
     if (name === "pinch-end" && Number.isFinite(extra.x) && Number.isFinite(extra.y)) {
       spatialWorld?.endHandPress(extra.x, extra.y);
     }
-    if (name === "cancel" || name === "hand-lost") {
+    if (name === "pinch-cancel" || name === "cancel" || name === "hand-lost") {
       spatialWorld?.cancelActiveInteraction();
       if (name === "hand-lost") spatialWorld?.onHandLost();
     }
