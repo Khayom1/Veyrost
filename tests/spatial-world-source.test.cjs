@@ -71,3 +71,8 @@ test("custom depth is serialized and restored with legacy layout compatibility",
   assert.match(source, /if \(depthBody && Number\.isFinite\(item\.z\)\) depthBody\.z = item\.z/);
   assert.match(source, /this\.depthControl\?\.remove\(\)/);
 });
+
+test("depth HUD stays clear of repair action and AURA pinches bypass its canvas raycast", () => {
+  assert.match(source, /repairButton\?\.style\.display === "block"[\s\S]*max\(132px, env\(safe-area-inset-bottom\)\)/);
+  assert.match(source, /elementFromPoint\?\.\(x, y\)\?\.closest\?\.\("\.spatial-depth-control, \.spatial-repair-control"\)/);
+});
