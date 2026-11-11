@@ -1,77 +1,105 @@
-# VEYROST — verified technical status
+# VEYROST — verified engineering status
 
 **Audit date:** 2026-11-11  
-**Branch:** `feat/spatial-persistence-hardening`  
-**Audit source:** `node scripts/project-status.mjs`  
-**Validation:** GitHub Actions was not used for this continuation, per instruction. The five protected-control criteria, six depth-physics criteria, and seven interactive-depth criteria were checked directly against committed source. No full Node regression run or physical-device test was performed for this continuation.
+**Branch:** feat/engineering-command-center  
+**Audit source:** node scripts/project-status.mjs  
+**CI:** source syntax, regression tests and source-evidence audit are required before merge.
 
 ## Current source-evidence result
 
-| Area | Implemented checks | Total checks | Result |
+The checklist uses binary source evidence. It does not measure visual quality, user experience, production readiness, or real-device reliability.
+
+| Area | Implemented | Total | Result |
 |---|---:|---:|---:|
-| Website foundation | 8 | 8 | 100.00% |
+| Website foundation and project inventory | 11 | 11 | 100.00% |
 | Matter Engine 2D | 9 | 9 | 100.00% |
 | AURA hand controller | 13 | 13 | 100.00% |
-| Main-site AURA integration | 7 | 7 | 100.00% |
-| Spatial rendered interface (perspective depth-rendered scope) | 8 | 8 | 100.00% |
-| Depth-axis collision physics (hybrid 2.5D) | 6 | 6 | 100.00% |
+| Main-site AURA integration | 8 | 8 | 100.00% |
+| 3D spatial engine source | 8 | 9 | 88.89% |
+| Depth-axis collision physics | 6 | 6 | 100.00% |
 | Interactive depth controls | 7 | 7 | 100.00% |
 | Spatial layout persistence | 4 | 4 | 100.00% |
 | Protected control lifecycle | 5 | 5 | 100.00% |
 | Technician service sequence | 0 | 8 | 0.00% |
 | Dialogue and spatial audio | 0 | 5 | 0.00% |
+| Engineering agent system | 0 | 3 | 0.00% |
 | Validation and release | 4 | 6 | 66.67% |
-| **Total** | **71** | **86** | **82.56%** |
+| **Total** | **75** | **94** | **79.79%** |
 
-- Implemented source criteria: **71 / 86**
-- Pending source criteria: **15 / 86**
-- Protected-control, depth-physics and interactive-depth source-evidence checks: **18 / 18** matched (static source verification; not a runtime test)
-- The last full CI pass (`43058327625`) predates the perspective-depth, protected-control, depth-physics and interactive-depth changes; it is not validation of the latest branch head.
+- Implemented source criteria: **75 / 94**
+- Pending criteria: **19 / 94**
+- Failed source criteria: **0**
+- Any later source edit must be validated again before merge.
 
-## Scope and limitations
+## What now matches the requested direction
 
-The score is a binary checklist ratio:
+### Corporate website and repository directory
 
-`implemented source criteria / all declared criteria × 100`
+- The website is a multi-page engineering portfolio, not a single-page landing page.
+- Routes include Overview, Projects, Workspace, Company, Research and Contact.
+- The inventory contains **19 public repositories and one private project record**.
+- The private record has no public source URL and does not expose code or implementation details.
+- Projects can be searched and filtered by engineering domain.
+- The Workspace has seven movable category modules. Project cards and workspace cards use the same opt-in layout editor.
+- AURA provides the cursor; MOVE ITEMS is a separate, explicit action.
+- Layout positions are stored locally in the current browser. Cloud sync is not configured.
 
-Every criterion has equal weight. It measures whether the defined source-level evidence exists. It is not a score for visual quality, production readiness, engineering effort, or physical-device reliability.
+### Matter Engine and AURA
 
-The protected-control lifecycle is implemented for HOME and AI SYSTEMS: first-pull resistance, second-pull release, fixed mount socket, localized repair action, and restoration to original coordinates. This is a functional interface repair flow, not the planned technician animation.
+- The 2D Matter Engine core and protected-control lifecycle have source evidence and regression coverage.
+- AURA requests camera access only after the user activates it; the shared site controller provides a conventional arrow cursor and hand gestures.
+- Layout editing is opt-in and the project directory/category cards are movable with mouse, touch and hand pinch.
+- Browser-storage failures are handled without aborting language/settings initialization.
 
-The spatial interface now uses a Three.js **perspective camera** and six independently layered panel depths, with per-panel tilt and floating motion. Matter handles panel movement and collision in X/Y; the new depth solver adds Z-axis collision resolution for panels whose X/Y projections overlap. The combined system is hybrid **2.5D**, not a full 6-DoF rigid-body engine.
+## Critical integration boundary
 
-Depth-axis collision is now integrated: projected X/Y overlap checks, mass-weighted positional correction, restitution impulses, anchored-body handling, synchronization with Matter panel positions, and deterministic depth reset. Interactive depth editing now includes a touch-friendly slider, AURA-clickable step buttons, mouse wheel and Shift+wheel precision control. The depth HUD is repositioned when the repair action appears, and AURA pinches on the HUD are excluded from the underlying 3D raycast. Depth is clamped to `-1.25..1.25`, persists in the existing version-1 layout format, and is backward-compatible with records that contain only X/Y. This has not yet been confirmed by a full runtime regression or on a physical phone.
+The 3D source modules exist and source-level checks cover renderer setup, panel physics, depth collision, controls and persistence. **The current corporate website does not mount SpatialWorldController from any public route.** Therefore the floating 3D scene and depth HUD are not yet live website features. One explicit integration acceptance item remains pending.
 
-Layout persistence is now implemented:
-- Versioned localStorage payload.
-- Normalized panel positions.
-- Validation of saved versions, panel IDs, duplicates and numeric coordinates.
-- Responsive position scaling on viewport changes.
-- Reset clears saved data and restores the default layout.
-- Storage errors fall back without crashing the scene.
+The current physics scope is hybrid **2.5D**: Matter owns X/Y movement and a separate depth solver handles Z separation. This is not a full 6-DoF rigid-body engine.
 
-## Still not implemented
+## What remains
 
-- Rigged, realistic service technicians.
-- Service vehicle arrival/departure and physical ladder handling.
-- Tug-of-war with a held detached interface control.
-- Technician-controlled interface lock and repair sequence.
-- Cable reconnection animation.
-- Localized character dialogue and emotion state machine.
-- Spatial character audio and synchronized mechanical sound.
-- Physical Android device camera/gesture testing.
-- Cross-browser, lighting and sustained-performance validation.
+### VEYROST Service Crew — 0/8
+
+- Rigged technician characters.
+- Service vehicle arrival/departure.
+- Physical ladder extraction, unfolding and climbing.
+- Tug-of-war with a held detached interface component.
+- Technician-controlled maintenance lock.
+- Hand-animated cable reconnection and repair.
+- Full repair sequence and interface restoration.
+
+### Dialogue and spatial audio — 0/5
+
+- Localized character voice lines (EN/RU/TJ).
+- Emotion and dialogue state machine.
+- Positional character audio.
+- Synchronized mechanical sound effects.
+- Mute, permission and accessibility controls.
+
+### Engineering agent system — 0/3
+
+- Repository planning and task orchestration runtime.
+- Automated repository audit and issue-triage agents.
+- Guarded implementation, review, test and release agents.
+
+The current repository contains GitHub Actions for syntax and regression checks, but **it does not contain the autonomous multi-agent engineering system described in the original request**.
+
+### Validation — 4/6
+
+- Android physical-device camera and gesture acceptance remains pending.
+- Cross-browser, lighting and sustained-performance validation remains pending.
 
 ## Reproduce the audit
 
-From the repository root:
+From the repository root, with Node.js 22:
 
 ```sh
 node --check aura-engine.mjs
 node --check spatial-math.mjs
 node --check spatial-world.mjs
-node --test tests/*.test.cjs
+node --test tests/*.test.cjs tests/*.test.mjs
 node scripts/project-status.mjs
 ```
 
-GitHub Actions is supplementary. If Actions is blocked by plan limits, use the commands above in a local Node.js environment; a blocked runner is not proof of a source-code defect.
+A CI pass proves these automated checks passed. It does not prove the camera works reliably on every phone or that the 3D scene is integrated into a public route.
