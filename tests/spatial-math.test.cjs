@@ -69,3 +69,14 @@ test("responsive layout scaling preserves normalized panel positions", async () 
   const scaled = scalePanelLayout([{ id: "home", x: 100, y: 200, width: 120, height: 50 }], 400, 800, 800, 400);
   assert.deepEqual(scaled, [{ id: "home", x: 200, y: 100, width: 240, height: 25 }]);
 });
+
+test("saved spatial layouts preserve validated depth and remain backward compatible", async () => {
+  const { validateSavedLayout } = await apiPromise;
+  assert.deepEqual(validateSavedLayout({ version: 1, panels: [
+    { id: "home", x: 0.2, y: 0.3, z: 0.85 },
+    { id: "projects", x: 0.4, y: 0.5, z: 9 }
+  ] }), [{ id: "home", x: 0.2, y: 0.3, z: 0.85 }]);
+  assert.deepEqual(validateSavedLayout({ version: 1, panels: [
+    { id: "home", x: 0.2, y: 0.3 }
+  ] }), [{ id: "home", x: 0.2, y: 0.3 }]);
+});
