@@ -183,6 +183,9 @@ export class AuraController {
   _consume(result) {
     const landmarks = result?.landmarks?.[0];
     if (!landmarks || landmarks.length < 21) {
+      if (this.lastGesture === "pinch") {
+        this._gesture("pinch-end", this.lastPosition || {});
+      }
       if (this.cursor) this.cursor.style.visibility = "hidden";
       this.lastGesture = "none";
       this.lastPosition = null;
@@ -210,6 +213,11 @@ export class AuraController {
     try { this.onCursorMove({ ...point }); } catch (_) {}
 
     const gesture = classifyHand(landmarks);
+    if (gesture === "pinch" && this.lastGesture !== "pinch") {
+      this._gesture("pinch-start", { x: point.x, y: point.y });
+    } else if (gesture !== "pinch" && this.lastGesture === "pinch") {
+      this._gesture("pinch-end", { x: point.x, y: point.y });
+    }
     if (gesture !== this.lastGesture) this._gesture(gesture, { x: point.x, y: point.y });
 
     if (gesture === "fist") {
