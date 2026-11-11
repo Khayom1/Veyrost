@@ -999,6 +999,7 @@ export class SpatialWorldController {
       panel.group.rotation.x += Math.sin(elapsed * 0.31 + index) * 0.00008;
       panel.group.rotation.y += Math.cos(elapsed * 0.27 + index * 0.7) * 0.00007;
     }
+    if (this.selectedId || this.hoveredId) this._refreshDepthControl();
 
     this.core.rotation.y = elapsed * 0.24;
     this.core.rotation.x = Math.sin(elapsed * 0.19) * 0.18;
@@ -1093,6 +1094,10 @@ export class SpatialWorldController {
     this.hasCustomLayout = false;
     this.physics.reset();
     this.depthPhysics?.reset();
+    for (const [id, depthBody] of this.depthPhysics?.bodies ?? []) {
+      const panel = this.panelGroups.get(id);
+      if (panel) panel.group.userData.depth = depthBody.z;
+    }
     this.selectedId = null;
     this._refreshDepthControl();
     for (const control of this.protectedControls.values()) control.reset();
