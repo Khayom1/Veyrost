@@ -1,5 +1,6 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js";
 import "./matter-engine.js";
+import { DepthPhysicsWorld } from "./spatial-depth-physics.mjs";
 import { createProtectedControlRegistry, PROTECTED_CONTROL_STATES } from "./protected-control.mjs";
 import {
   computeSpatialLayout,
@@ -119,6 +120,7 @@ export class SpatialWorldController {
     this.scene = null;
     this.camera = null;
     this.physics = null;
+    this.depthPhysics = null;
     this.clock = null;
     this.resizeObserver = null;
     this.panelGroups = new Map();
@@ -156,6 +158,7 @@ export class SpatialWorldController {
       gravity: 0,
       positionCorrection: 0.86
     });
+    this.depthPhysics = new DepthPhysicsWorld({ restitution: 0.38, friction: 0.1, maxSpeed: 2.8 });
 
     this.renderer = new THREE.WebGLRenderer({
       alpha: true,
@@ -373,7 +376,7 @@ export class SpatialWorldController {
 
       group.userData.panelId = definition.id;
       const panelIndex = layout.panels.indexOf(definition);
-      group.userData.depth = [-0.9, 0.55, -0.35, 0.85, -0.65, 0.25][panelIndex] ?? 0;
+      group.userData.depth = [-0.22, 0.18, -0.12, 0.24, -0.18, 0.12][panelIndex] ?? 0;
       group.rotation.set(
         panelIndex % 2 ? -0.035 : 0.035,
         panelIndex % 3 === 0 ? -0.055 : 0.055,
@@ -397,6 +400,17 @@ export class SpatialWorldController {
         maxCompression: 0.16,
         material: "hybrid",
         collisionEnabled: true,
+        anchored: isProtected
+      });
+      this.depthPhysics.add({
+        id: definition.id,
+        x: definition.x + definition.width / 2,
+        y: definition.y + definition.height / 2,
+        z: group.userData.depth,
+        width: definition.width,
+        height: definition.height,
+        depth: 0.22,
+        mass: isProtected ? 2.4 : 1.2,
         anchored: isProtected
       });
       this._syncPanel(bodyState, this.panelGroups.get(definition.id));
@@ -789,13 +803,15 @@ export class SpatialWorldController {
     const delta = Math.min(this.clock.getDelta(), 1 / 30);
     const elapsed = this.clock.elapsedTime;
     this.physics.step(delta);
+    this.depthPhysics?.step(delta);
 
     for (const [id, panel] of this.panelGroups) {
       const body = this.physics.get(id);
       this._syncPanel(body, panel);
       const index = this.layout.panels.findIndex(item => item.id === id);
       panel.group.rotation.z = Math.sin(elapsed * 0.42 + index * 1.1) * 0.012;
-      panel.group.position.z = (panel.group.userData.depth ?? 0) + Math.sin(elapsed * 0.8 + index) * 0.035;
+      const depthBody = this.depthPhysics?.get(id);
+      if (depthBody) panel.group.position.z = depthBody.z + Math.sin(elapsed * 0.8 + index) * 0.035;
       panel.group.rotation.x += Math.sin(elapsed * 0.31 + index) * 0.00008;
       panel.group.rotation.y += Math.cos(elapsed * 0.27 + index * 0.7) * 0.00007;
     }
