@@ -20,7 +20,7 @@ test("distance2d measures normalized landmark distance", async () => {
 test("pinch is classified before other finger poses", async () => {
   const { classifyHand } = await apiPromise;
   const points=hand();
-  points[4]={x:0.5,y:0.4}; points[8]={x:0.52,y:0.4};
+  points[8]={x:0.52,y:0.25}; points[4]={x:0.51,y:0.25};
   setFinger(points,8,6,true);
   assert.equal(classifyHand(points),"pinch");
 });
