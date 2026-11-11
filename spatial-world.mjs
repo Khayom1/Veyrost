@@ -680,21 +680,50 @@ export class SpatialWorldController {
   }
 
   _buildCursor() {
+    // A familiar desktop-style arrow: white face, dark outline, no halo or reticle.
+    // The group origin is the arrow tip, so the tracked fingertip maps to the click point.
     this.cursor3D = new THREE.Group();
-    const ring = new THREE.Mesh(
-      new THREE.TorusGeometry(0.105, 0.012, 8, 40),
+    const arrow = new THREE.Shape();
+    arrow.moveTo(0, 0);
+    arrow.lineTo(0.018, -0.205);
+    arrow.lineTo(0.067, -0.151);
+    arrow.lineTo(0.105, -0.226);
+    arrow.lineTo(0.135, -0.211);
+    arrow.lineTo(0.096, -0.137);
+    arrow.lineTo(0.169, -0.127);
+    arrow.closePath();
+
+    const face = new THREE.Mesh(
+      new THREE.ShapeGeometry(arrow),
       new THREE.MeshBasicMaterial({
-        color: 0xb6f7ff,
-        transparent: true,
-        opacity: 0.95
+        color: 0xffffff,
+        side: THREE.DoubleSide,
+        depthTest: false,
+        depthWrite: false
       })
     );
-    const dot = new THREE.Mesh(
-      new THREE.SphereGeometry(0.045, 12, 12),
-      new THREE.MeshBasicMaterial({ color: 0xeaffff })
+    const outlinePoints = [
+      new THREE.Vector3(0, 0, 0.002),
+      new THREE.Vector3(0.018, -0.205, 0.002),
+      new THREE.Vector3(0.067, -0.151, 0.002),
+      new THREE.Vector3(0.105, -0.226, 0.002),
+      new THREE.Vector3(0.135, -0.211, 0.002),
+      new THREE.Vector3(0.096, -0.137, 0.002),
+      new THREE.Vector3(0.169, -0.127, 0.002),
+      new THREE.Vector3(0, 0, 0.002)
+    ];
+    const outline = new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints(outlinePoints),
+      new THREE.LineBasicMaterial({
+        color: 0x111827,
+        depthTest: false,
+        depthWrite: false,
+        linewidth: 1
+      })
     );
-    this.cursor3D.add(ring, dot);
+    this.cursor3D.add(face, outline);
     this.cursor3D.position.z = 1.4;
+    this.cursor3D.renderOrder = 1000;
     this.cursor3D.visible = false;
     this.scene.add(this.cursor3D);
   }
