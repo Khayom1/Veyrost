@@ -31,7 +31,30 @@ section.content{padding:95px 0;border-top:1px solid var(--line)}.head{display:fl
 .aura-status{position:fixed;z-index:9997;left:18px;bottom:18px;max-width:min(90vw,410px);padding:10px 13px;border:1px solid #65e5ff55;border-radius:11px;background:#0a1422eF;color:#bfeeff;font-size:10px;font-weight:850;letter-spacing:.06em;box-shadow:0 12px 28px #0006;backdrop-filter:blur(15px);display:none}
 .aura-catch{position:fixed;z-index:9996;left:68vw;top:48vh;display:none;border:1px solid #b3a5ff8a;background:#b3a5ff1c;color:#e2dcff;border-radius:12px;padding:10px 13px;font-size:10px;font-weight:900;letter-spacing:.1em;box-shadow:0 0 25px #b3a5ff25;cursor:pointer}
 @media(max-width:650px){.aura-switch{width:48px;height:32px;padding:5px 3px;font-size:0}.aura-switch:before{content:"AURA";font-size:9px}.aura-switch.is-on:before{content:"ON"}.aura-status{left:10px;bottom:10px;font-size:9px;max-width:calc(100vw - 20px)}}
-\n@media(max-width:850px){.links{gap:13px}.links a{font-size:10px}.aboutgrid{gap:25px}}
+\n
+.spatial-stage{position:fixed;inset:0;z-index:9900;display:block;overflow:hidden;background:rgba(2,7,17,.97);color:#edf8ff;isolation:isolate}
+.spatial-stage[hidden]{display:none}
+.spatial-canvas-mount{position:absolute;inset:0;z-index:0;touch-action:none}
+.spatial-canvas-mount canvas{display:block;width:100%;height:100%;touch-action:none;outline:none}
+.spatial-hud{position:absolute;z-index:3;top:calc(env(safe-area-inset-top,0px) + 15px);left:18px;right:18px;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;pointer-events:none}
+.spatial-hud-brand{max-width:55%;padding:11px 14px;border:1px solid #6deaff4d;border-radius:11px;background:#06111dcc;backdrop-filter:blur(13px);box-shadow:0 10px 30px #0005}
+.spatial-hud-brand strong{display:block;color:#9cefff;font-size:10px;letter-spacing:.16em;font-weight:900}
+.spatial-hud-brand p{margin:5px 0 0;color:#a7bdd1;font-size:10px;line-height:1.55}
+.spatial-hud-actions{display:flex;gap:8px;pointer-events:auto}
+.spatial-control{border:1px solid #70e9ff75;border-radius:9px;padding:10px 13px;background:#0c1b2bcc;color:#b9f4ff;font-size:9px;letter-spacing:.09em;font-weight:900;cursor:pointer;backdrop-filter:blur(12px)}
+.spatial-control.primary{background:#e3fbff;color:#07131e;border-color:#e3fbff}
+.spatial-footer{position:absolute;z-index:2;left:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);color:#718aa4;font-size:9px;letter-spacing:.14em;pointer-events:none}
+@media(max-width:680px){
+ .spatial-hud{left:10px;right:10px;top:calc(env(safe-area-inset-top,0px) + 9px);gap:7px}
+ .spatial-hud-brand{max-width:51%;padding:8px 9px}
+ .spatial-hud-brand strong{font-size:8px;letter-spacing:.1em}
+ .spatial-hud-brand p{font-size:8px;line-height:1.4}
+ .spatial-hud-actions{gap:5px}
+ .spatial-control{padding:9px 8px;font-size:8px}
+ .spatial-footer{left:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 9px);font-size:8px}
+}
+
+@media(max-width:850px){.links{gap:13px}.links a{font-size:10px}.aboutgrid{gap:25px}}
 @media(max-width:650px){.container{width:calc(100% - 32px)}.nav{height:66px}.menu{display:block}.links{display:none;position:absolute;top:66px;left:0;right:0;padding:14px 20px 20px;background:#0c0e14;border-bottom:1px solid var(--line);flex-direction:column;gap:0}.links.open{display:flex}.links a{font-size:13px;padding:12px 0;border-bottom:1px solid var(--line)}.hero{min-height:auto}.hero-content{padding:88px 0 65px}h1{font-size:clamp(47px,13vw,69px)}.lead{font-size:14px}.meta{margin-top:48px;gap:20px}section.content{padding:72px 0}.head{display:block}.intro{margin-top:13px}.aboutgrid,.founder{grid-template-columns:1fr;gap:23px}.grid{grid-template-columns:repeat(2,1fr);gap:9px}.card{padding:16px;min-height:170px}.card h3{font-size:13px}.card p{font-size:11px}.project{align-items:flex-start;flex-direction:column;padding:23px}.articles{grid-template-columns:1fr}.ecosystem-grid{grid-template-columns:1fr}.ecosystem-card{padding:22px}.founder{padding:20px}.monogram{min-height:165px}.contactbox{padding:35px 18px}.footer{align-items:flex-start;flex-direction:column}}
 @media(max-width:370px){.grid{grid-template-columns:1fr}.langs button{padding:6px 7px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
@@ -121,10 +144,28 @@ links.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{links.cla
 let saved="en";try{saved=localStorage.getItem("veyrost-language")||"en"}catch(e){}language(saved);
 </script>
 
+
+<section id="spatial-stage" class="spatial-stage" hidden aria-hidden="true">
+  <div id="spatial-canvas-mount" class="spatial-canvas-mount" data-aura-ignore="true"></div>
+  <header class="spatial-hud">
+    <div class="spatial-hud-brand">
+      <strong id="spatial-title">VEYROST / SPATIAL INTERFACE</strong>
+      <p id="spatial-help">Point to a panel. Pinch and drag to move it. Release to open.</p>
+    </div>
+    <div class="spatial-hud-actions">
+      <button id="spatial-reset" class="spatial-control" type="button">RESET LAYOUT</button>
+      <button id="spatial-exit" class="spatial-control primary" type="button">AURA OFF</button>
+    </div>
+  </header>
+  <div class="spatial-footer">LOCAL 3D RENDER · MATTER COLLISION · HAND INPUT</div>
+</section>
+
 <video id="aura-camera-source" class="aura-camera-source" autoplay muted playsinline aria-hidden="true"></video>
 <div id="aura-cursor" class="aura-cursor" aria-hidden="true"></div>
 <div id="aura-status" class="aura-status" role="status" aria-live="polite">AURA OFF</div>
 <button id="aura-catch" class="aura-catch" type="button" data-t="auraCatch">CATCH ME</button>
+
+
 <script type="module">
 import { AuraController } from "./aura-engine.mjs";
 
@@ -133,12 +174,43 @@ const video = document.getElementById("aura-camera-source");
 const cursor = document.getElementById("aura-cursor");
 const status = document.getElementById("aura-status");
 const catchButton = document.getElementById("aura-catch");
+const stage = document.getElementById("spatial-stage");
+const spatialMount = document.getElementById("spatial-canvas-mount");
+const spatialReset = document.getElementById("spatial-reset");
+const spatialExit = document.getElementById("spatial-exit");
 let lang = document.documentElement.lang || "en";
 let state = "off";
+let spatialWorld = null;
+let spatialLoading = false;
+let spatialFallback = false;
 const labels = {
-  en: { off:"AURA OFF", on:"AURA ON · TAP TO STOP", offStatus:"AURA OFF · CAMERA RELEASED", onStatus:"AURA ACTIVE · CAMERA PROCESSED LOCALLY", paused:"AURA PAUSED · OPEN PALM TO RESUME", error:"AURA ERROR", catch:"CATCH ME" },
-  ru: { off:"AURA ВЫКЛ", on:"AURA ВКЛ · НАЖМИТЕ ДЛЯ ВЫКЛЮЧЕНИЯ", offStatus:"AURA ВЫКЛ · КАМЕРА ОТКЛЮЧЕНА", onStatus:"AURA АКТИВНА · ОБРАБОТКА ЛОКАЛЬНО", paused:"AURA ПАУЗА · ОТКРОЙТЕ ЛАДОНЬ", error:"ОШИБКА AURA", catch:"ПОЙМАЙ МЕНЯ" },
-  tj: { off:"AURA ХОМӮШ", on:"AURA ФАЪОЛ · БАРОИ ХОМӮШ КУНЕД", offStatus:"AURA ХОМӮШ · КАМЕРА ҚАТЪ ШУД", onStatus:"AURA ФАЪОЛ · КОРКАРДИ МАҲАЛЛӢ", paused:"AURA ТАВАҚҚУФ · КАФИ ДАСТРО КУШОЕД", error:"ХАТОИ AURA", catch:"МАРО БИГИР" }
+  en: {
+    off:"AURA OFF", on:"AURA ON · TAP TO STOP",
+    offStatus:"AURA OFF · CAMERA RELEASED",
+    onStatus:"AURA ACTIVE · CAMERA PROCESSED LOCALLY",
+    paused:"AURA PAUSED · OPEN PALM TO RESUME",
+    error:"AURA ERROR", catch:"CATCH ME",
+    spatialLoading:"LOADING 3D SPATIAL MODE…",
+    spatialFallback:"3D MODE UNAVAILABLE · HAND INPUT REMAINS ACTIVE"
+  },
+  ru: {
+    off:"AURA ВЫКЛ", on:"AURA ВКЛ · НАЖМИТЕ ДЛЯ ВЫКЛЮЧЕНИЯ",
+    offStatus:"AURA ВЫКЛ · КАМЕРА ОТКЛЮЧЕНА",
+    onStatus:"AURA АКТИВНА · ОБРАБОТКА ЛОКАЛЬНО",
+    paused:"AURA ПАУЗА · ОТКРОЙТЕ ЛАДОНЬ",
+    error:"ОШИБКА AURA", catch:"ПОЙМАЙ МЕНЯ",
+    spatialLoading:"ЗАГРУЗКА 3D-ИНТЕРФЕЙСА…",
+    spatialFallback:"3D НЕДОСТУПЕН · УПРАВЛЕНИЕ РУКОЙ РАБОТАЕТ"
+  },
+  tj: {
+    off:"AURA ХОМӮШ", on:"AURA ФАЪОЛ · БАРОИ ХОМӮШ КУНЕД",
+    offStatus:"AURA ХОМӮШ · КАМЕРА ҚАТЪ ШУД",
+    onStatus:"AURA ФАЪОЛ · КОРКАРДИ МАҲАЛЛӢ",
+    paused:"AURA ТАВАҚҚУФ · КАФИ ДАСТРО КУШОЕД",
+    error:"ХАТОИ AURA", catch:"МАРО БИГИР",
+    spatialLoading:"БОРШАВИИ МУҲИТИ ФАЗОИИ 3D…",
+    spatialFallback:"3D ДАСТРАС НЕСТ · ИДОРАКУНИИ ДАСТӢ ФАЪОЛ АСТ"
+  }
 };
 function words(){ return labels[lang] || labels.en; }
 function render() {
@@ -149,7 +221,7 @@ function render() {
   button.setAttribute("aria-pressed", String(active));
   button.setAttribute("aria-label", active ? words().on : words().off);
   status.style.display = state === "off" ? "none" : "block";
-  status.textContent = state === "active" ? words().onStatus :
+  status.textContent = state === "active" ? (spatialFallback ? words().spatialFallback : words().onStatus) :
     state === "paused" ? words().paused :
     state === "error" ? words().error + " · " + (window.__veyrostAuraError || "") :
     state === "starting" || state === "loading" ? (window.__veyrostAuraMessage || "AURA STARTING…") :
@@ -157,10 +229,61 @@ function render() {
   catchButton.style.display = active ? "block" : "none";
   catchButton.textContent = words().catch;
 }
+function destroySpatialMode() {
+  try { spatialWorld?.destroy(); } catch (_) {}
+  spatialWorld = null;
+  spatialLoading = false;
+  spatialFallback = false;
+  stage.hidden = true;
+  stage.setAttribute("aria-hidden", "true");
+}
+function navigateFromSpatial(target) {
+  button.click();
+  if (target === "matter-lab.html") {
+    window.location.href = target;
+    return;
+  }
+  const destination = document.querySelector(target);
+  if (destination) destination.scrollIntoView({ behavior: "smooth", block: "start" });
+  try { history.replaceState(null, "", target); } catch (_) {}
+}
+async function openSpatialMode() {
+  if (spatialWorld || spatialLoading || state !== "active") return;
+  spatialLoading = true;
+  status.textContent = words().spatialLoading;
+  try {
+    const { SpatialWorldController } = await import("./spatial-world.mjs");
+    if (!controller.active || state !== "active") return;
+    stage.hidden = false;
+    stage.setAttribute("aria-hidden", "false");
+    spatialWorld = new SpatialWorldController({
+      mount: spatialMount,
+      language: lang,
+      onNavigate: navigateFromSpatial,
+      onStatus: name => {
+        if (name === "ready" && state === "active") status.textContent = words().onStatus;
+      }
+    });
+    spatialWorld.start();
+    spatialWorld.setLanguage(lang);
+  } catch (error) {
+    spatialWorld?.destroy();
+    spatialWorld = null;
+    stage.hidden = true;
+    stage.setAttribute("aria-hidden", "true");
+    spatialFallback = true;
+    window.__veyrostSpatialError = error?.message || "WebGL initialization failed.";
+    render();
+  } finally {
+    spatialLoading = false;
+  }
+}
 function setStatus(next, message) {
   state = next;
   if (next === "error") window.__veyrostAuraError = message || "Camera or hand tracking unavailable.";
   else window.__veyrostAuraMessage = message || "";
+  if (next === "active") void openSpatialMode();
+  if (next === "off" || next === "error") destroySpatialMode();
   render();
 }
 function relocateCatch() {
@@ -174,14 +297,32 @@ catchButton.addEventListener("click", relocateCatch);
 const controller = new AuraController({
   video, cursor,
   onStatus: setStatus,
-  onGesture: name => {
-    if (name === "emergency-pause") setStatus("paused");
-    if (name === "resume") setStatus("active");
+  onGesture: (name, extra = {}) => {
+    if (name === "emergency-pause") {
+      spatialWorld?.setPaused(true);
+      setStatus("paused");
+    }
+    if (name === "resume") {
+      spatialWorld?.setPaused(false);
+      setStatus("active");
+    }
+    if (name === "pinch-start" && Number.isFinite(extra.x) && Number.isFinite(extra.y)) {
+      spatialWorld?.beginHandPress(extra.x, extra.y);
+    }
+    if (name === "pinch-end" && Number.isFinite(extra.x) && Number.isFinite(extra.y)) {
+      spatialWorld?.endHandPress(extra.x, extra.y);
+    }
+    if (name === "pinch-cancel" || name === "cancel" || name === "hand-lost") {
+      spatialWorld?.cancelActiveInteraction();
+      if (name === "hand-lost") spatialWorld?.onHandLost();
+    }
   },
   onCursorMove: ({x,y}) => {
-    if (catchButton.style.display !== "block") return;
-    const rect = catchButton.getBoundingClientRect();
-    if (Math.hypot(x-(rect.left+rect.width/2), y-(rect.top+rect.height/2)) < 90) relocateCatch();
+    spatialWorld?.onHandMove(x, y);
+    if (catchButton.style.display === "block") {
+      const rect = catchButton.getBoundingClientRect();
+      if (Math.hypot(x-(rect.left+rect.width/2), y-(rect.top+rect.height/2)) < 90) relocateCatch();
+    }
   }
 });
 button.addEventListener("click", async () => {
@@ -196,11 +337,17 @@ button.addEventListener("click", async () => {
     setStatus("error", error?.message || "AURA could not start.");
   }
 });
+spatialReset.addEventListener("click", () => spatialWorld?.resetLayout());
+spatialExit.addEventListener("click", () => button.click());
 new MutationObserver(() => {
   lang = document.documentElement.lang || "en";
+  spatialWorld?.setLanguage(lang);
   render();
 }).observe(document.documentElement, { attributes:true, attributeFilter:["lang"] });
-window.addEventListener("pagehide", () => { void controller.stop({notify:false}); });
+window.addEventListener("pagehide", () => {
+  destroySpatialMode();
+  void controller.stop({notify:false});
+});
 render();
 </script>
 </body>
