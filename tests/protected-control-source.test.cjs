@@ -36,3 +36,8 @@ test("reset restores all protected controls and removes repair affordance", () =
   assert.match(runtime, /for \(const control of this\.protectedControls\.values\(\)\) control\.reset\(\)/);
   assert.match(runtime, /this\.repairButton\.style\.display = "none"/);
 });
+
+test("protected repair restores the original depth layer and socket alignment", () => {
+  assert.match(runtime, /depthBody\.z = depthBody\.initialZ/);
+  assert.match(runtime, /socket\.position\.set\(center\.x, center\.y, \(\[-0\.22, 0\.18, -0\.12, 0\.24, -0\.18, 0\.12\]\[panelIndex\] \?\? 0\) - 0\.08\)/);
+});
