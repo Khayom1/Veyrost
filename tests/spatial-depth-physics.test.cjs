@@ -47,3 +47,13 @@ test("invalid dimensions and duplicate IDs are rejected", async () => {
   world.add({ id: "x", x: 0, y: 0, z: 0, width: 1, height: 1, depth: 1 });
   assert.throws(() => world.add({ id: "x", x: 0, y: 0, z: 0, width: 1, height: 1, depth: 1 }), /unique/);
 });
+
+test("reset restores initial depth and clears velocity", async () => {
+  const DepthPhysicsWorld = await loadDepthWorld();
+  const world = new DepthPhysicsWorld();
+  const body = world.add({ id: "reset", x: 0, y: 0, z: 0.35, width: 2, height: 2, depth: 0.2, velocityZ: 1 });
+  world.step(1 / 60);
+  world.reset();
+  assert.equal(body.z, 0.35);
+  assert.equal(body.velocityZ, 0);
+});
