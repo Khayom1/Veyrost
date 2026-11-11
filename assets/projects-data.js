@@ -18,6 +18,7 @@ export const projects = [
   {id:"skillguard",name:"SkillGuard",repo:"SkillGuard",group:"AI & security",type:"AI skill security scanner",language:"JavaScript",stars:0,updated:"2026-11-11",status:"Active build",description:"Local-first scanner that inspects AI-agent skill bundles for prompt injection, exposed secrets, hidden Unicode, risky execution patterns and permissions without executing scanned scripts.",url:"https://github.com/Khayom1/SkillGuard",demo:null},
   {id:"devkit",name:"VEYROST-DEVKIT",repo:"VEYROST-DEVKIT",group:"Developer tools",type:"Repository health toolkit",language:"JavaScript",stars:0,updated:"2026-11-11",status:"Active build",description:"Local-first repository quality and selected security checks, with explainable health scoring and reports in text, JSON, Markdown, HTML and SVG.",url:"https://github.com/Khayom1/VEYROST-DEVKIT",demo:null},
   {id:"chashma",name:"Chashma",repo:"Chashma",group:"Experiments",type:"Language game",language:"JavaScript",stars:0,updated:"2026-11-11",status:"Prototype",description:"A fast vocabulary game in Tajik, Russian and English: choose the correct translation before the spring overflows.",url:"https://github.com/Khayom1/Chashma",demo:null}
+  {id:"telegram-channel-mcp",name:"Telegram Channel MCP",repo:"telegram-channel-mcp",group:"Private systems",type:"Telegram channel automation",language:"JavaScript",stars:0,updated:"2026-11-10",status:"Private",visibility:"private",description:"Private repository. Source code and implementation details are not displayed in the public portfolio.",url:null,demo:null}
 ];
 
 export const projectGroups = [
@@ -31,5 +32,6 @@ export const projectGroups = [
   "Creative tools",
   "Data & research",
   "Research & hardware",
-  "Experiments"
+  "Experiments",
+  "Private systems"
 ];
