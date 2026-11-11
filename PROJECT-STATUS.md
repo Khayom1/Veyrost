@@ -3,7 +3,7 @@
 **Audit date:** 2026-11-11  
 **Branch:** `feat/spatial-persistence-hardening`  
 **Audit source:** `node scripts/project-status.mjs`  
-**Validation:** GitHub Actions was not used for this continuation, per instruction. Previous successful validation run: `43058327625`; new perspective rendering changes have not been runtime-tested on a device.
+**Validation:** GitHub Actions was not used for this continuation, per instruction. The source-evidence patterns for the five new protected-control criteria were checked against the committed files. No full regression run was performed after these changes.
 
 ## Current source-evidence result
 
@@ -14,7 +14,8 @@
 | AURA hand controller | 13 | 13 | 100.00% |
 | Main-site AURA integration | 7 | 7 | 100.00% |
 | Spatial rendered interface (perspective depth-rendered scope) | 8 | 8 | 100.00% |
-| Spatial layout persistence | 4 | 4 | 100.00% |\n| Protected control lifecycle | 5 | 5 | 100.00% |
+| Spatial layout persistence | 4 | 4 | 100.00% |
+| Protected control lifecycle | 5 | 5 | 100.00% |
 | Technician service sequence | 0 | 8 | 0.00% |
 | Dialogue and spatial audio | 0 | 5 | 0.00% |
 | Validation and release | 4 | 6 | 66.67% |
@@ -22,8 +23,8 @@
 
 - Implemented source criteria: **58 / 73**
 - Pending source criteria: **15 / 73**
-- Failed evidence checks: **0**
-- The latest successful run passed syntax checks, the combined regression suite, and the source-evidence calculator.
+- New protected-control evidence mismatches: **0 / 5** (direct source-pattern verification; not a runtime test)
+- The last full CI pass (`43058327625`) predates the perspective-depth and protected-control changes; it is not validation of the latest branch head.
 
 ## Scope and limitations
 
@@ -33,9 +34,13 @@ The score is a binary checklist ratio:
 
 Every criterion has equal weight. It measures whether the defined source-level evidence exists. It is not a score for visual quality, production readiness, engineering effort, or physical-device reliability.
 
-The protected-control lifecycle is implemented for HOME and AI SYSTEMS: first-pull resistance, second-pull release, fixed mount socket, localized repair action, and restoration to original coordinates. This is a functional interface repair flow, not the planned technician animation.\n\nThe spatial interface now uses a Three.js **perspective camera** and six independently layered panel depths, with per-panel tilt and floating motion. Its panel movement and collisions remain backed by the existing **2D** Matter Engine. The checklist's 8/8 means the eight declared source-level rendering criteria are present; it does not mean full 3D physics or depth-aware collision exists.
+The protected-control lifecycle is implemented for HOME and AI SYSTEMS: first-pull resistance, second-pull release, fixed mount socket, localized repair action, and restoration to original coordinates. This is a functional interface repair flow, not the planned technician animation.
 
-Perspective depth rendering is now present in source: responsive field-of-view camera, independent panel depth layers, animated tilt, and depth-aware panel placement. This has not yet been confirmed on a physical phone.\n\nLayout persistence is now implemented:
+The spatial interface now uses a Three.js **perspective camera** and six independently layered panel depths, with per-panel tilt and floating motion. Its panel movement and collisions remain backed by the existing **2D** Matter Engine. The checklist's 8/8 means the eight declared source-level rendering criteria are present; it does not mean full 3D physics or depth-aware collision exists.
+
+Perspective depth rendering is now present in source: responsive field-of-view camera, independent panel depth layers, animated tilt, and depth-aware panel placement. This has not yet been confirmed on a physical phone.
+
+Layout persistence is now implemented:
 - Versioned localStorage payload.
 - Normalized panel positions.
 - Validation of saved versions, panel IDs, duplicates and numeric coordinates.
