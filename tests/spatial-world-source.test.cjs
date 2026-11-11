@@ -8,9 +8,11 @@ test("spatial renderer is pinned to Three.js r187", () => {
   assert.match(source, /three@0\.187\.0\/build\/three\.module\.js/);
 });
 
-test("3D runtime uses a WebGL renderer and responsive orthographic camera", () => {
+test("3D runtime uses a WebGL renderer and responsive perspective camera", () => {
   assert.match(source, /new THREE\.WebGLRenderer/);
-  assert.match(source, /new THREE\.OrthographicCamera/);
+  assert.match(source, /new THREE\.PerspectiveCamera/);
+  assert.match(source, /camera\.fov/);
+  assert.match(source, /userData\.depth/);
   assert.match(source, /ResizeObserver/);
 });
 
