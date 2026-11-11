@@ -25,7 +25,8 @@ const translations={
   ru:{home:"Обзор",projects:"Проекты",studio:"Рабочая среда",company:"Компания",about:"О VEYROST",research:"Исследования",contact:"Контакты",move:"ПЕРЕМЕСТИТЬ",done:"ЗАВЕРШИТЬ",editHint:"Режим редактирования. Перетаскивайте карточки и категории.",saved:"Расположение сохранено."},
   tj:{home:"Шарҳи умумӣ",projects:"Лоиҳаҳо",studio:"Муҳити корӣ",company:"Ширкат",about:"Дар бораи VEYROST",research:"Таҳқиқот",contact:"Тамос",move:"ҶОЙИВАЗКУНӢ",done:"АНҶОМ",editHint:"Режими таҳрир фаъол аст. Корт ё категорияро кашед.",saved:"Ҷойгиршавӣ нигоҳ дошта шуд."}
 };
-let language=localStorage.getItem("veyrost-language")||"en";
+let language="en";
+try{language=localStorage.getItem("veyrost-language")||"en"}catch(_){}
 function applyLanguage(){
   const t=translations[language]||translations.en;
   $$("[data-label]").forEach(el=>{const key=el.dataset.label;if(t[key])el.textContent=t[key]});
@@ -193,9 +194,11 @@ if(projectGrid&&Array.isArray(window.VEYROST_PROJECTS)){
         <h3>${escapeHTML(p.name)}</h3><div class="project-repo">${escapeHTML(p.repo)} · ${escapeHTML(p.language)}</div>
         <p class="description">${escapeHTML(p.description)}</p>
         <div class="project-meta"><span class="tag">${escapeHTML(p.type)}</span><span class="tag">${escapeHTML(p.updated)}</span></div>
-        <div class="card-foot"><span class="project-repo">★ ${p.stars}</span><a class="arrow-link" href="${p.url}" target="_blank" rel="noopener">SOURCE REPOSITORY ↗</a></div>
+        <div class="card-foot"><span class="project-repo">${p.visibility==="private"?"PRIVATE REPOSITORY":"★ "+p.stars}</span>${p.visibility==="private"?'<span class="tag">OWNER ACCESS ONLY</span>':`<a class="arrow-link" href="${p.url}" target="_blank" rel="noopener">SOURCE REPOSITORY ↗</a>`}</div>
       </article>`).join(""):'<div class="empty-state">No projects match this search. Try another term or category.</div>';
-    if(count)count.textContent=`${list.length} / ${all.length} PUBLIC PROJECTS`;
+    const publicMatches=list.filter(p=>p.visibility!=="private").length;
+    const privateMatches=list.length-publicMatches;
+    if(count)count.textContent=`${publicMatches} PUBLIC + ${privateMatches} PRIVATE`;
     registerMovable();restorePositions();
   };
   function escapeHTML(value){return String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]))}
@@ -205,14 +208,16 @@ if(projectGrid&&Array.isArray(window.VEYROST_PROJECTS)){
 // Settings switches are deliberately local preferences, not fake cloud controls.
 $$("[data-local-toggle]").forEach(button=>{
   const key="veyrost-setting:"+button.dataset.localToggle;
-  const saved=localStorage.getItem(key);
+  let saved=null;
+  try{saved=localStorage.getItem(key)}catch(_){}
   const value=saved===null?button.dataset.default==="true":saved==="true";
   button.setAttribute("aria-checked",String(value));
   button.addEventListener("click",()=>{
     const next=button.getAttribute("aria-checked")!=="true";
     button.setAttribute("aria-checked",String(next));
-    localStorage.setItem(key,String(next));
+    let persisted=true;
+    try{localStorage.setItem(key,String(next))}catch(_){persisted=false}
     if(button.dataset.localToggle==="reduced-motion")document.documentElement.classList.toggle("reduced-motion",next);
-    toast("Preference saved on this device.");
+    toast(persisted?"Preference saved on this device.":"Preference changed for this session; browser storage is unavailable.");
   });
 });

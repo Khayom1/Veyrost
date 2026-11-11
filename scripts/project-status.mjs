@@ -12,6 +12,9 @@ const checks = [
   ["WEB-06","Website foundation","Corporate overview includes modular engineering categories","index.html",/Many systems\. One engineering direction[\s\S]*data-veyrost-layout-item/],
   ["WEB-07","Website foundation","Project directory has category filters and an inventory grid","projects.html",/project-filter[\s\S]*id="project-grid"/],
   ["WEB-08","Website foundation","Dedicated contact and collaboration page","contact.html",/mailto:prafessorittiloot@gmail\.com/],
+  ["WEB-09","Website foundation","Complete inventory distinguishes 19 public repositories and one private project record","projects.html",/19 public repositories and one private project record/],
+  ["WEB-10","Website foundation","Private systems has its own draggable workspace category","studio.html",/data-layout-id="workspace-private"/],
+  ["WEB-11","Website foundation","Private project entries are rendered as owner-only records","assets/veyrost-site.js",/OWNER ACCESS ONLY/],
 
   // Matter Engine: prototype behavior present in source.
   ["MAT-01","Matter Engine 2D","Physics world implementation","matter-engine.js",/class MatterWorld/],
@@ -47,6 +50,7 @@ const checks = [
   ["INT-05","Main-site AURA integration","AURA status HUD is mounted","index.html",/id="aura-status"/],
   ["INT-06","Main-site AURA integration","Opt-in MOVE control is gated by AURA state","assets/veyrost-site.js",/editButton.hidden=false/],
   ["INT-07","Main-site AURA integration","Shared UI exposes EN/RU/TJ labels","assets/veyrost-site.js",/translations=/],
+  ["INT-08","Main-site AURA integration","Language and settings controls tolerate unavailable browser storage","assets/veyrost-site.js",/try\{saved=localStorage\.getItem\(key\)/],
 
   // Not yet implemented: each row is a specific acceptance requirement.
   ["3D-01","3D spatial environment","Three.js WebGL scene renderer","spatial-world.mjs",/new THREE\.WebGLRenderer/],
@@ -57,6 +61,7 @@ const checks = [
   ["3D-06","3D spatial environment","Mobile pixel-ratio cap and responsive layout","spatial-world.mjs",/setPixelRatio\(Math\.min[\s\S]*width < 680 \? 1\.2 : 1\.5/],
   ["3D-07","3D spatial environment","Independent panel depth layers in perspective scene","spatial-world.mjs",/userData\.depth = \[[-0-9., ]+\][\s\S]*position\.set\(position\.x, position\.y, panel\.group\.userData\.depth/],
   ["3D-08","3D spatial environment","Depth-aware panel tilt and floating animation","spatial-world.mjs",/group\.rotation\.set\([\s\S]*group\.rotation\.y \+=/],
+  ["3D-09","3D spatial environment","Spatial engine is mounted from a reachable public website route",null,null],
   ["DPH-01","Depth-axis collision physics","Dedicated Z-axis physics world and body registry","spatial-depth-physics.mjs",/export class DepthPhysicsWorld[\s\S]*this\.bodies = new Map\(\)/],
   ["DPH-02","Depth-axis collision physics","Projected X/Y overlap gates depth collision","spatial-depth-physics.mjs",/function overlap2D[\s\S]*a\.width \+ b\.width[\s\S]*a\.height \+ b\.height/],
   ["DPH-03","Depth-axis collision physics","Mass-weighted positional correction","spatial-depth-physics.mjs",/1 \/ a\.mass[\s\S]*correction \* invA[\s\S]*correction \* invB/],
@@ -95,6 +100,11 @@ const checks = [
   ["AUD-03","Dialogue and spatial audio","Spatially positioned character audio",null,null],
   ["AUD-04","Dialogue and spatial audio","Action-synchronized mechanical sound effects",null,null],
   ["AUD-05","Dialogue and spatial audio","Audio mute, permission and accessibility controls",null,null],
+
+  // Autonomous engineering agents requested for the VEYROST group platform.
+  ["AGT-01","Engineering agent system","Repository planning and task orchestration runtime",null,null],
+  ["AGT-02","Engineering agent system","Automated repository audit and issue triage agents",null,null],
+  ["AGT-03","Engineering agent system","Guarded implementation, review, test and release agents",null,null],
 
   // Test/acceptance: source checks that are part of the current CI pipeline.
   ["QA-01","Validation and release","AURA engine syntax validation in CI",".github/workflows/aura-engine-tests.yml",/node --check aura-engine\.mjs/],
