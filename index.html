@@ -26,34 +26,16 @@ section.content{padding:95px 0;border-top:1px solid var(--line)}.head{display:fl
 .aura-switch{border:1px solid #65e5ff65;background:#65e5ff0d;color:#a5efff;border-radius:9px;padding:7px 10px;font-size:10px;font-weight:900;letter-spacing:.07em;white-space:nowrap;cursor:pointer;transition:.2s}
 .aura-switch:hover{background:#65e5ff18;border-color:#65e5ffb0}.aura-switch.is-on{background:#9c8aff1c;color:#d5caff;border-color:#aa99ffb0;box-shadow:0 0 20px #a99aff20}.aura-switch:disabled{opacity:.55;cursor:wait}
 .aura-camera-source{position:fixed;width:1px;height:1px;left:-10000px;top:-10000px;opacity:0;pointer-events:none}
-.aura-cursor{position:fixed;z-index:9998;width:23px;height:23px;border:2px solid #c5faff;border-radius:50%;background:#68e8ff25;box-shadow:0 0 12px #72eaff,0 0 34px #72eaff85;transform:translate(-50%,-50%);pointer-events:none;visibility:hidden}
-.aura-cursor:after{content:"";position:absolute;inset:5px;border-radius:50%;background:#e9fdff}
+.aura-cursor{position:fixed;z-index:10000;left:0;top:0;width:24px;height:32px;transform:none;pointer-events:none;visibility:hidden}
+.aura-cursor svg{display:block;width:24px;height:32px;overflow:visible;filter:drop-shadow(0 1px 1px #0009)}
+html.aura-active,html.aura-active *{cursor:none!important}
+.aura-layout-toggle{display:none;align-items:center;justify-content:center;min-height:32px;padding:6px 8px;border:1px solid #aa99ff70;border-radius:9px;background:#a99aff12;color:#d7cdff;font-size:9px;font-weight:900;letter-spacing:.07em;white-space:nowrap;cursor:pointer}
+.aura-layout-toggle.is-visible{display:inline-flex}
+html.veyrost-layout-editing [data-veyrost-layout-item]{outline:1px dashed #b3a5ffb0;outline-offset:4px;cursor:grab!important;user-select:none;-webkit-user-select:none;touch-action:none}
+html.veyrost-layout-editing [data-veyrost-layout-item]:active{cursor:grabbing!important}
 .aura-status{position:fixed;z-index:9997;left:18px;bottom:18px;max-width:min(90vw,410px);padding:10px 13px;border:1px solid #65e5ff55;border-radius:11px;background:#0a1422eF;color:#bfeeff;font-size:10px;font-weight:850;letter-spacing:.06em;box-shadow:0 12px 28px #0006;backdrop-filter:blur(15px);display:none}
-.aura-catch{position:fixed;z-index:9996;left:68vw;top:48vh;display:none;border:1px solid #b3a5ff8a;background:#b3a5ff1c;color:#e2dcff;border-radius:12px;padding:10px 13px;font-size:10px;font-weight:900;letter-spacing:.1em;box-shadow:0 0 25px #b3a5ff25;cursor:pointer}
 @media(max-width:650px){.aura-switch{width:48px;height:32px;padding:5px 3px;font-size:0}.aura-switch:before{content:"AURA";font-size:9px}.aura-switch.is-on:before{content:"ON"}.aura-status{left:10px;bottom:10px;font-size:9px;max-width:calc(100vw - 20px)}}
 \n
-.spatial-stage{position:fixed;inset:0;z-index:9900;display:block;overflow:hidden;background:rgba(2,7,17,.97);color:#edf8ff;isolation:isolate}
-.spatial-stage[hidden]{display:none}
-.spatial-canvas-mount{position:absolute;inset:0;z-index:0;touch-action:none}
-.spatial-canvas-mount canvas{display:block;width:100%;height:100%;touch-action:none;outline:none}
-.spatial-hud{position:absolute;z-index:3;top:calc(env(safe-area-inset-top,0px) + 15px);left:18px;right:18px;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;pointer-events:none}
-.spatial-hud-brand{max-width:55%;padding:11px 14px;border:1px solid #6deaff4d;border-radius:11px;background:#06111dcc;backdrop-filter:blur(13px);box-shadow:0 10px 30px #0005}
-.spatial-hud-brand strong{display:block;color:#9cefff;font-size:10px;letter-spacing:.16em;font-weight:900}
-.spatial-hud-brand p{margin:5px 0 0;color:#a7bdd1;font-size:10px;line-height:1.55}
-.spatial-hud-actions{display:flex;gap:8px;pointer-events:auto}
-.spatial-control{border:1px solid #70e9ff75;border-radius:9px;padding:10px 13px;background:#0c1b2bcc;color:#b9f4ff;font-size:9px;letter-spacing:.09em;font-weight:900;cursor:pointer;backdrop-filter:blur(12px)}
-.spatial-control.primary{background:#e3fbff;color:#07131e;border-color:#e3fbff}
-.spatial-footer{position:absolute;z-index:2;left:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);color:#718aa4;font-size:9px;letter-spacing:.14em;pointer-events:none}
-@media(max-width:680px){
- .spatial-hud{left:10px;right:10px;top:calc(env(safe-area-inset-top,0px) + 9px);gap:7px}
- .spatial-hud-brand{max-width:51%;padding:8px 9px}
- .spatial-hud-brand strong{font-size:8px;letter-spacing:.1em}
- .spatial-hud-brand p{font-size:8px;line-height:1.4}
- .spatial-hud-actions{gap:5px}
- .spatial-control{padding:9px 8px;font-size:8px}
- .spatial-footer{left:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 9px);font-size:8px}
-}
-
 @media(max-width:850px){.links{gap:13px}.links a{font-size:10px}.aboutgrid{gap:25px}}
 @media(max-width:650px){.container{width:calc(100% - 32px)}.nav{height:66px}.menu{display:block}.links{display:none;position:absolute;top:66px;left:0;right:0;padding:14px 20px 20px;background:#0c0e14;border-bottom:1px solid var(--line);flex-direction:column;gap:0}.links.open{display:flex}.links a{font-size:13px;padding:12px 0;border-bottom:1px solid var(--line)}.hero{min-height:auto}.hero-content{padding:88px 0 65px}h1{font-size:clamp(47px,13vw,69px)}.lead{font-size:14px}.meta{margin-top:48px;gap:20px}section.content{padding:72px 0}.head{display:block}.intro{margin-top:13px}.aboutgrid,.founder{grid-template-columns:1fr;gap:23px}.grid{grid-template-columns:repeat(2,1fr);gap:9px}.card{padding:16px;min-height:170px}.card h3{font-size:13px}.card p{font-size:11px}.project{align-items:flex-start;flex-direction:column;padding:23px}.articles{grid-template-columns:1fr}.ecosystem-grid{grid-template-columns:1fr}.ecosystem-card{padding:22px}.founder{padding:20px}.monogram{min-height:165px}.contactbox{padding:35px 18px}.footer{align-items:flex-start;flex-direction:column}}
 @media(max-width:370px){.grid{grid-template-columns:1fr}.langs button{padding:6px 7px}}
@@ -66,7 +48,8 @@ section.content{padding:95px 0;border-top:1px solid var(--line)}.head{display:fl
 <nav class="links" id="links">
 <a href="#about" data-t="navAbout">About</a><a href="#focus" data-t="navFocus">Focus</a><a href="#projects" data-t="navProjects">Projects</a><a href="#ecosystem" data-t="navEcosystem">Ecosystem</a><a href="#research" data-t="navResearch">Research</a><a href="#founder" data-t="navFounder">Founder</a><a href="#contact" data-t="navContact">Contact</a>
 </nav>
-<div class="right"><button class="aura-switch" id="aura-toggle" type="button" aria-pressed="false" aria-label="Enable AURA camera controls" data-t="auraMode">AURA OFF</button><div class="langs"><button data-lang="en" class="active">EN</button><button data-lang="ru">RU</button><button data-lang="tj">TJ</button></div><button class="menu" id="menu" aria-label="Menu">☰</button></div>
+<div class="right"><button class="aura-switch" id="aura-toggle" type="button" aria-pressed="false" aria-label="Enable AURA camera controls" data-t="auraMode">AURA OFF</button>
+<button class="aura-layout-toggle" id="aura-layout-toggle" type="button" aria-label="Customize interface button positions" title="Customize interface button positions" aria-pressed="false" hidden>MOVE</button><div class="langs"><button data-lang="en" class="active">EN</button><button data-lang="ru">RU</button><button data-lang="tj">TJ</button></div><button class="menu" id="menu" aria-label="Menu">☰</button></div>
 </div></header>
 <main>
 <div class="container"><div class="hero" id="home"><div class="hero-content">
@@ -145,23 +128,12 @@ let saved="en";try{saved=localStorage.getItem("veyrost-language")||"en"}catch(e)
 </script>
 
 
-<section id="spatial-stage" class="spatial-stage" hidden aria-hidden="true">
-  <div id="spatial-canvas-mount" class="spatial-canvas-mount" data-aura-ignore="true"></div>
-  <header class="spatial-hud">
-    <div class="spatial-hud-brand">
-      <strong id="spatial-title">VEYROST / SPATIAL INTERFACE</strong>
-      <p id="spatial-help">Point to a panel. Pinch and drag to move it. Release to open.</p>
-    </div>
-    <div class="spatial-hud-actions">
-      <button id="spatial-reset" class="spatial-control" type="button">RESET LAYOUT</button>
-      <button id="spatial-exit" class="spatial-control primary" type="button">AURA OFF</button>
-    </div>
-  </header>
-  <div class="spatial-footer">LOCAL 3D RENDER · MATTER COLLISION · HAND INPUT</div>
-</section>
-
 <video id="aura-camera-source" class="aura-camera-source" autoplay muted playsinline aria-hidden="true"></video>
-<div id="aura-cursor" class="aura-cursor" aria-hidden="true"></div>
+<div id="aura-cursor" class="aura-cursor" aria-hidden="true">
+  <svg viewBox="0 0 24 32" focusable="false" aria-hidden="true">
+    <path d="M2 1 L2 27 L8 20.5 L12.4 30 L16.2 28.2 L11.7 18.8 L22 18.3 Z" fill="#f8fbff" stroke="#101827" stroke-width="1.5" stroke-linejoin="round"/>
+  </svg>
+</div>
 <div id="aura-status" class="aura-status" role="status" aria-live="polite">AURA OFF</div>
 <button id="aura-catch" class="aura-catch" type="button" data-t="auraCatch">CATCH ME</button>
 
@@ -170,182 +142,182 @@ let saved="en";try{saved=localStorage.getItem("veyrost-language")||"en"}catch(e)
 import { AuraController } from "./aura-engine.mjs";
 
 const button = document.getElementById("aura-toggle");
+const layoutButton = document.getElementById("aura-layout-toggle");
 const video = document.getElementById("aura-camera-source");
 const cursor = document.getElementById("aura-cursor");
 const status = document.getElementById("aura-status");
-const catchButton = document.getElementById("aura-catch");
-const stage = document.getElementById("spatial-stage");
-const spatialMount = document.getElementById("spatial-canvas-mount");
-const spatialReset = document.getElementById("spatial-reset");
-const spatialExit = document.getElementById("spatial-exit");
 let lang = document.documentElement.lang || "en";
 let state = "off";
-let spatialWorld = null;
-let spatialLoading = false;
-let spatialFallback = false;
+let layoutEditing = false;
+let activeDrag = null;
+const LAYOUT_KEY = "veyrost:button-layout:v1";
+const MOVABLE_SELECTOR = "a.btn, .links a, .social a, .footlinks a";
+
 const labels = {
   en: {
     off:"AURA OFF", on:"AURA ON · TAP TO STOP",
     offStatus:"AURA OFF · CAMERA RELEASED",
     onStatus:"AURA ACTIVE · CAMERA PROCESSED LOCALLY",
     paused:"AURA PAUSED · OPEN PALM TO RESUME",
-    error:"AURA ERROR", catch:"CATCH ME",
-    spatialLoading:"LOADING 3D SPATIAL MODE…",
-    spatialFallback:"3D MODE UNAVAILABLE · HAND INPUT REMAINS ACTIVE"
+    error:"AURA ERROR", customize:"MOVE", done:"DONE",
+    editing:"AURA ACTIVE · LAYOUT EDITING · DRAG LINKS TO MOVE"
   },
   ru: {
     off:"AURA ВЫКЛ", on:"AURA ВКЛ · НАЖМИТЕ ДЛЯ ВЫКЛЮЧЕНИЯ",
     offStatus:"AURA ВЫКЛ · КАМЕРА ОТКЛЮЧЕНА",
     onStatus:"AURA АКТИВНА · ОБРАБОТКА ЛОКАЛЬНО",
     paused:"AURA ПАУЗА · ОТКРОЙТЕ ЛАДОНЬ",
-    error:"ОШИБКА AURA", catch:"ПОЙМАЙ МЕНЯ",
-    spatialLoading:"ЗАГРУЗКА 3D-ИНТЕРФЕЙСА…",
-    spatialFallback:"3D НЕДОСТУПЕН · УПРАВЛЕНИЕ РУКОЙ РАБОТАЕТ"
+    error:"ОШИБКА AURA", customize:"СДВИГ", done:"ГОТОВО",
+    editing:"AURA АКТИВНА · РЕЖИМ НАСТРОЙКИ · ПЕРЕТАЩИТЕ ССЫЛКИ"
   },
   tj: {
-    off:"AURA ХОМӮШ", on:"AURA ФАЪОЛ · БАРОИ ХОМӮШ КУНЕД",
+    off:"AURA ХОМӮШ", on:"AURA ФАЪОЛ · БАРОИ ХОМӮШ КАРДАН",
     offStatus:"AURA ХОМӮШ · КАМЕРА ҚАТЪ ШУД",
     onStatus:"AURA ФАЪОЛ · КОРКАРДИ МАҲАЛЛӢ",
     paused:"AURA ТАВАҚҚУФ · КАФИ ДАСТРО КУШОЕД",
-    error:"ХАТОИ AURA", catch:"МАРО БИГИР",
-    spatialLoading:"БОРШАВИИ МУҲИТИ ФАЗОИИ 3D…",
-    spatialFallback:"3D ДАСТРАС НЕСТ · ИДОРАКУНИИ ДАСТӢ ФАЪОЛ АСТ"
+    error:"ХАТОИ AURA", customize:"ҶОЙ", done:"ТАЙЁР",
+    editing:"AURA ФАЪОЛ · РЕЖИМИ ҶОЙИ ТУГМАҲО · БАРОИ ҶОЙИВАЗКУНӢ КАШЕД"
   }
 };
-function words(){ return labels[lang] || labels.en; }
-function render() {
-  const active = state === "active" || state === "paused";
-  button.textContent = active ? words().on : words().off;
-  button.classList.toggle("is-on", active);
-  button.disabled = state === "starting" || state === "loading";
-  button.setAttribute("aria-pressed", String(active));
-  button.setAttribute("aria-label", active ? words().on : words().off);
-  status.style.display = state === "off" ? "none" : "block";
-  status.textContent = state === "active" ? (spatialFallback ? words().spatialFallback : words().onStatus) :
-    state === "paused" ? words().paused :
-    state === "error" ? words().error + " · " + (window.__veyrostAuraError || "") :
-    state === "starting" || state === "loading" ? (window.__veyrostAuraMessage || "AURA STARTING…") :
-    words().offStatus;
-  catchButton.style.display = active ? "block" : "none";
-  catchButton.textContent = words().catch;
+function copy(){ return labels[lang] || labels.en; }
+
+function movableElements(){
+  const elements=[...document.querySelectorAll(MOVABLE_SELECTOR)];
+  elements.forEach((element,index)=>{
+    element.dataset.veyrostLayoutId="link-"+index;
+    element.dataset.veyrostLayoutItem="true";
+  });
+  return elements;
 }
-function destroySpatialMode() {
-  try { spatialWorld?.destroy(); } catch (_) {}
-  spatialWorld = null;
-  spatialLoading = false;
-  spatialFallback = false;
-  stage.hidden = true;
-  stage.setAttribute("aria-hidden", "true");
+function offsetOf(element){
+  const value=(element.style.translate || "0px 0px").trim().split(/\s+/);
+  return {x:Number.parseFloat(value[0]) || 0,y:Number.parseFloat(value[1]) || 0};
 }
-function navigateFromSpatial(target) {
-  button.click();
-  if (target === "matter-lab.html") {
-    window.location.href = target;
-    return;
-  }
-  const destination = document.querySelector(target);
-  if (destination) destination.scrollIntoView({ behavior: "smooth", block: "start" });
-  try { history.replaceState(null, "", target); } catch (_) {}
-}
-async function openSpatialMode() {
-  if (spatialWorld || spatialLoading || state !== "active") return;
-  spatialLoading = true;
-  status.textContent = words().spatialLoading;
-  try {
-    const { SpatialWorldController } = await import("./spatial-world.mjs");
-    if (!controller.active || state !== "active") return;
-    stage.hidden = false;
-    stage.setAttribute("aria-hidden", "false");
-    spatialWorld = new SpatialWorldController({
-      mount: spatialMount,
-      language: lang,
-      onNavigate: navigateFromSpatial,
-      onStatus: name => {
-        if (name === "ready" && state === "active") status.textContent = words().onStatus;
-      }
+function saveLayout(){
+  try{
+    const positions=movableElements().map(element=>{
+      const point=offsetOf(element);
+      return {id:element.dataset.veyrostLayoutId,x:point.x,y:point.y};
     });
-    spatialWorld.start();
-    spatialWorld.setLanguage(lang);
-  } catch (error) {
-    spatialWorld?.destroy();
-    spatialWorld = null;
-    stage.hidden = true;
-    stage.setAttribute("aria-hidden", "true");
-    spatialFallback = true;
-    window.__veyrostSpatialError = error?.message || "WebGL initialization failed.";
-    render();
-  } finally {
-    spatialLoading = false;
-  }
+    localStorage.setItem(LAYOUT_KEY,JSON.stringify(positions));
+  }catch(_){}
 }
-function setStatus(next, message) {
-  state = next;
-  if (next === "error") window.__veyrostAuraError = message || "Camera or hand tracking unavailable.";
-  else window.__veyrostAuraMessage = message || "";
-  if (next === "active") void openSpatialMode();
-  if (next === "off" || next === "error") destroySpatialMode();
+function restoreLayout(){
+  const elements=movableElements();
+  try{
+    const saved=JSON.parse(localStorage.getItem(LAYOUT_KEY) || "[]");
+    if(!Array.isArray(saved)) return;
+    const byId=new Map(saved.filter(item=>item && typeof item.id==="string").map(item=>[item.id,item]));
+    for(const element of elements){
+      const position=byId.get(element.dataset.veyrostLayoutId);
+      if(!position || !Number.isFinite(position.x) || !Number.isFinite(position.y)) continue;
+      element.style.translate=position.x+"px "+position.y+"px";
+    }
+  }catch(_){}
+}
+function render(){
+  const active=state==="active" || state==="paused";
+  document.documentElement.classList.toggle("aura-active",active);
+  button.textContent=active ? copy().on : copy().off;
+  button.classList.toggle("is-on",active);
+  button.disabled=state==="starting" || state==="loading";
+  button.setAttribute("aria-pressed",String(active));
+  button.setAttribute("aria-label",active ? copy().on : copy().off);
+  layoutButton.hidden=!active;
+  layoutButton.classList.toggle("is-visible",active);
+  layoutButton.textContent=layoutEditing ? copy().done : copy().customize;
+  layoutButton.setAttribute("aria-pressed",String(layoutEditing));
+  status.style.display=state==="off" ? "none" : "block";
+  status.textContent=state==="active" ? (layoutEditing ? copy().editing : copy().onStatus) :
+    state==="paused" ? copy().paused :
+    state==="error" ? copy().error+" · "+(window.__veyrostAuraError || "") :
+    state==="starting" || state==="loading" ? (window.__veyrostAuraMessage || "AURA STARTING…") :
+    copy().offStatus;
+}
+function finishDrag(){
+  if(!activeDrag) return;
+  const moved=activeDrag.moved;
+  activeDrag=null;
+  if(moved) saveLayout();
+}
+function beginDrag(x,y,source){
+  if(!layoutEditing || activeDrag) return false;
+  const target=document.elementFromPoint(x,y)?.closest?.("[data-veyrost-layout-item]");
+  if(!target) return false;
+  const origin=offsetOf(target);
+  activeDrag={element:target,source,startX:x,startY:y,originX:origin.x,originY:origin.y,moved:false};
+  return true;
+}
+function moveDrag(x,y,source){
+  if(!activeDrag || activeDrag.source!==source) return;
+  const dx=x-activeDrag.startX;
+  const dy=y-activeDrag.startY;
+  if(Math.hypot(dx,dy)>3) activeDrag.moved=true;
+  activeDrag.element.style.translate=(activeDrag.originX+dx)+"px "+(activeDrag.originY+dy)+"px";
+}
+function setLayoutEditing(enabled){
+  layoutEditing=Boolean(enabled) && (state==="active" || state==="paused");
+  document.documentElement.classList.toggle("veyrost-layout-editing",layoutEditing);
+  if(!layoutEditing) finishDrag();
   render();
 }
-function relocateCatch() {
-  const margin = 22;
-  const maxX = Math.max(margin, window.innerWidth - catchButton.offsetWidth - margin);
-  const maxY = Math.max(110, window.innerHeight - catchButton.offsetHeight - margin);
-  catchButton.style.left = Math.round(margin + Math.random() * (maxX - margin)) + "px";
-  catchButton.style.top = Math.round(90 + Math.random() * Math.max(1, maxY - 90)) + "px";
+function setStatus(next,message){
+  state=next;
+  if(next==="error") window.__veyrostAuraError=message || "Camera or hand tracking unavailable.";
+  else window.__veyrostAuraMessage=message || "";
+  if(next==="off" || next==="error") setLayoutEditing(false);
+  render();
 }
-catchButton.addEventListener("click", relocateCatch);
-const controller = new AuraController({
-  video, cursor,
-  onStatus: setStatus,
-  onGesture: (name, extra = {}) => {
-    if (name === "emergency-pause") {
-      spatialWorld?.setPaused(true);
-      setStatus("paused");
-    }
-    if (name === "resume") {
-      spatialWorld?.setPaused(false);
-      setStatus("active");
-    }
-    if (name === "pinch-start" && Number.isFinite(extra.x) && Number.isFinite(extra.y)) {
-      spatialWorld?.beginHandPress(extra.x, extra.y);
-    }
-    if (name === "pinch-end" && Number.isFinite(extra.x) && Number.isFinite(extra.y)) {
-      spatialWorld?.endHandPress(extra.x, extra.y);
-    }
-    if (name === "pinch-cancel" || name === "cancel" || name === "hand-lost") {
-      spatialWorld?.cancelActiveInteraction();
-      if (name === "hand-lost") spatialWorld?.onHandLost();
-    }
-  },
-  onCursorMove: ({x,y}) => {
-    spatialWorld?.onHandMove(x, y);
-    if (catchButton.style.display === "block") {
-      const rect = catchButton.getBoundingClientRect();
-      if (Math.hypot(x-(rect.left+rect.width/2), y-(rect.top+rect.height/2)) < 90) relocateCatch();
-    }
-  }
+
+restoreLayout();
+document.addEventListener("pointerdown",event=>{
+  if(!layoutEditing || event.button!==0) return;
+  const target=event.target?.closest?.("[data-veyrost-layout-item]");
+  if(!target) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  beginDrag(event.clientX,event.clientY,"pointer");
 });
-button.addEventListener("click", async () => {
-  if (controller.active) {
+document.addEventListener("pointermove",event=>moveDrag(event.clientX,event.clientY,"pointer"));
+document.addEventListener("pointerup",()=>{if(activeDrag?.source==="pointer") finishDrag();});
+document.addEventListener("pointercancel",()=>{if(activeDrag?.source==="pointer") finishDrag();});
+document.addEventListener("click",event=>{
+  if(!layoutEditing) return;
+  if(event.target?.closest?.("[data-veyrost-layout-item]")){
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  }
+},true);
+
+const controller=new AuraController({
+  video,cursor,
+  onStatus:setStatus,
+  onGesture:(name,extra={})=>{
+    if(name==="pinch-start" && Number.isFinite(extra.x) && Number.isFinite(extra.y)) beginDrag(extra.x,extra.y,"hand");
+    if(name==="pinch-end" || name==="pinch-cancel" || name==="cancel" || name==="hand-lost"){
+      if(activeDrag?.source==="hand") finishDrag();
+    }
+    if(name==="emergency-pause") setStatus("paused");
+    if(name==="resume") setStatus("active");
+  },
+  onCursorMove:({x,y})=>moveDrag(x,y,"hand")
+});
+
+button.addEventListener("click",async()=>{
+  if(controller.active){
     await controller.stop();
     return;
   }
-  try {
-    await controller.start();
-    relocateCatch();
-  } catch (error) {
-    setStatus("error", error?.message || "AURA could not start.");
-  }
+  try{await controller.start();}
+  catch(error){setStatus("error",error?.message || "AURA could not start.");}
 });
-spatialReset.addEventListener("click", () => spatialWorld?.resetLayout());
-spatialExit.addEventListener("click", () => button.click());
-new MutationObserver(() => {
-  lang = document.documentElement.lang || "en";
-  spatialWorld?.setLanguage(lang);
+layoutButton.addEventListener("click",()=>setLayoutEditing(!layoutEditing));
+new MutationObserver(()=>{
+  lang=document.documentElement.lang || "en";
   render();
-}).observe(document.documentElement, { attributes:true, attributeFilter:["lang"] });
-window.addEventListener("pagehide", () => {
-  destroySpatialMode();
+}).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
+window.addEventListener("pagehide",()=>{
+  setLayoutEditing(false);
   void controller.stop({notify:false});
 });
 render();
