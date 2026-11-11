@@ -33,7 +33,7 @@ The spatial layout is stored in browser `localStorage` under `veyrost:spatial-la
 - Emergency pause stops spatial interaction until resumed.
 - Selecting a panel without moving opens its destination; dragging moves the panel.
 - Selecting a movable panel also opens a depth HUD. Its range control and step buttons adjust the panel on the Z axis; mouse-wheel input adjusts the hovered/selected panel, and Shift+wheel uses finer steps.
-- The depth HUD is localized in English, Russian and Tajik. Its step buttons are compatible with AURA pinch activation; touch users can use the range control and buttons.
+- The depth HUD is localized in English, Russian and Tajik. Its step buttons are compatible with AURA pinch activation; touch users can use the range control and buttons. The selected depth is saved in the existing `version: 1` payload; older records without `z` remain valid.
 
 ## Protected controls and mount repair
 
