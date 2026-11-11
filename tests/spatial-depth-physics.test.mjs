@@ -37,7 +37,7 @@ test("mass ratio controls positional correction", async () => {
   const light = world.add({ id: "light", x: 0, y: 0, z: 0, width: 2, height: 2, depth: 0.5, mass: 1 });
   const heavy = world.add({ id: "heavy", x: 0, y: 0, z: 0.1, width: 2, height: 2, depth: 0.5, mass: 10 });
   world.step(1 / 60);
-  assert.ok(Math.abs(light.z) > Math.abs(heavy.z) * 5);
+  assert.ok(Math.abs(light.z - 0) > Math.abs(heavy.z - 0.1) * 5);
 });
 
 test("invalid dimensions and duplicate IDs are rejected", async () => {
