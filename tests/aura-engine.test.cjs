@@ -99,6 +99,7 @@ test("pinch emits start and end events for draggable spatial objects", async () 
   setFinger(pointing, 20, 18, false);
   pointing[4] = { x: 0.1, y: 0.1 };
   controller._consume({ landmarks: [pointing] });
+  controller._consume({ landmarks: [pointing] });
 
   assert.ok(events.some(event => event.name === "pinch-start"));
   assert.ok(events.some(event => event.name === "pinch-end"));
@@ -138,7 +139,7 @@ test("pinch recognition scales with hand size and uses a wider release threshold
   points[4] = {x:0.5,y:0.34};
   points[8] = {x:0.5,y:0.38};
   assert.equal(classifyHand(points), "pinch");
-  points[4] = {x:0.5,y:0.29};
+  points[4] = {x:0.5,y:0.1};
   points[8] = {x:0.5,y:0.38};
   assert.equal(classifyHand(points, undefined, "pinch"), "pinch");
   assert.equal(classifyHand(points), "move");
