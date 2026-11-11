@@ -170,15 +170,13 @@ export class SpatialWorldController {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x030916);
     this.scene.fog = new THREE.FogExp2(0x07101c, 0.018);
-    this.camera = new THREE.OrthographicCamera(
-      -width / (2 * this.units),
-      width / (2 * this.units),
-      height / (2 * this.units),
-      -height / (2 * this.units),
+    this.camera = new THREE.PerspectiveCamera(
+      THREE.MathUtils.radToDeg(2 * Math.atan(height / (2 * this.units * 18))),
+      width / height,
       0.1,
       100
     );
-    this.camera.position.set(0, 0, 24);
+    this.camera.position.set(0, 0, 18);
     this.camera.lookAt(0, 0, 0);
 
     this._buildEnvironment();
@@ -365,7 +363,13 @@ export class SpatialWorldController {
       group.add(hitArea);
 
       group.userData.panelId = definition.id;
-      group.rotation.set(0.012 * (layout.panels.indexOf(definition) % 2 ? 1 : -1), 0, 0);
+      const panelIndex = layout.panels.indexOf(definition);
+      group.userData.depth = [-0.9, 0.55, -0.35, 0.85, -0.65, 0.25][panelIndex] ?? 0;
+      group.rotation.set(
+        panelIndex % 2 ? -0.035 : 0.035,
+        panelIndex % 3 === 0 ? -0.055 : 0.055,
+        panelIndex % 2 ? 0.012 : -0.012
+      );
       this.scene.add(group);
       this.panelGroups.set(definition.id, { group, bodyMaterial, definition, hitArea });
 
@@ -439,10 +443,10 @@ export class SpatialWorldController {
     const height = Math.max(1, this.window.innerHeight);
     this.renderer.setPixelRatio(Math.min(this.window.devicePixelRatio || 1, width < 680 ? 1.2 : 1.5));
     this.renderer.setSize(width, height, false);
-    this.camera.left = -width / (2 * this.units);
-    this.camera.right = width / (2 * this.units);
-    this.camera.top = height / (2 * this.units);
-    this.camera.bottom = -height / (2 * this.units);
+    this.camera.aspect = width / height;
+    this.camera.fov = THREE.MathUtils.radToDeg(
+      2 * Math.atan(height / (2 * this.units * this.camera.position.z))
+    );
     this.camera.updateProjectionMatrix();
 
     const previousWidth = this.viewport?.width ?? width;
@@ -644,7 +648,7 @@ export class SpatialWorldController {
       this.window.innerHeight,
       this.units
     );
-    panel.group.position.set(position.x, position.y, 0);
+    panel.group.position.set(position.x, position.y, panel.group.userData.depth ?? 0);
     const amount = Math.min(0.22, body.compression || 0);
     panel.group.scale.x = body.compressionAxis === "x" ? 1 - amount : 1 + amount * 0.18;
     panel.group.scale.y = body.compressionAxis === "y" ? 1 - amount : 1 + amount * 0.18;
@@ -661,7 +665,9 @@ export class SpatialWorldController {
       this._syncPanel(body, panel);
       const index = this.layout.panels.findIndex(item => item.id === id);
       panel.group.rotation.z = Math.sin(elapsed * 0.42 + index * 1.1) * 0.012;
-      panel.group.position.z = 0.04 + Math.sin(elapsed * 0.8 + index) * 0.025;
+      panel.group.position.z = (panel.group.userData.depth ?? 0) + Math.sin(elapsed * 0.8 + index) * 0.035;
+      panel.group.rotation.x += Math.sin(elapsed * 0.31 + index) * 0.00008;
+      panel.group.rotation.y += Math.cos(elapsed * 0.27 + index * 0.7) * 0.00007;
     }
 
     this.core.rotation.y = elapsed * 0.24;
