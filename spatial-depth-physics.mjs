@@ -55,10 +55,10 @@ export class DepthPhysicsWorld {
     const invB = b.anchored ? 0 : 1 / b.mass;
     const inverseTotal = invA + invB;
     if (!inverseTotal) return;
-    const direction = a.z <= b.z ? -1 : 1;
+    const direction = a.z <= b.z ? 1 : -1;
     const correction = Math.max(0, penetration - 0.0005) * 0.82 / inverseTotal;
-    if (invA) a.z += direction * correction * invA;
-    if (invB) b.z -= direction * correction * invB;
+    if (invA) a.z -= direction * correction * invA;
+    if (invB) b.z += direction * correction * invB;
 
     const relative = (b.velocityZ - a.velocityZ) * direction;
     if (relative < 0) {
