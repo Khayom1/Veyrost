@@ -186,9 +186,11 @@ export class AuraController {
       if (this.lastGesture === "pinch") {
         this._gesture("pinch-end", this.lastPosition || {});
       }
+      if (this.lastPosition) this._gesture("hand-lost");
       if (this.cursor) this.cursor.style.visibility = "hidden";
       this.lastGesture = "none";
       this.lastPosition = null;
+      this.smoothedPosition = null;
       return;
     }
 
