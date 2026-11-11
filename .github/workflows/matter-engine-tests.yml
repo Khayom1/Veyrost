@@ -1,0 +1,27 @@
+name: Matter Engine checks
+
+on:
+  push:
+    branches:
+      - feat/veyrost-matter-engine-foundation
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check JavaScript syntax
+        run: node --check matter-engine.js
+      - name: Run physics regression tests
+        run: node --test tests/matter-engine.test.cjs
