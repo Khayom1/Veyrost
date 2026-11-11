@@ -100,9 +100,11 @@ export function validateSavedLayout(value, allowedIds = SPATIAL_PANELS.map(panel
   for (const panel of value.panels) {
     if (!panel || typeof panel.id !== "string" || !allowed.has(panel.id) || seen.has(panel.id)) continue;
     const x = Number(panel.x), y = Number(panel.y);
+    const z = panel.z === undefined ? undefined : Number(panel.z);
     if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+    if (z !== undefined && (!Number.isFinite(z) || z < -1.25 || z > 1.25)) continue;
     seen.add(panel.id);
-    panels.push({ id: panel.id, x, y });
+    panels.push(z === undefined ? { id: panel.id, x, y } : { id: panel.id, x, y, z });
   }
   return panels.length ? panels : null;
 }
