@@ -53,3 +53,19 @@ test("compact panel bounds remain inside a narrow mobile viewport", async () => 
     assert.ok(panel.x + panel.width <= 320);
   }
 });
+
+test("saved spatial layouts reject invalid records and unknown panel IDs", async () => {
+  const { validateSavedLayout } = await apiPromise;
+  assert.deepEqual(validateSavedLayout({ version: 1, panels: [
+    { id: "home", x: 0.2, y: 0.3 },
+    { id: "unknown", x: 0.1, y: 0.1 },
+    { id: "projects", x: Infinity, y: 0.2 }
+  ] }), [{ id: "home", x: 0.2, y: 0.3 }]);
+  assert.equal(validateSavedLayout({ version: 2, panels: [{ id: "home", x: 0, y: 0 }] }), null);
+});
+
+test("responsive layout scaling preserves normalized panel positions", async () => {
+  const { scalePanelLayout } = await apiPromise;
+  const scaled = scalePanelLayout([{ id: "home", x: 100, y: 200, width: 120, height: 50 }], 400, 800, 800, 400);
+  assert.deepEqual(scaled, [{ id: "home", x: 200, y: 100, width: 240, height: 25 }]);
+});
