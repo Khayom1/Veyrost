@@ -52,25 +52,42 @@ test("layout editing requires AURA and the explicit MOVE ITEMS control", () => {
   assert.match(site, /moveDrag\(x,y,"hand"\)/);
 });
 
-test("categories and project cards can be moved with mouse, touch and hand pinch", () => {
+test("workspace categories and project cards are movable, including the private category", () => {
+  const studio=fs.readFileSync("studio.html","utf8");
   assert.match(site, /addEventListener\("pointerdown"/);
   assert.match(site, /addEventListener\("pointermove"/);
   assert.match(site, /data-veyrost-layout-item/);
   assert.match(site, /localStorage\.setItem\(LAYOUT_KEY/);
   assert.match(site, /Object\.assign\(positions,existing\)/);
+  assert.equal((studio.match(/class="card workspace-module" data-veyrost-layout-item/g)||[]).length,7);
+  assert.match(studio,/data-layout-id="workspace-private"/);
+  assert.match(studio,/1 PRIVATE PROJECT/);
 });
 
-test("the project directory contains all 19 public repositories and source links", () => {
-  assert.equal(projects.length,19);
-  assert.equal(new Set(projects.map(p=>p.id)).size,19);
-  for (const project of projects) {
+test("the directory contains every repository record without exposing private source links", () => {
+  assert.equal(projects.length,20);
+  assert.equal(new Set(projects.map(p=>p.id)).size,20);
+  const publicProjects=projects.filter(p=>p.visibility!=="private");
+  const privateProjects=projects.filter(p=>p.visibility==="private");
+  assert.equal(publicProjects.length,19);
+  assert.equal(privateProjects.length,1);
+  for (const project of publicProjects) {
     assert.ok(project.name && project.repo && project.description);
     assert.match(project.url,/^https:\/\/github\.com\/Khayom1\//);
   }
+  assert.equal(privateProjects[0].repo,"telegram-channel-mcp");
+  assert.equal(privateProjects[0].url,null);
+  assert.match(site,/p\.visibility==="private"[\s\S]*OWNER ACCESS ONLY/);
   assert.ok(projects.some(p=>p.repo==="SkillGuard"));
   assert.ok(projects.some(p=>p.repo==="WAYLINE-RADIO"));
   assert.ok(projects.some(p=>p.repo==="Scancam"));
   assert.ok(projects.some(p=>p.repo==="textivo"));
+});
+
+test("browser storage failures do not abort language or settings controls", () => {
+  assert.match(site,/try\{language=localStorage\.getItem\("veyrost-language"\)/);
+  assert.match(site,/try\{saved=localStorage\.getItem\(key\)\}catch\(_\)\{\}/);
+  assert.match(site,/try\{localStorage\.setItem\(key,String\(next\)\)\}catch\(_\)\{persisted=false\}/);
 });
 
 test("project directory has real search, category filters and count feedback", () => {
