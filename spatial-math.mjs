@@ -75,3 +75,34 @@ export function computeSpatialLayout(width, height) {
     }
   };
 }
+
+export function scalePanelLayout(panels, oldWidth, oldHeight, newWidth, newHeight) {
+  const fromWidth = Math.max(1, finite(oldWidth, 1));
+  const fromHeight = Math.max(1, finite(oldHeight, 1));
+  const toWidth = Math.max(1, finite(newWidth, 1));
+  const toHeight = Math.max(1, finite(newHeight, 1));
+  const sx = toWidth / fromWidth;
+  const sy = toHeight / fromHeight;
+  return (Array.isArray(panels) ? panels : []).map(panel => ({
+    id: String(panel.id),
+    x: finite(panel.x, 0) * sx,
+    y: finite(panel.y, 0) * sy,
+    width: Math.max(1, finite(panel.width, 1) * sx),
+    height: Math.max(1, finite(panel.height, 1) * sy)
+  }));
+}
+
+export function validateSavedLayout(value, allowedIds = SPATIAL_PANELS.map(panel => panel.id)) {
+  if (!value || value.version !== 1 || !Array.isArray(value.panels)) return null;
+  const allowed = new Set(allowedIds);
+  const seen = new Set();
+  const panels = [];
+  for (const panel of value.panels) {
+    if (!panel || typeof panel.id !== "string" || !allowed.has(panel.id) || seen.has(panel.id)) continue;
+    const x = Number(panel.x), y = Number(panel.y);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+    seen.add(panel.id);
+    panels.push({ id: panel.id, x, y });
+  }
+  return panels.length ? panels : null;
+}
