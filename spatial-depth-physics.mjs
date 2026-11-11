@@ -18,7 +18,7 @@ export class DepthPhysicsWorld {
       if (!Number.isFinite(value)) throw new TypeError(`Depth body ${key} must be finite.`);
     }
     if (width <= 0 || height <= 0 || depth <= 0 || mass <= 0) throw new RangeError("Depth body dimensions and mass must be positive.");
-    const body = { id, x, y, z, width, height, depth, mass, velocityZ, anchored: Boolean(anchored), collisions: 0 };
+    const body = { id, x, y, z, initialZ: z, width, height, depth, mass, velocityZ, anchored: Boolean(anchored), collisions: 0 };
     this.bodies.set(id, body);
     return body;
   }
@@ -26,6 +26,15 @@ export class DepthPhysicsWorld {
   get(id) { return this.bodies.get(id) ?? null; }
 
   remove(id) { return this.bodies.delete(id); }
+
+  reset() {
+    for (const body of this.bodies.values()) {
+      body.z = body.initialZ;
+      body.velocityZ = 0;
+      body.collisions = 0;
+    }
+    this.collisions = 0;
+  }
 
   step(delta) {
     const dt = clamp(Number.isFinite(delta) ? delta : 0, 0, 1 / 20);
