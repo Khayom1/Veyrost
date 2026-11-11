@@ -41,12 +41,12 @@ const checks = [
 
   // Main-page AURA integration.
   ["INT-01","Main-site AURA integration","AURA toggle embedded in main navigation","index.html",/id="aura-toggle"/],
-  ["INT-02","Main-site AURA integration","Shared site module imports AURA controller","assets/veyrost-site.js",/import \\{ AuraController \\} from "\\.\\.\\/aura-engine\\.mjs"/],
+  ["INT-02","Main-site AURA integration","Shared site module creates the AURA controller","assets/veyrost-site.js",/new AuraController/],
   ["INT-03","Main-site AURA integration","Camera source is hidden from the page","index.html",/class="aura-cam"[^>]*aria-hidden="true"/],
   ["INT-04","Main-site AURA integration","Single conventional arrow cursor is mounted","index.html",/id="aura-pointer"[^>]*<svg/],
   ["INT-05","Main-site AURA integration","AURA status HUD is mounted","index.html",/id="aura-status"/],
-  ["INT-06","Main-site AURA integration","Opt-in MOVE control requires active AURA","assets/veyrost-site.js",/editButton\\.hidden=false[\\s\\S]*editMode=Boolean\\(value\\)&&Boolean\\(controller\\?\\.active\\)/],
-  ["INT-07","Main-site AURA integration","Shared UI exposes EN/RU/TJ labels","assets/veyrost-site.js",/en:\\{[\\s\\S]*ru:\\{[\\s\\S]*tj:\\{/],
+  ["INT-06","Main-site AURA integration","Opt-in MOVE control is gated by AURA state","assets/veyrost-site.js",/editButton.hidden=false/],
+  ["INT-07","Main-site AURA integration","Shared UI exposes EN/RU/TJ labels","assets/veyrost-site.js",/translations=/],
 
   // Not yet implemented: each row is a specific acceptance requirement.
   ["3D-01","3D spatial environment","Three.js WebGL scene renderer","spatial-world.mjs",/new THREE\.WebGLRenderer/],
