@@ -1,0 +1,31 @@
+name: Matter Engine checks
+
+on:
+  push:
+    branches:
+      - feat/veyrost-matter-engine-foundation
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check JavaScript syntax
+        run: node --check matter-engine.js
+      - name: Check embedded lab script syntax
+        run: |
+          node -e 'const fs=require("node:fs"); const html=fs.readFileSync("matter-lab.html","utf8"); const match=html.match(/<script>\s*([\s\S]*?)<\/script>/i); if(!match) throw new Error("Inline lab script not found"); fs.writeFileSync("/tmp/matter-lab-inline.js",match[1]);'
+          node --check /tmp/matter-lab-inline.js
+      - name: Run physics regression tests
+        run: node --test tests/matter-engine.test.cjs

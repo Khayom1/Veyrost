@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080b12">
+<meta name="description" content="VEYROST MATTER ENGINE interactive physics prototype.">
+<title>VEYROST MATTER ENGINE — Lab</title>
+<style>
+:root{color-scheme:dark;--bg:#070a10;--panel:#0e1420;--panel2:#121b2a;--line:#26364b;--text:#eef5ff;--muted:#8e9db4;--cyan:#65e5ff;--violet:#a99aff;--warn:#ffca74;--red:#ff6b77;--green:#81edbb}
+*{box-sizing:border-box}html,body{height:100%;margin:0}body{overflow:hidden;background:radial-gradient(ellipse at 75% 0%,#273b6738,transparent 42%),var(--bg);color:var(--text);font:14px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+button{font:inherit;color:inherit;cursor:pointer}button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+.top{height:76px;display:flex;align-items:center;gap:16px;padding:0 22px;border-bottom:1px solid var(--line);background:#090e18eF;position:relative;z-index:20}
+.brand{display:flex;align-items:center;gap:10px;min-width:170px}.mark{width:35px;height:35px;display:grid;place-items:center;border-radius:10px;background:linear-gradient(140deg,#b5a4ff,#55c9ef);color:#08111b;font-weight:950;font-size:19px;box-shadow:0 0 24px #6acfff30}
+.brand strong{display:block;letter-spacing:.16em;font-size:12px}.brand small{display:block;color:var(--muted);font-size:9px;letter-spacing:.18em}
+.nav{display:flex;align-items:center;gap:8px;margin-left:auto}.nav button,.tool{border:1px solid var(--line);background:#ffffff06;border-radius:10px;padding:9px 12px;font-size:11px;font-weight:800;letter-spacing:.04em;transition:.2s}
+.nav button:hover,.tool:hover{border-color:#6ce4ff7c;background:#70e5ff12}.nav button.protected{border-color:#a99aff65;color:#d8d0ff}
+.nav .socket{min-width:78px;border:1px dashed #ffb86d80;color:#ffcc90;background:#ffac4210;border-radius:10px;padding:8px 10px;font-size:10px;letter-spacing:.08em}
+.lang{display:flex;gap:3px;border:1px solid var(--line);padding:3px;border-radius:9px}.lang button{border:0;background:transparent;border-radius:6px;color:var(--muted);padding:5px 7px;font-size:10px;font-weight:800}.lang button.active{background:#28354a;color:white}
+.layout{height:calc(100dvh - 76px);display:grid;grid-template-columns:minmax(0,1fr) 290px}
+.workspace{position:relative;overflow:hidden;min-width:0;isolation:isolate;background-image:linear-gradient(#ffffff07 1px,transparent 1px),linear-gradient(90deg,#ffffff07 1px,transparent 1px);background-size:34px 34px}
+.workspace:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 42%,#1b43632b,transparent 58%)}
+.workspace:after{content:"";position:absolute;inset:10px;border:1px solid #ffffff0b;border-radius:16px;pointer-events:none}
+.hud{position:absolute;top:22px;left:26px;right:26px;display:flex;justify-content:space-between;gap:12px;align-items:flex-start;z-index:4;pointer-events:none}
+.hud>div{pointer-events:none}.eyebrow{color:var(--cyan);font-size:9px;font-weight:900;letter-spacing:.22em}.title{font-size:clamp(20px,3vw,30px);letter-spacing:-.045em;font-weight:800;margin-top:5px}.sub{color:var(--muted);font-size:11px;margin-top:6px}.status{border:1px solid var(--line);border-radius:30px;padding:7px 10px;color:#aab9cb;background:#0c1421d9;font-size:9px;font-weight:900;letter-spacing:.1em;white-space:nowrap}
+.status.live{border-color:#65e5ff5c;color:var(--cyan);box-shadow:0 0 25px #65e5ff12}
+.instruction{position:absolute;left:26px;bottom:24px;color:#91a1b7;font-size:10px;max-width:380px;z-index:4;pointer-events:none}
+.items{position:absolute;inset:0;z-index:2;overflow:hidden;touch-action:none}
+.matter-item{position:absolute;left:0;top:0;min-width:112px;height:54px;padding:0 19px;border-radius:15px;border:1px solid #9ceeff6b;background:linear-gradient(150deg,#20384a,#111d2b 62%,#0c1521);box-shadow:inset 0 1px #ffffff26,0 12px 28px #0007,0 0 22px #60dfff17;color:#eafaff;font-size:11px;font-weight:900;letter-spacing:.12em;display:flex;align-items:center;justify-content:center;white-space:nowrap;user-select:none;touch-action:none;transform-origin:center;will-change:transform;transition:border-color .15s,box-shadow .15s}
+.matter-item.gel{background:linear-gradient(145deg,#7ddff44a,#4b83bc42 52%,#15304c);border-color:#6deaffaa;box-shadow:inset 0 1px #ffffff65,0 12px 28px #0008,0 0 26px #6befff2b;backdrop-filter:blur(7px)}
+.matter-item.metal{background:linear-gradient(145deg,#626d79,#263341 48%,#101c27);border-color:#c4d4e3a6;box-shadow:inset 0 1px #ffffff65,0 13px 29px #0009}
+.matter-item.hybrid{background:linear-gradient(145deg,#293e52,#142638 55%,#0c1624);border-color:#7bdfff9c}
+.matter-item.dragging{z-index:10;box-shadow:0 18px 45px #000b,0 0 30px #63e6ff39;border-color:#c5f8ff}
+.matter-item.detached{border-color:#ffca74;box-shadow:0 0 25px #ffbc5733,0 15px 35px #0009}
+.socket-wire{position:relative;display:inline-flex;align-items:center;gap:5px;min-width:82px;color:#ffcc8f;border:1px dashed #ffb86d8a;border-radius:10px;padding:6px 8px;font-size:9px;font-weight:900;letter-spacing:.1em;background:#ffae3c0d}
+.socket-wire:after{content:"";position:absolute;left:50%;top:100%;height:18px;width:2px;background:repeating-linear-gradient(to bottom,#ffba6a 0 3px,transparent 3px 6px);transform:rotate(-13deg);transform-origin:top}
+.sidebar{border-left:1px solid var(--line);background:linear-gradient(180deg,#101827,#0b111b);padding:20px 17px;overflow:auto;position:relative;z-index:5}
+.panel-title{font-size:10px;color:var(--cyan);letter-spacing:.18em;font-weight:900}.panel h2{font-size:20px;letter-spacing:-.04em;margin:5px 0 18px}.block{border:1px solid var(--line);background:#ffffff05;border-radius:13px;padding:14px;margin:12px 0}
+.block h3{font-size:11px;margin:0 0 7px}.block p{font-size:10px;color:var(--muted);margin:0;line-height:1.7}
+.toggle{width:100%;margin:7px 0;border:1px solid var(--line);background:#121e2d;border-radius:10px;padding:11px 12px;display:flex;align-items:center;justify-content:space-between;text-align:left;font-size:11px;font-weight:850}
+.toggle.active{border-color:#65e5ff99;background:#123047;color:#8eeeff;box-shadow:0 0 22px #65e5ff12}
+.pip{width:8px;height:8px;border-radius:50%;background:#66768c;box-shadow:0 0 0 4px #66768c21}.active .pip{background:var(--green);box-shadow:0 0 0 4px #81edbb21}
+.field{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:11px 0;font-size:10px;color:#b5c2d3}.field select{background:#111b2a;border:1px solid var(--line);border-radius:8px;padding:7px;color:white;font:inherit}
+input[type=range]{width:100%;accent-color:var(--cyan)}
+.action{width:100%;border:1px solid var(--line);background:#ffffff08;border-radius:10px;padding:10px;margin-top:8px;font-size:10px;font-weight:900;letter-spacing:.07em}.action.primary{border-color:#68e7ff80;color:#a3f0ff;background:#62dfff13}.action.warn{border-color:#ffca746c;color:#ffd49a;background:#ffbb4e0e}
+.action:disabled{opacity:.38;cursor:not-allowed}
+.callout{display:none;border:1px solid #ffbd6766;background:#ffb94b0c;padding:13px;border-radius:13px;margin-top:12px}.callout.show{display:block}.callout strong{display:block;color:#ffd39b;font-size:10px;letter-spacing:.08em}.callout p{font-size:10px;color:#b9a58a;line-height:1.6}
+.toast{position:absolute;left:50%;bottom:70px;transform:translate(-50%,15px);z-index:30;background:#101c2b;border:1px solid #6ce5ff6a;color:#e7faff;border-radius:11px;padding:10px 14px;font-size:11px;box-shadow:0 12px 30px #0008;opacity:0;pointer-events:none;transition:.22s;max-width:min(88%,420px);text-align:center}.toast.show{opacity:1;transform:translate(-50%,0)}
+body.editing .matter-item{cursor:grab}body.editing .matter-item.dragging{cursor:grabbing}
+body.editing .workspace{box-shadow:inset 0 0 0 1px #65e5ff26}
+body.aura-visual .workspace{background-image:linear-gradient(#74e8ff0d 1px,transparent 1px),linear-gradient(90deg,#74e8ff0d 1px,transparent 1px);background-size:34px 34px}
+.footer-note{font-size:9px;color:#677990;margin-top:16px;line-height:1.6}
+@media(max-width:850px){.layout{grid-template-columns:1fr;grid-template-rows:minmax(260px,1fr) auto;height:calc(100dvh - 68px)}.top{height:68px;padding:0 12px;gap:8px}.brand{min-width:auto}.brand small{display:none}.nav{gap:5px}.nav button{padding:8px 9px}.lang{display:none}.sidebar{border-left:0;border-top:1px solid var(--line);padding:12px;max-height:38dvh;display:grid;grid-template-columns:1fr 1fr;gap:0 10px}.panel{grid-column:1/-1}.block{margin:6px 0;padding:10px}.block.controls{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:8px}.block.controls h3{grid-column:1/-1}.instruction{bottom:14px;left:16px;font-size:9px}.hud{left:17px;right:17px;top:16px}.status{font-size:8px}.matter-item{height:48px;min-width:100px;padding:0 14px;font-size:10px}}
+@media(max-width:430px){.brand strong{font-size:10px}.mark{width:30px;height:30px}.nav button{font-size:9px;padding:7px 8px}.sidebar{max-height:42dvh}.status{display:none}.title{font-size:21px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="index.html" aria-label="VEYROST home"><span class="mark">V</span><span><strong>VEYROST</strong><small>MATTER ENGINE / LAB</small></span></a>
+  <nav class="nav" aria-label="Protected system controls">
+    <button class="protected" id="menuLock" data-protected="menu">MENU</button>
+    <button class="protected" id="settingsLock" data-protected="settings">SETTINGS</button>
+  </nav>
+  <div class="lang" aria-label="Language">
+    <button data-lang="en" class="active">EN</button><button data-lang="ru">RU</button><button data-lang="tj">TJ</button>
+  </div>
+</header>
+<div class="layout">
+  <main class="workspace" id="workspace" aria-label="Matter physics workspace">
+    <div class="hud"><div><div class="eyebrow">VEYROST / SPATIAL INTERFACE</div><div class="title" data-i18n="title">A physical interface.</div><div class="sub" data-i18n="subtitle">Buttons have mass. Boundaries have force.</div></div><div class="status" id="status">ENGINE STANDBY</div></div>
+    <div class="items" id="items"></div>
+    <div class="instruction" data-i18n="hint">Enable Matter Mode, then drag the floating controls. Push them together. The workspace edges are solid walls.</div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </main>
+  <aside class="sidebar">
+    <div class="panel">
+      <div class="panel-title">CONTROL DECK / 01</div>
+      <h2 data-i18n="control">Matter controls</h2>
+      <button class="toggle" id="matterToggle"><span data-i18n="matterMode">MATTER MODE</span><span class="pip"></span></button>
+      <button class="toggle" id="auraVisualToggle"><span data-i18n="auraVisual">AURA VISUAL LAYER</span><span class="pip"></span></button>
+      <div class="block">
+        <h3 data-i18n="materialTitle">MATERIAL PROFILE</h3>
+        <div class="field"><label for="material">Material</label><select id="material"><option value="hybrid">Hybrid / default</option><option value="metal">Matter Metal</option><option value="gel">Matter Gel</option></select></div>
+        <div class="field"><label for="mass">Object mass</label><output id="massValue">1.0×</output></div><input id="mass" type="range" min=".5" max="4" step=".1" value="1.4">
+        <div class="field"><label for="elasticity">Elasticity</label><output id="elasticValue">42%</output></div><input id="elasticity" type="range" min="0" max="1" step=".01" value=".42">
+      </div>
+      <div class="block controls">
+        <h3 data-i18n="layoutTitle">LAYOUT</h3>
+        <button class="action primary" id="saveLayout" data-i18n="save">SAVE LAYOUT</button>
+        <button class="action" id="resetLayout" data-i18n="reset">RESET INTERFACE</button>
+      </div>
+      <div class="callout" id="detachedCallout">
+        <strong data-i18n="detached">PROTECTED CONTROL DETACHED</strong>
+        <p data-i18n="detachedText">The mount is exposed. The cinematic service crew is the next development milestone.</p>
+        <button class="action warn" disabled data-i18n="crewLater">SERVICE CREW — PHASE II</button>
+        <button class="action" id="restoreControls" data-i18n="restore">RESTORE CONTROL FOR TESTING</button>
+      </div>
+      <div class="block">
+        <h3 data-i18n="rulesTitle">PHYSICS RULES</h3>
+        <p data-i18n="rules">Objects push apart on contact. Compression is capped to preserve their shape. Viewport boundaries are solid. MENU and SETTINGS resist the first pull and detach on the second.</p>
+      </div>
+      <p class="footer-note" data-i18n="disclaimer">Prototype 0.1 · Mouse and touch input · No camera access · No frame upload · Not yet the final 3D repair experience.</p>
+    </div>
+  </aside>
+</div>
+<script src="matter-engine.js"></script>
+<script>
+(function(){
+  "use strict";
+  const M=window.VEYROST_MATTER;
+  if(!M){document.getElementById("status").textContent="ENGINE ERROR";return;}
+  const $=id=>document.getElementById(id);
+  const workspace=$("workspace"),items=$("items"),status=$("status"),toast=$("toast");
+  const bodies=new Map(),protectedState={menu:{attempts:0,label:"MENU",socket:false},settings:{attempts:0,label:"SETTINGS",socket:false}};
+  const world=new M.MatterWorld(1,1,{gravity:0.0});
+  let editMode=false,auraVisual=false,lastFrame=0,lastToast=0,activePointer=null,dragSample=null;
+  const i18n={
+    en:{title:"A physical interface.",subtitle:"Buttons have mass. Boundaries have force.",hint:"Enable Matter Mode, then drag the floating controls. Push them together. The workspace edges are solid walls.",control:"Matter controls",matterMode:"MATTER MODE",auraVisual:"AURA VISUAL LAYER",materialTitle:"MATERIAL PROFILE",layoutTitle:"LAYOUT",save:"SAVE LAYOUT",reset:"RESET INTERFACE",detached:"PROTECTED CONTROL DETACHED",detachedText:"The mount is exposed. The cinematic service crew is the next development milestone.",crewLater:"SERVICE CREW — PHASE II",restore:"RESTORE CONTROL FOR TESTING",rulesTitle:"PHYSICS RULES",rules:"Objects push apart on contact. Compression is capped to preserve their shape. Viewport boundaries are solid. MENU and SETTINGS resist the first pull and detach on the second.",disclaimer:"Prototype 0.1 · Mouse and touch input · No camera access · No frame upload · Not yet the final 3D repair experience.",heavy:"Heavy lock engaged. The control resisted your first pull.",detachedToast:"Mount released. Detached control is now a physical object.",saved:"Layout saved on this device.",resetDone:"Interface reset. Protected controls restored.",modeOn:"Matter Mode active. Drag any free control.",modeOff:"Matter Mode paused.",press:"Switch on Matter Mode before pulling this protected control."},
+    ru:{title:"Физический интерфейс.",subtitle:"У кнопок есть масса. У границ есть сила.",hint:"Включите Matter Mode и перетаскивайте свободные элементы. Сближайте их: края рабочей области — твёрдые стены.",control:"Управление Matter",matterMode:"РЕЖИМ MATTER",auraVisual:"ВИЗУАЛЬНЫЙ СЛОЙ AURA",materialTitle:"ПРОФИЛЬ МАТЕРИАЛА",layoutTitle:"РАСКЛАДКА",save:"СОХРАНИТЬ",reset:"СБРОСИТЬ ИНТЕРФЕЙС",detached:"ЗАЩИЩЁННЫЙ ЭЛЕМЕНТ ОТКЛЮЧЁН",detachedText:"Крепление открыто. Кинематографическая команда ремонта — следующий этап разработки.",crewLater:"РЕМОНТНАЯ БРИГАДА — ЭТАП II",restore:"ВОССТАНОВИТЬ ДЛЯ ТЕСТА",rulesTitle:"ПРАВИЛА ФИЗИКИ",rules:"При контакте объекты отталкиваются. Сжатие ограничено, чтобы сохранить форму. Границы экрана непроходимы. MENU и SETTINGS сопротивляются первой попытке и отсоединяются при второй.",disclaimer:"Прототип 0.1 · Мышь и касание · Без доступа к камере · Без загрузки кадров · Это ещё не финальная 3D-сцена ремонта.",heavy:"Тяжёлый фиксатор сработал. Первая попытка не удалась.",detachedToast:"Крепление сорвано. Элемент стал физическим объектом.",saved:"Раскладка сохранена на этом устройстве.",resetDone:"Интерфейс сброшен. Защищённые элементы восстановлены.",modeOn:"Matter Mode включён. Перетаскивайте свободные элементы.",modeOff:"Matter Mode приостановлен.",press:"Сначала включите Matter Mode."},
+    tj:{title:"Интерфейси физикӣ.",subtitle:"Тугмаҳо вазн доранд. Канорҳо муқовимат доранд.",hint:"Matter Mode-ро фаъол кунед ва тугмаҳои озодро кашед. Онҳоро ба ҳам наздик кунед: канорҳои майдон деворҳои сахтанд.",control:"Идоракунии Matter",matterMode:"РЕЖИМИ MATTER",auraVisual:"ҚАБАТИ НАМОИШИИ AURA",materialTitle:"НАМУДИ МАВОД",layoutTitle:"ҶОЙГИРКУНӢ",save:"ЗАХИРА КАРДАН",reset:"АЗ НАВ СОХТАН",detached:"ТУГМАИ ҲИФЗШУДА КАНДА ШУД",detachedText:"Ҷойи пайвастшавӣ кушода аст. Гурӯҳи таъмири кинематографӣ марҳилаи навбатии таҳия мебошад.",crewLater:"ГУРӮҲИ ТАЪМИР — МАРҲИЛАИ II",restore:"БАРҚАРОРСОЗӢ БАРОИ САНҶИШ",rulesTitle:"ҚОИДАҲОИ ФИЗИКА",rules:"Ҳангоми бархӯрд объектҳо якдигарро тела медиҳанд. Фишурдашавӣ маҳдуд аст, то шакл нигоҳ дошта шавад. Канорҳои экран деворҳои сахтанд. MENU ва SETTINGS ба кашиши аввал муқобилат карда, дар кӯшиши дуюм канда мешаванд.",disclaimer:"Прототипи 0.1 · Муш ва ламс · Бе дастрасӣ ба камера · Бе ирсоли тасвир · Ҳанӯз саҳнаи ниҳоии 3D-и таъмир нест.",heavy:"Қулфи вазнин фаъол шуд. Кашиши аввалро тугма қабул накард.",detachedToast:"Пайвастшавӣ канда шуд. Тугма акнун объекти физикӣ аст.",saved:"Ҷойгиркунӣ дар ҳамин дастгоҳ захира шуд.",resetDone:"Интерфейс аз нав танзим шуд. Тугмаҳои ҳифзшуда баргаштанд.",modeOn:"Matter Mode фаъол аст. Тугмаҳои озодро кашед.",modeOff:"Matter Mode боздошта шуд.",press:"Аввал Matter Mode-ро фаъол кунед."}
+  };
+  let language="en";
+  function t(key){return (i18n[language]||i18n.en)[key]||i18n.en[key]||key;}
+  function showToast(message){toast.textContent=message;toast.classList.add("show");clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>toast.classList.remove("show"),2300);}
+  function setLanguage(lang){language=i18n[lang]?lang:"en";document.documentElement.lang=language;document.querySelectorAll("[data-i18n]").forEach(el=>{const key=el.dataset.i18n;el.textContent=t(key);});document.querySelectorAll("[data-lang]").forEach(b=>b.classList.toggle("active",b.dataset.lang===language));}
+  document.querySelectorAll("[data-lang]").forEach(b=>b.addEventListener("click",()=>setLanguage(b.dataset.lang)));
+  function measure(){const r=items.getBoundingClientRect();world.setBounds(r.width,r.height);}
+  function createItem(id,label,x,y,opts){
+    const o=opts||{},el=document.createElement("button");
+    el.type="button";el.className="matter-item "+(o.material||"hybrid");el.textContent=label;
+    el.dataset.body=id;el.setAttribute("aria-label",label+" physical control");
+    items.appendChild(el);
+    const rect=el.getBoundingClientRect();
+    const body=world.add({id,x,y,width:o.width||Math.max(112,rect.width||126),height:o.height||54,mass:o.mass||1.4,elasticity:o.elasticity??.42,friction:o.friction??.22,maxCompression:o.maxCompression??.16,material:o.material||"hybrid"});
+    bodies.set(id,el);return body;
+  }
+  function render(){
+    for(const [id,el] of bodies){
+      const b=world.get(id);if(!b)continue;
+      const squash=b.compression;
+      const sx=b.compressionAxis==="x"?1-squash*.62:1+squash*.14;
+      const sy=b.compressionAxis==="y"?1-squash*.62:1+squash*.14;
+      el.style.transform="translate3d("+b.x+"px,"+b.y+"px,0) scale("+sx+","+sy+")";
+      el.classList.toggle("dragging",b.dragging);
+      el.classList.toggle("detached",b.detached);
+    }
+  }
+  function pointerPos(event){const r=items.getBoundingClientRect();return{x:event.clientX-r.left,y:event.clientY-r.top};}
+  function beginItemDrag(event,el){
+    if(!editMode)return;
+    const id=el.dataset.body,b=world.get(id);if(!b)return;
+    event.preventDefault();el.setPointerCapture?.(event.pointerId);
+    const p=pointerPos(event);world.beginDrag(id,p.x,p.y);activePointer=event.pointerId;
+    dragSample={x:event.clientX,y:event.clientY,time:performance.now(),vx:0,vy:0};
+  }
+  function moveItemDrag(event){
+    if(activePointer!==event.pointerId||!dragSample)return;
+    const p=pointerPos(event);world.dragTo(p.x,p.y);
+    const now=performance.now(),dt=Math.max((now-dragSample.time)/1000,.008);
+    dragSample.vx=(event.clientX-dragSample.x)/dt;dragSample.vy=(event.clientY-dragSample.y)/dt;
+    dragSample.x=event.clientX;dragSample.y=event.clientY;dragSample.time=now;
+  }
+  function endItemDrag(event){
+    if(activePointer!==event.pointerId)return;
+    world.endDrag(dragSample?.vx*.28||0,dragSample?.vy*.28||0);
+    activePointer=null;dragSample=null;
+  }
+  function bindItem(el){
+    el.addEventListener("pointerdown",e=>beginItemDrag(e,el));
+    el.addEventListener("click",()=>{if(!editMode)showToast("Demo control · enable Matter Mode to manipulate it.");});
+  }
+  window.addEventListener("pointermove",moveItemDrag);
+  window.addEventListener("pointerup",endItemDrag);
+  window.addEventListener("pointercancel",endItemDrag);
+  function createProtectedBody(id){
+    const label=id.toUpperCase();
+    return world.add({id:"protected-"+id,x:0,y:0,width:label==="SETTINGS"?112:96,height:42,mass:3.6,elasticity:.12,friction:.62,maxCompression:.08,material:"metal",anchored:true,collisionEnabled:false});
+  }
+  function addDefaultItems(){
+    createProtectedBody("menu");createProtectedBody("settings");
+    const w=items.clientWidth,h=items.clientHeight;
+    createItem("projects","PROJECTS",Math.max(26,w*.16),Math.max(115,h*.42),{mass:1.5,material:"hybrid"});
+    createItem("contact","CONTACT",Math.max(170,w*.42),Math.max(170,h*.56),{mass:2.1,material:"metal",elasticity:.24});
+    createItem("research","RESEARCH",Math.max(24,w*.63),Math.max(110,h*.31),{mass:1.1,material:"gel",elasticity:.7,maxCompression:.18});
+    for(const el of items.querySelectorAll(".matter-item"))bindItem(el);
+    measure();render();
+  }
+  function loadSavedLayout(){
+    try{
+      const raw=localStorage.getItem("veyrost-matter-layout");
+      if(!raw)return;
+      const saved=JSON.parse(raw);
+      if(saved.version!==1||!Array.isArray(saved.items))return;
+      for(const item of saved.items){
+        const b=world.get(item.id);
+        if(!b||item.id.startsWith("protected-"))continue;
+        if(Number.isFinite(item.x))b.x=item.x;
+        if(Number.isFinite(item.y))b.y=item.y;
+        if(Number.isFinite(item.mass))b.mass=clamp(item.mass,.5,4);
+        if(Number.isFinite(item.elasticity))b.elasticity=clamp(item.elasticity,0,1);
+        if(["metal","gel","hybrid"].includes(item.material)){
+          b.material=item.material;
+          const el=bodies.get(b.id);
+          if(el){el.classList.remove("metal","gel","hybrid");el.classList.add(item.material);}
+        }
+      }
+    }catch(e){showToast("Saved layout could not be loaded.");}
+  }
+  function setMatter(enabled){
+    editMode=enabled;document.body.classList.toggle("editing",enabled);
+    $("matterToggle").classList.toggle("active",enabled);
+    status.textContent=enabled?"MATTER ENGINE / ACTIVE":"ENGINE STANDBY";
+    status.classList.toggle("live",enabled);
+    showToast(enabled?t("modeOn"):t("modeOff"));
+  }
+  $("matterToggle").addEventListener("click",()=>setMatter(!editMode));
+  $("auraVisualToggle").addEventListener("click",()=>{
+    auraVisual=!auraVisual;document.body.classList.toggle("aura-visual",auraVisual);
+    $("auraVisualToggle").classList.toggle("active",auraVisual);
+    showToast("Visual layer only. Camera hand tracking is not connected in this prototype.");
+  });
+  function detachProtected(id,event){
+    const state=protectedState[id],button=$(id==="menu"?"menuLock":"settingsLock");
+    if(!editMode){showToast(t("press"));return;}
+    const dx=event.clientX,dy=event.clientY;
+    const bodyId="protected-"+id;
+    const release=world.tryDetach(bodyId);
+    if(!release.detached){
+      button.classList.add("shake");setTimeout(()=>button.classList.remove("shake"),550);
+      showToast(t("heavy"));return;
+    }
+    const r=button.getBoundingClientRect(),wr=items.getBoundingClientRect();
+    const socket=document.createElement("span");socket.className="socket-wire";socket.textContent="⟟ "+id.toUpperCase()+" / OPEN";
+    socket.id=id+"Socket";button.replaceWith(socket);state.socket=true;
+    const startX=clamp(dx-wr.left-54,0,Math.max(0,items.clientWidth-122));
+    const startY=clamp(dy-wr.top-25,0,Math.max(0,items.clientHeight-58));
+    const b=world.get(bodyId);
+    b.x=startX;b.y=startY;b.collisionEnabled=true;
+    const item=document.createElement("button");
+    item.type="button";item.className="matter-item metal detached";item.textContent=id.toUpperCase();
+    item.dataset.body=bodyId;item.setAttribute("aria-label",id.toUpperCase()+" detached physical control");
+    items.appendChild(item);bodies.set(bodyId,item);bindItem(item);
+    render();
+    $("detachedCallout").classList.add("show");
+    const p=pointerPos(event);world.beginDrag(b.id,p.x,p.y);activePointer=event.pointerId;
+    dragSample={x:event.clientX,y:event.clientY,time:performance.now(),vx:0,vy:0};
+    showToast(t("detachedToast"));
+  }
+  function bindProtected(id){
+    const button=$(id==="menu"?"menuLock":"settingsLock");
+    let start=null,used=false;
+    button.addEventListener("pointerdown",event=>{
+      if(!editMode)return;
+      start={x:event.clientX,y:event.clientY,pointer:event.pointerId};used=false;
+      button.setPointerCapture?.(event.pointerId);
+    });
+    button.addEventListener("pointermove",event=>{
+      if(!start||start.pointer!==event.pointerId||used)return;
+      if(Math.hypot(event.clientX-start.x,event.clientY-start.y)>10){
+        used=true;detachProtected(id,event);start=null;
+      }
+    });
+    button.addEventListener("pointerup",()=>{start=null;});
+    button.addEventListener("pointercancel",()=>{start=null;});
+    button.addEventListener("click",()=>{if(!editMode)showToast("Protected system control.");});
+  }
+  bindProtected("menu");bindProtected("settings");
+  $("material").addEventListener("change",e=>{
+    for(const b of world.bodies.values()){b.material=e.target.value;const el=bodies.get(b.id);if(el){el.classList.remove("gel","metal","hybrid");el.classList.add(e.target.value);}}
+  });
+  $("mass").addEventListener("input",e=>{
+    const value=Number(e.target.value);$("massValue").textContent=value.toFixed(1)+"×";
+    for(const b of world.bodies.values())if(!b.detached)b.mass=value;
+  });
+  $("elasticity").addEventListener("input",e=>{
+    const value=Number(e.target.value);$("elasticValue").textContent=Math.round(value*100)+"%";
+    for(const b of world.bodies.values())if(!b.detached)b.elasticity=value;
+  });
+  $("saveLayout").addEventListener("click",()=>{
+    const data={version:1,items:Array.from(world.bodies.values()).filter(b=>!b.id.startsWith("protected-")&&!b.detached).map(b=>({id:b.id,x:b.x,y:b.y,material:b.material,mass:b.mass,elasticity:b.elasticity}))};
+    try{localStorage.setItem("veyrost-matter-layout",JSON.stringify(data));showToast(t("saved"));}catch(e){showToast("Local storage unavailable on this browser.");}
+  });
+  function restoreAll(){
+    for(const [id,state] of Object.entries(protectedState)){
+      const bodyId="protected-"+id;
+      if(world.get(bodyId)){world.remove(bodyId);bodies.get(bodyId)?.remove();bodies.delete(bodyId);}
+      const socket=$(id+"Socket");
+      if(socket){const btn=document.createElement("button");btn.className="protected";btn.id=id==="menu"?"menuLock":"settingsLock";btn.dataset.protected=id;btn.textContent=state.label;socket.replaceWith(btn);bindProtected(id);}
+      state.socket=false;
+      createProtectedBody(id);
+    }
+    for(const [id] of Array.from(bodies)){if(id.startsWith("detached-")){world.remove(id);bodies.get(id)?.remove();bodies.delete(id);}}
+    $("detachedCallout").classList.remove("show");
+  }
+  $("restoreControls").addEventListener("click",restoreAll);
+  $("resetLayout").addEventListener("click",()=>{
+    world.reset();restoreAll();
+    for(const [id,el] of bodies){const b=world.get(id);if(b){el.classList.remove("detached");}}
+    render();showToast(t("resetDone"));
+  });
+  function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
+  function frame(now){
+    if(!lastFrame)lastFrame=now;
+    const dt=Math.min((now-lastFrame)/1000,1/30);lastFrame=now;
+    measure();world.step(dt);render();requestAnimationFrame(frame);
+  }
+  window.addEventListener("resize",measure);
+  addDefaultItems();
+  loadSavedLayout();
+  setLanguage("en");
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
