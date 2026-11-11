@@ -142,6 +142,7 @@ test("pinch recognition scales with hand size and uses a wider release threshold
   points[4] = {x:0.5,y:0.24};
   points[8] = {x:0.5,y:0.38};
   assert.equal(classifyHand(points, undefined, "pinch"), "pinch");
+  points[4] = {x:0.5,y:0.18};
   assert.equal(classifyHand(points), "move");
 });
 
