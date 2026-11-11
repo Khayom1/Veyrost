@@ -168,11 +168,11 @@ body.aura-visual .workspace{background-image:linear-gradient(#74e8ff0d 1px,trans
   }
   function bindItem(el){
     el.addEventListener("pointerdown",e=>beginItemDrag(e,el));
-    el.addEventListener("pointermove",moveItemDrag);
-    el.addEventListener("pointerup",endItemDrag);
-    el.addEventListener("pointercancel",endItemDrag);
     el.addEventListener("click",()=>{if(!editMode)showToast("Demo control · enable Matter Mode to manipulate it.");});
   }
+  window.addEventListener("pointermove",moveItemDrag);
+  window.addEventListener("pointerup",endItemDrag);
+  window.addEventListener("pointercancel",endItemDrag);
   function addDefaultItems(){
     const w=items.clientWidth,h=items.clientHeight;
     createItem("projects","PROJECTS",Math.max(26,w*.16),Math.max(115,h*.42),{mass:1.5,material:"hybrid"});
