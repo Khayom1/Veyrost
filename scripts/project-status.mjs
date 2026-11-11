@@ -66,7 +66,7 @@ const checks = [
   ["DUI-01","Interactive depth controls","Touch-friendly depth slider and step buttons","spatial-world.mjs",/_buildDepthControl\(\)[\s\S]*type = "range"[\s\S]*adjustSelectedDepth\(-0\.05, true\)[\s\S]*adjustSelectedDepth\(0\.05, true\)/],
   ["DUI-02","Interactive depth controls","Mouse wheel and precision modifier change panel depth","spatial-world.mjs",/addEventListener\("wheel", this\._wheel, \{ passive: false \}\)[\s\S]*event\.shiftKey \? 0\.01 : 0\.035[\s\S]*setPanelDepth\(id, body\.z \+ direction \* fine, true\)/],
   ["DUI-03","Interactive depth controls","Depth range is clamped and anchored controls are immutable","spatial-world.mjs",/body\.anchored \|\| !Number\.isFinite[\s\S]*Math\.max\(-1\.25, Math\.min\(1\.25/],
-  ["DUI-04","Interactive depth controls","Depth values are persisted and restored in the existing layout format","spatial-world.mjs",/z: Number\(\(depthBody\?\.z \?\? 0\)\.toFixed\(4\)\)[\s\S]*depthBody\.z = item\.z/],
+  ["DUI-04","Interactive depth controls","Depth values are persisted and restored in the existing layout format","spatial-world.mjs",/depthBody\.z = item\.z[\s\S]*z: Number\(\(depthBody\?\.z \?\? 0\)\.toFixed\(4\)\)/],
   ["DUI-05","Interactive depth controls","Depth controls have EN/RU/TJ labels and instructions","spatial-world.mjs",/depth: "PANEL DEPTH"[\s\S]*depth: "ГЛУБИНА ПАНЕЛИ"[\s\S]*depth: "ЧУҚУРИИ ПАНЕЛ"/],
   ["DUI-06","Interactive depth controls","AURA pinch can activate the depth step buttons","aura-engine.mjs",/elementFromPoint\(x, y\)[\s\S]*target\.click\(\)/],
   ["LAY-01","Spatial layout persistence","Versioned local layout serialization","spatial-world.mjs",/version: 1, panels/],
