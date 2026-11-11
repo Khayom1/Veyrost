@@ -3,7 +3,7 @@ name: AURA engine checks
 on:
   push:
     branches:
-      - 'feat/aura-*'
+      - 'feat/*'
   pull_request:
     branches:
       - main
@@ -33,3 +33,5 @@ jobs:
           node --check /tmp/index-aura.mjs
       - name: Run project regression tests
         run: node --test tests/*.test.cjs
+      - name: Calculate source-evidence progress
+        run: node scripts/project-status.mjs
