@@ -25,7 +25,7 @@ jobs:
         run: node --check aura-engine.mjs
       - name: Check AURA lab module syntax
         run: |
-          node -e 'const fs=require("node:fs"); const html=fs.readFileSync("aura-lab.html","utf8"); const match=html.match(/<script type="module">([\\s\\S]*?)<\\/script>/i); if(!match) throw new Error("AURA lab module not found"); fs.writeFileSync("/tmp/aura-lab.mjs",match[1]);'
+          node -e 'const fs=require("node:fs"); const html=fs.readFileSync("aura-lab.html","utf8"); const match=html.match(/<script type="module">([\s\S]*?)<\/script>/i); if(!match) throw new Error("AURA lab module not found"); fs.writeFileSync("/tmp/aura-lab.mjs",match[1]);'
           node --check /tmp/aura-lab.mjs
       - name: Run project regression tests
         run: node --test tests/*.test.cjs
