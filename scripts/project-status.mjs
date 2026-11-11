@@ -61,6 +61,11 @@ const checks = [
   ["LAY-02","Spatial layout persistence","Saved layout validation and unknown-ID rejection","spatial-math.mjs",/validateSavedLayout[\s\S]*allowed\.has\(panel\.id\)/],
   ["LAY-03","Spatial layout persistence","Normalized panel coordinates restored from local storage","spatial-world.mjs",/localStorage\?\.getItem[\s\S]*item\.x \* this\.window\.innerWidth/],
   ["LAY-04","Spatial layout persistence","Reset clears saved layout and restores initial layout","spatial-world.mjs",/removeItem\(this\.storageKey\)[\s\S]*this\.physics\.reset\(\)/],
+  ["PRO-01","Protected control lifecycle","Protected navigation controls are anchored on mount","spatial-world.mjs",/protectedIds = new Set\(\["home", "ai-systems"\]\)[\s\S]*anchored: isProtected/],
+  ["PRO-02","Protected control lifecycle","First pull resists and second pull detaches","protected-control.mjs",/first-pull-resisted[\s\S]*mount-released/],
+  ["PRO-03","Protected control lifecycle","Detached control reveals fixed 3D mount socket","spatial-world.mjs",/_buildProtectedSocket[\s\S]*socket\.visible = true/],
+  ["PRO-04","Protected control lifecycle","Repair restores the mounted control and hides socket","spatial-world.mjs",/control\.beginRepair\(\)[\s\S]*this\.physics\.repair\(id\)[\s\S]*control\.completeRepair\(\)[\s\S]*socket\.visible = false/],
+  ["PRO-05","Protected control lifecycle","Repair action is localized in EN/RU/TJ","spatial-world.mjs",/repair: "REPAIR MOUNT"[\s\S]*repair: "ВОССТАНОВИТЬ КРЕПЛЕНИЕ"[\s\S]*repair: "ПАЙВАСТКУНИРО БАРҚАРОР КУН"/],
 
 
   ["CREW-01","Technician service sequence","Rigged realistic technician character models",null,null],
