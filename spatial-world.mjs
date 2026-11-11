@@ -1,5 +1,6 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js";
 import "./matter-engine.js";
+import { createProtectedControlRegistry, PROTECTED_CONTROL_STATES } from "./protected-control.mjs";
 import {
   computeSpatialLayout,
   screenToWorld,
@@ -119,6 +120,10 @@ export class SpatialWorldController {
     this.resizeObserver = null;
     this.panelGroups = new Map();
     this.panelMeshes = [];
+    this.protectedIds = new Set(["home", "ai-systems"]);
+    this.protectedControls = createProtectedControlRegistry(this.protectedIds);
+    this.protectedSockets = new Map();
+    this.repairButton = null;
     this.hoveredId = null;
     this.activeDrag = null;
     this.pointer = { x: 0, y: 0 };
@@ -181,6 +186,7 @@ export class SpatialWorldController {
 
     this._buildEnvironment();
     this._buildPanels();
+    this._buildProtectedRepairControl();
     this._restoreLayout();
     this._buildCursor();
     this._bindEvents();
@@ -373,6 +379,9 @@ export class SpatialWorldController {
       this.scene.add(group);
       this.panelGroups.set(definition.id, { group, bodyMaterial, definition, hitArea });
 
+      const isProtected = this.protectedIds.has(definition.id);
+      if (isProtected) this._buildProtectedSocket(definition, panelIndex);
+
       const bodyState = this.physics.add({
         id: definition.id,
         x: definition.x,
@@ -385,7 +394,7 @@ export class SpatialWorldController {
         maxCompression: 0.16,
         material: "hybrid",
         collisionEnabled: true,
-        anchored: false
+        anchored: isProtected
       });
       this._syncPanel(bodyState, this.panelGroups.get(definition.id));
       this.panelMeshes.push(group);
@@ -400,6 +409,91 @@ export class SpatialWorldController {
     );
     this.core.position.x = corePoint.x;
     this.core.position.y = corePoint.y;
+  }
+
+  _buildProtectedSocket(definition, panelIndex) {
+    const socket = new THREE.Group();
+    const width = definition.width / this.units;
+    const height = definition.height / this.units;
+    const frame = new THREE.Mesh(
+      new THREE.RingGeometry(Math.min(width, height) * 0.34, Math.min(width, height) * 0.43, 48),
+      new THREE.MeshBasicMaterial({ color: 0xffb45e, transparent: true, opacity: 0.8, side: THREE.DoubleSide })
+    );
+    socket.add(frame);
+    const center = screenToWorld(
+      definition.x + definition.width / 2,
+      definition.y + definition.height / 2,
+      this.window.innerWidth,
+      this.window.innerHeight,
+      this.units
+    );
+    socket.position.set(center.x, center.y, ([-0.9, 0.55, -0.35, 0.85, -0.65, 0.25][panelIndex] ?? 0) - 0.08);
+    socket.visible = false;
+    this.scene.add(socket);
+    this.protectedSockets.set(definition.id, socket);
+  }
+
+  _buildProtectedRepairControl() {
+    const button = this.document.createElement("button");
+    button.type = "button";
+    button.className = "spatial-repair-control";
+    button.textContent = "REPAIR MOUNT";
+    button.setAttribute("aria-label", "Repair detached protected interface controls");
+    Object.assign(button.style, {
+      position: "absolute",
+      right: "max(16px, env(safe-area-inset-right))",
+      bottom: "max(76px, env(safe-area-inset-bottom))",
+      zIndex: "20",
+      display: "none",
+      padding: "13px 17px",
+      border: "1px solid rgba(255,180,94,.8)",
+      borderRadius: "999px",
+      background: "rgba(22,25,35,.94)",
+      color: "#ffd39b",
+      font: "700 11px system-ui,sans-serif",
+      letterSpacing: ".12em",
+      boxShadow: "0 0 28px rgba(255,180,94,.18)",
+      cursor: "pointer",
+      touchAction: "manipulation"
+    });
+    button.addEventListener("click", () => this.repairDetachedControls());
+    this.mount.appendChild(button);
+    this.repairButton = button;
+  }
+
+  repairDetachedControls() {
+    let repaired = 0;
+    for (const [id, control] of this.protectedControls) {
+      if (!control.beginRepair()) continue;
+      const body = this.physics?.get(id);
+      if (body) {
+        body.vx = 0;
+        body.vy = 0;
+        body.dragging = false;
+        this.physics.repair(id);
+        control.completeRepair();
+        const socket = this.protectedSockets.get(id);
+        if (socket) socket.visible = false;
+        const panel = this.panelGroups.get(id);
+        if (panel) {
+          panel.group.visible = true;
+          panel.group.scale.set(1, 1, 1);
+        }
+        repaired += 1;
+      }
+    }
+    if (this.repairButton && !this._hasDetachedProtectedControl()) {
+      this.repairButton.style.display = "none";
+    }
+    if (repaired) this.saveLayout();
+    return repaired;
+  }
+
+  _hasDetachedProtectedControl() {
+    for (const control of this.protectedControls.values()) {
+      if (control.snapshot().state === PROTECTED_CONTROL_STATES.DETACHED) return true;
+    }
+    return false;
   }
 
   _buildCursor() {
@@ -547,7 +641,27 @@ export class SpatialWorldController {
     const id = this._raycastPanel(x, y);
     if (!id) return false;
     const body = this.physics.get(id);
-    if (!body || !this.physics.beginDrag(id, x, y)) return false;
+    if (!body) return false;
+    if (this.protectedIds.has(id) && body.anchored) {
+      const lifecycle = this.protectedControls.get(id);
+      const result = lifecycle?.pull();
+      const release = this.physics.tryDetach(id);
+      if (!result?.accepted || !release.detached) {
+        const panel = this.panelGroups.get(id);
+        if (panel) {
+          panel.group.position.x += 0.035;
+          panel.group.rotation.z += 0.025;
+          panel.bodyMaterial.emissiveIntensity = 1.65;
+        }
+        this._emitStatus("protected-resisting");
+        return false;
+      }
+      const socket = this.protectedSockets.get(id);
+      if (socket) socket.visible = true;
+      if (this.repairButton) this.repairButton.style.display = "block";
+      this._emitStatus("protected-detached");
+    }
+    if (!this.physics.beginDrag(id, x, y)) return false;
     this.activeDrag = {
       id,
       source,
@@ -584,6 +698,7 @@ export class SpatialWorldController {
     this._updateDrag(x, y);
     this.physics.endDrag(drag.vx, drag.vy);
     this.activeDrag = null;
+    if (this.protectedIds.has(drag.id) && this.physics.get(drag.id)?.detached) return;
     if (drag.moved) this.saveLayout();
     else {
       const panel = this.layout.panels.find(item => item.id === drag.id);
@@ -751,6 +866,10 @@ export class SpatialWorldController {
     try { this.window.localStorage?.removeItem(this.storageKey); } catch (_) {}
     this.hasCustomLayout = false;
     this.physics.reset();
+    for (const control of this.protectedControls.values()) control.reset();
+    for (const socket of this.protectedSockets.values()) socket.visible = false;
+    for (const panel of this.panelGroups.values()) panel.group.visible = true;
+    if (this.repairButton) this.repairButton.style.display = "none";
     this.cancelActiveInteraction();
     this._resize();
   }
@@ -784,6 +903,9 @@ export class SpatialWorldController {
     }
     this.renderer?.dispose();
     this.renderer?.domElement?.remove();
+    this.repairButton?.remove();
+    this.repairButton = null;
+    this.protectedSockets.clear();
     this.panelGroups.clear();
     this.panelMeshes = [];
     this.physics = null;
