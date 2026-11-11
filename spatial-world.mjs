@@ -839,6 +839,8 @@ export class SpatialWorldController {
 
   _beginPress(x, y, source) {
     if (!this.running || this.paused || this.activeDrag) return false;
+    const overlay = this.document?.elementFromPoint?.(x, y)?.closest?.(".spatial-depth-control, .spatial-repair-control");
+    if (overlay) return false;
     const id = this._raycastPanel(x, y);
     if (!id) {
       this.selectedId = null;
