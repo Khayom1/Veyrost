@@ -619,6 +619,9 @@ export class SpatialWorldController {
     const body = id ? this.depthPhysics?.get(id) : null;
     const available = Boolean(body && !body.anchored);
     this.depthControl.style.display = available ? "block" : "none";
+    this.depthControl.style.bottom = this.repairButton?.style.display === "block"
+      ? "max(132px, env(safe-area-inset-bottom))"
+      : "max(72px, env(safe-area-inset-bottom))";
     if (!body) return;
     if (this.depthRange) {
       this.depthRange.value = String(body.z);
@@ -655,7 +658,11 @@ export class SpatialWorldController {
     if (this.repairButton && !this._hasDetachedProtectedControl()) {
       this.repairButton.style.display = "none";
     }
-    if (repaired) this.saveLayout();
+    if (repaired) {
+      this.selectedId = null;
+      this._refreshDepthControl();
+      this.saveLayout();
+    }
     return repaired;
   }
 
