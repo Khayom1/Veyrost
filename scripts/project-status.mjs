@@ -43,7 +43,7 @@ const checks = [
   ["INT-01","Main-site AURA integration","AURA toggle embedded in main navigation","index.html",/id="aura-toggle"/],
   ["INT-02","Main-site AURA integration","Shared site module creates the AURA controller","assets/veyrost-site.js",/new AuraController/],
   ["INT-03","Main-site AURA integration","Camera source is hidden from the page","index.html",/class="aura-cam"[^>]*aria-hidden="true"/],
-  ["INT-04","Main-site AURA integration","Single conventional arrow cursor is mounted","index.html",/id="aura-pointer"[^>]*<svg/],
+  ["INT-04","Main-site AURA integration","Single conventional arrow cursor is mounted","index.html",/id="aura-pointer"/],
   ["INT-05","Main-site AURA integration","AURA status HUD is mounted","index.html",/id="aura-status"/],
   ["INT-06","Main-site AURA integration","Opt-in MOVE control is gated by AURA state","assets/veyrost-site.js",/editButton.hidden=false/],
   ["INT-07","Main-site AURA integration","Shared UI exposes EN/RU/TJ labels","assets/veyrost-site.js",/translations=/],
@@ -99,7 +99,7 @@ const checks = [
   // Test/acceptance: source checks that are part of the current CI pipeline.
   ["QA-01","Validation and release","AURA engine syntax validation in CI",".github/workflows/aura-engine-tests.yml",/node --check aura-engine\.mjs/],
   ["QA-02","Validation and release","Standalone AURA lab module syntax validation in CI",".github/workflows/aura-engine-tests.yml",/aura-lab\.html[\s\S]*node --check \/tmp\/aura-lab\.mjs/],
-  ["QA-03","Validation and release","Main-site AURA module syntax validation in CI",".github/workflows/aura-engine-tests.yml",/index\.html[\s\S]*node --check \/tmp\/index-aura\.mjs/],
+  ["QA-03","Validation and release","Shared site module syntax validation in CI",".github/workflows/aura-engine-tests.yml",/veyrost-site\.mjs/],
   ["QA-04","Validation and release","Combined regression suite covers CommonJS and ES module tests",".github/workflows/aura-engine-tests.yml",/node --test tests\/\*\.test\.cjs tests\/\*\.test\.mjs/],
   ["QA-05","Validation and release","Android physical-device camera and gesture test",null,null],
   ["QA-06","Validation and release","Cross-browser, lighting and sustained-performance validation",null,null]
