@@ -261,6 +261,7 @@ export class AuraController {
     const element = this.document?.elementFromPoint(x, y);
     const target = element?.closest?.('button,a,[role="button"],input[type="button"],input[type="checkbox"],summary');
     if (!target || target.hasAttribute("disabled") || target.getAttribute("aria-disabled") === "true") return;
+    if (target.closest?.("[data-veyrost-layout-item]") && this.document?.documentElement?.classList?.contains("veyrost-layout-editing")) return;
     if (target.closest("[data-aura-ignore]")) return;
     target.click();
   }

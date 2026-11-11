@@ -45,7 +45,7 @@ const checks = [
   ["INT-03","Main-site AURA integration","Camera source is hidden from the page","index.html",/class="aura-camera-source"[\s\S]*aria-hidden="true"/],
   ["INT-04","Main-site AURA integration","Hand cursor overlay is mounted","index.html",/id="aura-cursor"/],
   ["INT-05","Main-site AURA integration","AURA status HUD is mounted","index.html",/id="aura-status"/],
-  ["INT-06","Main-site AURA integration","AURA-only CATCH ME control","index.html",/id="aura-catch"[\s\S]*relocateCatch/],
+  ["INT-06","Main-site AURA integration","Opt-in layout MOVE control appears only while AURA is active","index.html",/id="aura-layout-toggle"[\s\S]*layoutButton\.hidden=!active[\s\S]*setLayoutEditing\(!layoutEditing\)/],
   ["INT-07","Main-site AURA integration","EN/RU/TJ AURA interface labels","index.html",/auraMode:"AURA OFF"[\s\S]*auraMode:"AURA ВЫКЛ"[\s\S]*auraMode:"AURA ХОМӮШ"/],
 
   // Not yet implemented: each row is a specific acceptance requirement.
@@ -100,7 +100,7 @@ const checks = [
   ["QA-01","Validation and release","AURA engine syntax validation in CI",".github/workflows/aura-engine-tests.yml",/node --check aura-engine\.mjs/],
   ["QA-02","Validation and release","Standalone AURA lab module syntax validation in CI",".github/workflows/aura-engine-tests.yml",/aura-lab\.html[\s\S]*node --check \/tmp\/aura-lab\.mjs/],
   ["QA-03","Validation and release","Main-site AURA module syntax validation in CI",".github/workflows/aura-engine-tests.yml",/index\.html[\s\S]*node --check \/tmp\/index-aura\.mjs/],
-  ["QA-04","Validation and release","Combined regression suite covers AURA and Matter engines",".github/workflows/aura-engine-tests.yml",/node --test tests\/\*\.test\.cjs/],
+  ["QA-04","Validation and release","Combined regression suite covers CommonJS and ES module tests",".github/workflows/aura-engine-tests.yml",/node --test tests\/\*\.test\.cjs tests\/\*\.test\.mjs/],
   ["QA-05","Validation and release","Android physical-device camera and gesture test",null,null],
   ["QA-06","Validation and release","Cross-browser, lighting and sustained-performance validation",null,null]
 ];
