@@ -14,14 +14,14 @@
 | AURA hand controller | 13 | 13 | 100.00% |
 | Main-site AURA integration | 7 | 7 | 100.00% |
 | Spatial rendered interface (perspective depth-rendered scope) | 8 | 8 | 100.00% |
-| Spatial layout persistence | 4 | 4 | 100.00% |
+| Spatial layout persistence | 4 | 4 | 100.00% |\n| Protected control lifecycle | 5 | 5 | 100.00% |
 | Technician service sequence | 0 | 8 | 0.00% |
 | Dialogue and spatial audio | 0 | 5 | 0.00% |
 | Validation and release | 4 | 6 | 66.67% |
-| **Total** | **53** | **68** | **77.94%** |
+| **Total** | **58** | **73** | **79.45%** |
 
-- Implemented source criteria: **53 / 68**
-- Pending source criteria: **15 / 68**
+- Implemented source criteria: **58 / 73**
+- Pending source criteria: **15 / 73**
 - Failed evidence checks: **0**
 - The latest successful run passed syntax checks, the combined regression suite, and the source-evidence calculator.
 
@@ -33,7 +33,7 @@ The score is a binary checklist ratio:
 
 Every criterion has equal weight. It measures whether the defined source-level evidence exists. It is not a score for visual quality, production readiness, engineering effort, or physical-device reliability.
 
-The spatial interface now uses a Three.js **perspective camera** and six independently layered panel depths, with per-panel tilt and floating motion. Its panel movement and collisions remain backed by the existing **2D** Matter Engine. The checklist's 8/8 means the eight declared source-level rendering criteria are present; it does not mean full 3D physics or depth-aware collision exists.
+The protected-control lifecycle is implemented for HOME and AI SYSTEMS: first-pull resistance, second-pull release, fixed mount socket, localized repair action, and restoration to original coordinates. This is a functional interface repair flow, not the planned technician animation.\n\nThe spatial interface now uses a Three.js **perspective camera** and six independently layered panel depths, with per-panel tilt and floating motion. Its panel movement and collisions remain backed by the existing **2D** Matter Engine. The checklist's 8/8 means the eight declared source-level rendering criteria are present; it does not mean full 3D physics or depth-aware collision exists.
 
 Perspective depth rendering is now present in source: responsive field-of-view camera, independent panel depth layers, animated tilt, and depth-aware panel placement. This has not yet been confirmed on a physical phone.\n\nLayout persistence is now implemented:
 - Versioned localStorage payload.
