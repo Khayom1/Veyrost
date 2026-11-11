@@ -11,6 +11,7 @@ This branch contains the experimental spatial interface integrated with the exis
 - `spatial-world.mjs` owns the Three.js perspective scene, depth-layered panel meshes, raycasting, pointer/hand interaction, animation loop, and GPU cleanup.
 - `spatial-math.mjs` contains deterministic screen/world transforms, responsive panel layout, and versioned layout validation.
 - `matter-engine.js` supplies 2D rigid-body-like panel motion and collision resolution. It is not a 3D physics solver.
+- `spatial-depth-physics.mjs` adds a depth-axis collision layer: projected X/Y overlap checks, mass-weighted Z separation, restitution impulses, and anchored-body handling. Matter remains responsible for X/Y motion; the combined runtime is hybrid 2.5D, not a full 6-DoF rigid-body engine.
 
 ## Layout persistence
 
@@ -38,9 +39,9 @@ Two navigation panels (`HOME` and `AI SYSTEMS`) are mounted as protected control
 
 ## Honest scope boundary
 
-The current scene is a 3D-rendered perspective scene with independent depth layers, beveled physical panel meshes, animated tilt and a responsive perspective camera. Panel movement and collision still use a 2D Matter physics world; the interface is therefore depth-rendered but not a full 3D rigid-body simulation. It does **not** yet provide:
+The current scene is a 3D-rendered perspective scene with independent depth layers, beveled physical panel meshes, animated tilt and a responsive perspective camera. Matter handles X/Y panel motion; the dedicated depth solver resolves Z-axis collisions when panel projections overlap. This is a hybrid 2.5D simulation, not a full 3D rigid-body engine with angular momentum or unrestricted 3-axis motion. It does **not** yet provide:
 
-- Full 3D rigid-body simulation, depth-aware collision, or unrestricted depth manipulation.
+- Full 6-DoF rigid-body simulation, angular momentum, and unrestricted depth manipulation.
 - Realistic rigged technician characters.
 - Service vehicle, ladder, climb, cable reconnection, or tug-of-war animation.
 - Localized character dialogue or spatial audio.
