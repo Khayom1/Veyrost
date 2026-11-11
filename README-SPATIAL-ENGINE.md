@@ -8,7 +8,7 @@ This branch contains the experimental spatial interface integrated with the exis
 
 - `index.html` owns AURA permission, lifecycle, language switching, and the spatial-mode mount.
 - `aura-engine.mjs` requests camera access only after a user action, classifies hand landmarks, and emits cursor/gesture events.
-- `spatial-world.mjs` owns the Three.js scene, panel meshes, raycasting, pointer/hand interaction, animation loop, and GPU cleanup.
+- `spatial-world.mjs` owns the Three.js perspective scene, depth-layered panel meshes, raycasting, pointer/hand interaction, animation loop, and GPU cleanup.
 - `spatial-math.mjs` contains deterministic screen/world transforms, responsive panel layout, and versioned layout validation.
 - `matter-engine.js` supplies 2D rigid-body-like panel motion and collision resolution. It is not a 3D physics solver.
 
@@ -34,9 +34,9 @@ The spatial layout is stored in browser `localStorage` under `veyrost:spatial-la
 
 ## Honest scope boundary
 
-The current scene is a 3D-rendered, mostly planar (2.5D) interface. It uses an orthographic camera and a 2D Matter physics world. It does **not** yet provide:
+The current scene is a 3D-rendered perspective scene with independent depth layers, beveled physical panel meshes, animated tilt and a responsive perspective camera. Panel movement and collision still use a 2D Matter physics world; the interface is therefore depth-rendered but not a full 3D rigid-body simulation. It does **not** yet provide:
 
-- Full 3D rigid-body simulation or unrestricted depth manipulation.
+- Full 3D rigid-body simulation, depth-aware collision, or unrestricted depth manipulation.
 - Realistic rigged technician characters.
 - Service vehicle, ladder, climb, cable reconnection, or tug-of-war animation.
 - Localized character dialogue or spatial audio.
