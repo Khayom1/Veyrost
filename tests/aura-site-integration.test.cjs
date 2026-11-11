@@ -109,3 +109,18 @@ test("layout editor and project filtering are available on mobile", () => {
   assert.match(css,/\.project-grid\{grid-template-columns:1fr\}/);
   assert.match(css,/\.studio-layout\{grid-template-columns:1fr\}/);
 });
+
+test("mobile menus and footers do not repeat the Contact destination", () => {
+  for (const page of ["index.html","projects.html","studio.html","company.html","research.html"]) {
+    const source=fs.readFileSync(page,"utf8");
+    assert.doesNotMatch(source,/data-close-menu data-label="contact">Contact<\/a><a href="contact\.html" data-label="contact">Contact/);
+    assert.doesNotMatch(source,/<a href="contact\.html">Contact<\/a><a href="contact\.html" data-label="contact">Contact/);
+  }
+});
+
+test("the public project directory explains its private entry without claiming a public source link", () => {
+  const page=fs.readFileSync("projects.html","utf8");
+  assert.match(page,/19 public repositories and one private project record/);
+  assert.match(page,/private source code and implementation details remain hidden/);
+  assert.match(page,/19 PUBLIC \+ 1 PRIVATE/);
+});
