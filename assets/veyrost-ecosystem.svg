@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="440" viewBox="0 0 1200 440" role="img" aria-labelledby="title desc">
+<title id="title">VEYROST technology ecosystem</title>
+<desc id="desc">An animated architecture diagram connecting the VEYROST core to SkillGuard AI security and VEYROST Developer Kit.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#17152b"/><stop offset=".55" stop-color="#0d1424"/><stop offset="1" stop-color="#10101a"/></linearGradient>
+  <linearGradient id="violet" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c4b5fd"/><stop offset="1" stop-color="#6d8cff"/></linearGradient>
+  <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#72e3ff"/><stop offset="1" stop-color="#718bff"/></linearGradient>
+  <filter id="glow"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#a99aff" opacity=".18"/></pattern>
+</defs>
+<rect width="1200" height="440" rx="28" fill="url(#bg)"/>
+<rect width="1200" height="440" rx="28" fill="url(#dots)"/>
+<g fill="none" stroke-linecap="round">
+ <path d="M600 215 C480 215 420 130 315 130" stroke="#9b8cff" stroke-width="2" opacity=".45"/>
+ <path d="M600 215 C720 215 780 310 885 310" stroke="#72dfff" stroke-width="2" opacity=".45"/>
+ <path d="M315 130 C430 130 470 215 600 215 S770 310 885 310" stroke="#ffffff" stroke-width="1" stroke-dasharray="4 12" opacity=".15"/>
+ <circle r="4" fill="#c4b5fd" filter="url(#glow)"><animateMotion dur="5s" repeatCount="indefinite" path="M600 215 C480 215 420 130 315 130"/></circle>
+ <circle r="4" fill="#72e3ff" filter="url(#glow)"><animateMotion dur="6s" repeatCount="indefinite" path="M600 215 C720 215 780 310 885 310"/></circle>
+</g>
+<g transform="translate(600 215)">
+ <circle r="104" fill="#9b8cff" opacity=".08"><animate attributeName="r" values="96;112;96" dur="5s" repeatCount="indefinite"/></circle>
+ <circle r="78" fill="#111525" stroke="url(#violet)" stroke-width="2"/>
+ <circle r="65" fill="none" stroke="#c4b5fd" stroke-width="1" stroke-dasharray="3 8"><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="28s" repeatCount="indefinite"/></circle>
+ <text y="-4" text-anchor="middle" fill="#fff" font-family="Inter,Arial,sans-serif" font-size="27" font-weight="800" letter-spacing="4">V</text>
+ <text y="22" text-anchor="middle" fill="#c7c2e7" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="700" letter-spacing="3">VEYROST CORE</text>
+</g>
+<g transform="translate(115 65)">
+ <rect width="300" height="130" rx="18" fill="#17182a" stroke="#a99aff" stroke-opacity=".65"/>
+ <rect x="20" y="22" width="44" height="44" rx="12" fill="#a99aff" fill-opacity=".16"/>
+ <path d="M42 30 L55 35 V45 C55 55 49 60 42 64 C35 60 29 55 29 45 V35 Z" fill="none" stroke="#c4b5fd" stroke-width="2"/>
+ <path d="M36 45 L41 50 L49 40" fill="none" stroke="#c4b5fd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+ <text x="80" y="42" fill="#fff" font-family="Inter,Arial,sans-serif" font-size="18" font-weight="750">SkillGuard</text>
+ <text x="80" y="63" fill="#b8b4d0" font-family="Inter,Arial,sans-serif" font-size="10" letter-spacing="1.6">AI SECURITY</text>
+ <text x="22" y="100" fill="#969cac" font-family="Inter,Arial,sans-serif" font-size="12">Inspect agent skills. Reduce risk.</text>
+ <circle cx="278" cy="23" r="3" fill="#a99aff"><animate attributeName="opacity" values=".3;1;.3" dur="2s" repeatCount="indefinite"/></circle>
+</g>
+<g transform="translate(785 245)">
+ <rect width="300" height="130" rx="18" fill="#131c2a" stroke="#72dfff" stroke-opacity=".65"/>
+ <rect x="20" y="22" width="44" height="44" rx="12" fill="#72dfff" fill-opacity=".13"/>
+ <path d="M31 35 H53 M31 44 H53 M31 53 H46" stroke="#72dfff" stroke-width="2.5" stroke-linecap="round"/>
+ <circle cx="52" cy="53" r="3" fill="#72dfff"/>
+ <text x="80" y="42" fill="#fff" font-family="Inter,Arial,sans-serif" font-size="17" font-weight="750">VEYROST-DEVKIT</text>
+ <text x="80" y="63" fill="#a9c8d9" font-family="Inter,Arial,sans-serif" font-size="10" letter-spacing="1.6">ENGINEERING TOOLS</text>
+ <text x="22" y="100" fill="#969cac" font-family="Inter,Arial,sans-serif" font-size="12">Inspect repositories. Improve quality.</text>
+ <circle cx="278" cy="23" r="3" fill="#72dfff"><animate attributeName="opacity" values=".3;1;.3" dur="2.6s" repeatCount="indefinite"/></circle>
+</g>
+<g font-family="Inter,Arial,sans-serif" font-size="10" fill="#777f98" letter-spacing="2">
+ <text x="60" y="390">INDEPENDENT ENGINEERING</text>
+ <text x="930" y="70">CONNECTED BY DESIGN</text>
+</g>
+<g fill="#a99aff" opacity=".6"><circle cx="510" cy="70" r="2"/><circle cx="700" cy="90" r="2"/><circle cx="740" cy="390" r="2"/><circle cx="470" cy="350" r="2"/></g>
+</svg>
