@@ -123,6 +123,9 @@ export class SpatialWorldController {
     this.pointer = { x: 0, y: 0 };
     this.lastFrame = 0;
     this.units = SPATIAL_UNITS_PER_PIXEL;
+    this.storageKey = "veyrost:spatial-layout:v1";
+    this.hasCustomLayout = false;
+    this.viewport = null;
     this._animate = this._animate.bind(this);
     this._resize = this._resize.bind(this);
     this._pointerMove = this._pointerMove.bind(this);
@@ -179,6 +182,7 @@ export class SpatialWorldController {
 
     this._buildEnvironment();
     this._buildPanels();
+    this._restoreLayout();
     this._buildCursor();
     this._bindEvents();
     this._resize();
@@ -440,24 +444,41 @@ export class SpatialWorldController {
     this.camera.bottom = -height / (2 * this.units);
     this.camera.updateProjectionMatrix();
 
+    const previousWidth = this.viewport?.width ?? width;
+    const previousHeight = this.viewport?.height ?? height;
     const layout = computeSpatialLayout(width, height);
     this.layout = layout;
     if (this.physics) {
       this.physics.setBounds(width, height);
+      const sx = width / Math.max(1, previousWidth);
+      const sy = height / Math.max(1, previousHeight);
       for (const definition of layout.panels) {
         const body = this.physics.get(definition.id);
         if (!body) continue;
-        body.x = definition.x;
-        body.y = definition.y;
-        body.width = definition.width;
-        body.height = definition.height;
-        body.initial.x = definition.x;
-        body.initial.y = definition.y;
+        const wasInitial = !this.hasCustomLayout && previousWidth === width && previousHeight === height;
+        if (wasInitial) {
+          body.x = definition.x;
+          body.y = definition.y;
+          body.width = definition.width;
+          body.height = definition.height;
+          body.initial.x = definition.x;
+          body.initial.y = definition.y;
+        } else {
+          body.x *= sx;
+          body.y *= sy;
+          body.width = definition.width;
+          body.height = definition.height;
+          body.x = Math.max(0, Math.min(width - body.width, body.x));
+          body.y = Math.max(0, Math.min(height - body.height, body.y));
+          body.initial.x = Math.max(0, Math.min(width - body.width, body.initial.x * sx));
+          body.initial.y = Math.max(0, Math.min(height - body.height, body.initial.y * sy));
+        }
         this._syncPanel(body, this.panelGroups.get(definition.id));
       }
       this.physics.draggedId = null;
       this.activeDrag = null;
     }
+    this.viewport = { width, height };
     if (this.core) {
       const point = screenToWorld(layout.core.x, layout.core.y, width, height, this.units);
       this.core.position.x = point.x;
@@ -558,7 +579,8 @@ export class SpatialWorldController {
     this._updateDrag(x, y);
     this.physics.endDrag(drag.vx, drag.vy);
     this.activeDrag = null;
-    if (!drag.moved) {
+    if (drag.moved) this.saveLayout();
+    else {
       const panel = this.layout.panels.find(item => item.id === drag.id);
       if (panel) this.onNavigate(panel.target, panel.id);
     }
@@ -677,10 +699,53 @@ export class SpatialWorldController {
     }
   }
 
+  _restoreLayout() {
+    try {
+      const raw = this.window.localStorage?.getItem(this.storageKey);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      const saved = globalThis.VEYROST_SPATIAL_MATH?.validateSavedLayout?.(parsed);
+      if (!saved) return;
+      for (const item of saved) {
+        const body = this.physics.get(item.id);
+        if (!body || body.detached) continue;
+        body.x = Math.max(0, Math.min(this.physics.width - body.width, item.x * this.window.innerWidth));
+        body.y = Math.max(0, Math.min(this.physics.height - body.height, item.y * this.window.innerHeight));
+      }
+      this.hasCustomLayout = true;
+    } catch (_) {
+      // Storage can be unavailable in private browsing or restricted contexts.
+    }
+  }
+
+  saveLayout() {
+    if (!this.physics) return false;
+    try {
+      const panels = [];
+      for (const definition of this.layout.panels) {
+        const body = this.physics.get(definition.id);
+        if (!body || body.detached) continue;
+        panels.push({
+          id: definition.id,
+          x: Number((body.x / Math.max(1, this.physics.width)).toFixed(6)),
+          y: Number((body.y / Math.max(1, this.physics.height)).toFixed(6))
+        });
+      }
+      this.window.localStorage?.setItem(this.storageKey, JSON.stringify({ version: 1, panels }));
+      this.hasCustomLayout = true;
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   resetLayout() {
     if (!this.physics) return;
+    try { this.window.localStorage?.removeItem(this.storageKey); } catch (_) {}
+    this.hasCustomLayout = false;
     this.physics.reset();
     this.cancelActiveInteraction();
+    this._resize();
   }
 
   destroy() {
