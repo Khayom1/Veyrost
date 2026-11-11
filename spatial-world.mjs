@@ -14,6 +14,7 @@ const COPY = {
     help: "Point to a panel. Pinch and drag to move it. Release to open.",
     reset: "RESET LAYOUT",
     exit: "AURA OFF",
+    repair: "REPAIR MOUNT",
     status: "3D SPATIAL MODE ACTIVE",
     panels: {
       home: ["HOME", "Overview and direction"],
@@ -29,6 +30,7 @@ const COPY = {
     help: "Укажите на панель. Зажмите и переместите. Отпустите, чтобы открыть.",
     reset: "СБРОСИТЬ РАСКЛАДКУ",
     exit: "ВЫКЛЮЧИТЬ AURA",
+    repair: "ВОССТАНОВИТЬ КРЕПЛЕНИЕ",
     status: "АКТИВЕН 3D-РЕЖИМ",
     panels: {
       home: ["ГЛАВНАЯ", "Обзор и направление"],
@@ -44,6 +46,7 @@ const COPY = {
     help: "Ба панел ишора кун. Бо pinch онро ҳаракат деҳ. Барои кушодан раҳо кун.",
     reset: "БАРҚАРОРИ ЧИДАШ",
     exit: "AURA-РО ХОМӮШ КУН",
+    repair: "ПАЙВАСТКУНИРО БАРҚАРОР КУН",
     status: "ҲОЛАТИ ФАЗОИИ 3D ФАЪОЛ АСТ",
     panels: {
       home: ["АСОСӢ", "Шарҳ ва самт"],
@@ -437,7 +440,7 @@ export class SpatialWorldController {
     const button = this.document.createElement("button");
     button.type = "button";
     button.className = "spatial-repair-control";
-    button.textContent = "REPAIR MOUNT";
+    button.textContent = COPY[this.language]?.repair ?? COPY.en.repair;
     button.setAttribute("aria-label", "Repair detached protected interface controls");
     Object.assign(button.style, {
       position: "absolute",
@@ -805,6 +808,7 @@ export class SpatialWorldController {
     setText("spatial-help", copy.help);
     setText("spatial-reset", copy.reset);
     setText("spatial-exit", copy.exit);
+    if (this.repairButton) this.repairButton.textContent = copy.repair;
     for (const [id, panel] of this.panelGroups) {
       const texture = makeLabelTexture(
         this.document,
