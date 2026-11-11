@@ -49,12 +49,12 @@ const checks = [
   ["INT-07","Main-site AURA integration","EN/RU/TJ AURA interface labels","index.html",/auraMode:"AURA OFF"[\s\S]*auraMode:"AURA ВЫКЛ"[\s\S]*auraMode:"AURA ХОМӮШ"/],
 
   // Not yet implemented: each row is a specific acceptance requirement.
-  ["3D-01","3D spatial environment","Three-dimensional runtime and scene graph",null,null],
-  ["3D-02","3D spatial environment","Interactive depth-aware camera and world navigation",null,null],
-  ["3D-03","3D spatial environment","3D interface objects with lighting and shadows",null,null],
-  ["3D-04","3D spatial environment","3D collision and deformation for interface objects",null,null],
-  ["3D-05","3D spatial environment","Depth-aware hand cursor and object interaction",null,null],
-  ["3D-06","3D spatial environment","Mobile adaptive rendering and performance limits",null,null],
+  ["3D-01","3D spatial environment","Three.js WebGL scene renderer","spatial-world.mjs",/new THREE\\.WebGLRenderer/],
+  ["3D-02","3D spatial environment","Orthographic scene camera and viewport resize","spatial-world.mjs",/new THREE\\.OrthographicCamera[\\s\\S]*_resize/],
+  ["3D-03","3D spatial environment","Lit physical 3D interface panels","spatial-world.mjs",/new THREE\\.MeshPhysicalMaterial/],
+  ["3D-04","3D spatial environment","Matter Engine collision and deformation in 3D","spatial-world.mjs",/new Matter\\.MatterWorld[\\s\\S]*this\\.physics\\.step\\(delta\\)/],
+  ["3D-05","3D spatial environment","Raycast selection and hand-driven object control","spatial-world.mjs",/new THREE\\.Raycaster[\\s\\S]*beginHandPress\\(x, y\\)[\\s\\S]*onHandMove\\(x, y\\)/],
+  ["3D-06","3D spatial environment","Mobile pixel-ratio cap and responsive layout","spatial-world.mjs",/setPixelRatio\\(Math\\.min[\\s\\S]*width < 680 \\? 1\\.2 : 1\\.5/],
 
   ["CREW-01","Technician service sequence","Rigged realistic technician character models",null,null],
   ["CREW-02","Technician service sequence","Service vehicle arrival and departure animation",null,null],
