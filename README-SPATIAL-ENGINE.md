@@ -17,10 +17,10 @@ This branch contains the experimental spatial interface integrated with the exis
 
 The spatial layout is stored in browser `localStorage` under `veyrost:spatial-layout:v1`.
 
-- Only normalized panel positions are persisted.
-- The payload is versioned (`version: 1`).
+- Normalized X/Y positions and the panel's bounded Z position are persisted.
+- The payload remains versioned (`version: 1`); Z is an optional field so layouts saved by older builds remain valid.
 - Unknown panel IDs, duplicates, malformed coordinates, and unsupported versions are rejected.
-- Layout is restored within current viewport bounds.
+- Layout is restored within current viewport bounds; valid Z values are restored within `-1.25` to `1.25`.
 - Resizing scales panel positions relative to the previous viewport before applying new bounds.
 - Reset clears the saved layout and restores the default arrangement.
 - Storage failures are non-fatal; private browsing or storage restrictions fall back to the default layout.
@@ -32,6 +32,8 @@ The spatial layout is stored in browser `localStorage` under `veyrost:spatial-la
 - Losing the tracked hand cancels a held interaction.
 - Emergency pause stops spatial interaction until resumed.
 - Selecting a panel without moving opens its destination; dragging moves the panel.
+- Selecting a movable panel also opens a depth HUD. Its range control and step buttons adjust the panel on the Z axis; mouse-wheel input adjusts the hovered/selected panel, and Shift+wheel uses finer steps.
+- The depth HUD is localized in English, Russian and Tajik. Its step buttons are compatible with AURA pinch activation; touch users can use the range control and buttons.
 
 ## Protected controls and mount repair
 
@@ -41,7 +43,7 @@ Two navigation panels (`HOME` and `AI SYSTEMS`) are mounted as protected control
 
 The current scene is a 3D-rendered perspective scene with independent depth layers, beveled physical panel meshes, animated tilt and a responsive perspective camera. Matter handles X/Y panel motion; the dedicated depth solver resolves Z-axis collisions when panel projections overlap. This is a hybrid 2.5D simulation, not a full 3D rigid-body engine with angular momentum or unrestricted 3-axis motion. It does **not** yet provide:
 
-- Full 6-DoF rigid-body simulation, angular momentum, and unrestricted depth manipulation.
+- Full 6-DoF rigid-body simulation and angular momentum. Z editing is currently clamped to a safe range rather than unrestricted.
 - Realistic rigged technician characters.
 - Service vehicle, ladder, climb, cable reconnection, or tug-of-war animation.
 - Localized character dialogue or spatial audio.
