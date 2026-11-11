@@ -31,6 +31,10 @@ jobs:
         run: |
           node -e 'const fs=require("node:fs"); const html=fs.readFileSync("index.html","utf8"); const scripts=[...html.matchAll(/<script type="module">([\s\S]*?)<\/script>/gi)]; if(!scripts.length) throw new Error("Main AURA module not found"); fs.writeFileSync("/tmp/index-aura.mjs",scripts[scripts.length-1][1]);'
           node --check /tmp/index-aura.mjs
+      - name: Check 3D spatial engine syntax
+        run: |
+          node --check spatial-math.mjs
+          node --check spatial-world.mjs
       - name: Run project regression tests
         run: node --test tests/*.test.cjs
       - name: Calculate source-evidence progress
