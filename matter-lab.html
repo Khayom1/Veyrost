@@ -186,6 +186,27 @@ body.aura-visual .workspace{background-image:linear-gradient(#74e8ff0d 1px,trans
     for(const el of items.querySelectorAll(".matter-item"))bindItem(el);
     measure();render();
   }
+  function loadSavedLayout(){
+    try{
+      const raw=localStorage.getItem("veyrost-matter-layout");
+      if(!raw)return;
+      const saved=JSON.parse(raw);
+      if(saved.version!==1||!Array.isArray(saved.items))return;
+      for(const item of saved.items){
+        const b=world.get(item.id);
+        if(!b||item.id.startsWith("protected-"))continue;
+        if(Number.isFinite(item.x))b.x=item.x;
+        if(Number.isFinite(item.y))b.y=item.y;
+        if(Number.isFinite(item.mass))b.mass=clamp(item.mass,.5,4);
+        if(Number.isFinite(item.elasticity))b.elasticity=clamp(item.elasticity,0,1);
+        if(["metal","gel","hybrid"].includes(item.material)){
+          b.material=item.material;
+          const el=bodies.get(b.id);
+          if(el){el.classList.remove("metal","gel","hybrid");el.classList.add(item.material);}
+        }
+      }
+    }catch(e){showToast("Saved layout could not be loaded.");}
+  }
   function setMatter(enabled){
     editMode=enabled;document.body.classList.toggle("editing",enabled);
     $("matterToggle").classList.toggle("active",enabled);
@@ -257,7 +278,7 @@ body.aura-visual .workspace{background-image:linear-gradient(#74e8ff0d 1px,trans
     for(const b of world.bodies.values())if(!b.detached)b.elasticity=value;
   });
   $("saveLayout").addEventListener("click",()=>{
-    const data={version:1,items:Array.from(world.bodies.values()).map(b=>({id:b.id,x:b.x,y:b.y,material:b.material,mass:b.mass,elasticity:b.elasticity,detached:b.detached}))};
+    const data={version:1,items:Array.from(world.bodies.values()).filter(b=>!b.id.startsWith("protected-")&&!b.detached).map(b=>({id:b.id,x:b.x,y:b.y,material:b.material,mass:b.mass,elasticity:b.elasticity}))};
     try{localStorage.setItem("veyrost-matter-layout",JSON.stringify(data));showToast(t("saved"));}catch(e){showToast("Local storage unavailable on this browser.");}
   });
   function restoreAll(){
@@ -286,6 +307,7 @@ body.aura-visual .workspace{background-image:linear-gradient(#74e8ff0d 1px,trans
   }
   window.addEventListener("resize",measure);
   addDefaultItems();
+  loadSavedLayout();
   setLanguage("en");
   requestAnimationFrame(frame);
 })();
