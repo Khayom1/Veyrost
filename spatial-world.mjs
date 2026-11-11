@@ -912,6 +912,7 @@ export class SpatialWorldController {
     try { this.window.localStorage?.removeItem(this.storageKey); } catch (_) {}
     this.hasCustomLayout = false;
     this.physics.reset();
+    this.depthPhysics?.reset();
     for (const control of this.protectedControls.values()) control.reset();
     for (const socket of this.protectedSockets.values()) socket.visible = false;
     for (const panel of this.panelGroups.values()) panel.group.visible = true;
