@@ -50,11 +50,13 @@ const checks = [
 
   // Not yet implemented: each row is a specific acceptance requirement.
   ["3D-01","3D spatial environment","Three.js WebGL scene renderer","spatial-world.mjs",/new THREE\.WebGLRenderer/],
-  ["3D-02","3D spatial environment","Orthographic scene camera and viewport resize","spatial-world.mjs",/new THREE\.OrthographicCamera[\s\S]*_resize/],
+  ["3D-02","3D spatial environment","Perspective camera with responsive field of view","spatial-world.mjs",/new THREE\.PerspectiveCamera[\s\S]*camera\.fov[\s\S]*_resize/],
   ["3D-03","3D spatial environment","Lit physical 3D interface panels","spatial-world.mjs",/new THREE\.MeshPhysicalMaterial/],
   ["3D-04","3D spatial environment","2D Matter-backed planar collision and bounded deformation","spatial-world.mjs",/new Matter\.MatterWorld[\s\S]*this\.physics\.step\(delta\)/],
   ["3D-05","3D spatial environment","Raycast selection and hand-driven object control","spatial-world.mjs",/new THREE\.Raycaster[\s\S]*beginHandPress\(x, y\)[\s\S]*onHandMove\(x, y\)/],
   ["3D-06","3D spatial environment","Mobile pixel-ratio cap and responsive layout","spatial-world.mjs",/setPixelRatio\(Math\.min[\s\S]*width < 680 \? 1\.2 : 1\.5/],
+  ["3D-07","3D spatial environment","Independent panel depth layers in perspective scene","spatial-world.mjs",/userData\.depth = \[[-0-9., ]+\][\s\S]*position\.set\(position\.x, position\.y, panel\.group\.userData\.depth/],
+  ["3D-08","3D spatial environment","Depth-aware panel tilt and floating animation","spatial-world.mjs",/group\.rotation\.set\([\s\S]*group\.rotation\.y \+=/],
   ["LAY-01","Spatial layout persistence","Versioned local layout serialization","spatial-world.mjs",/version: 1, panels/],
   ["LAY-02","Spatial layout persistence","Saved layout validation and unknown-ID rejection","spatial-math.mjs",/validateSavedLayout[\s\S]*allowed\.has\(panel\.id\)/],
   ["LAY-03","Spatial layout persistence","Normalized panel coordinates restored from local storage","spatial-world.mjs",/localStorage\?\.getItem[\s\S]*item\.x \* this\.window\.innerWidth/],
