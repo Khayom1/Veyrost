@@ -3,7 +3,7 @@
 **Audit date:** 2026-11-11  
 **Branch:** `feat/spatial-persistence-hardening`  
 **Audit source:** `node scripts/project-status.mjs`  
-**Validation:** GitHub Actions was not used for this continuation, per instruction. The source-evidence patterns for the five new protected-control criteria were checked against the committed files. No full regression run was performed after these changes.
+**Validation:** GitHub Actions was not used for this continuation, per instruction. The source-evidence patterns for the five new protected-control criteria were checked against the committed files. No full regression run was performed after these changes. The five depth-physics source-evidence patterns were checked directly; the Node test cases were added but not executed in this environment.
 
 ## Current source-evidence result
 
@@ -14,17 +14,18 @@
 | AURA hand controller | 13 | 13 | 100.00% |
 | Main-site AURA integration | 7 | 7 | 100.00% |
 | Spatial rendered interface (perspective depth-rendered scope) | 8 | 8 | 100.00% |
+| Depth-axis collision physics (hybrid 2.5D) | 5 | 5 | 100.00% |
 | Spatial layout persistence | 4 | 4 | 100.00% |
 | Protected control lifecycle | 5 | 5 | 100.00% |
 | Technician service sequence | 0 | 8 | 0.00% |
 | Dialogue and spatial audio | 0 | 5 | 0.00% |
 | Validation and release | 4 | 6 | 66.67% |
-| **Total** | **58** | **73** | **79.45%** |
+| **Total** | **63** | **78** | **80.77%** |
 
-- Implemented source criteria: **58 / 73**
-- Pending source criteria: **15 / 73**
+- Implemented source criteria: **63 / 78**
+- Pending source criteria: **15 / 78**
 - New protected-control evidence mismatches: **0 / 5** (direct source-pattern verification; not a runtime test)
-- The last full CI pass (`43058327625`) predates the perspective-depth and protected-control changes; it is not validation of the latest branch head.
+- The last full CI pass (`43058327625`) predates the perspective-depth, protected-control, and depth-physics changes; it is not validation of the latest branch head.
 
 ## Scope and limitations
 
@@ -36,9 +37,9 @@ Every criterion has equal weight. It measures whether the defined source-level e
 
 The protected-control lifecycle is implemented for HOME and AI SYSTEMS: first-pull resistance, second-pull release, fixed mount socket, localized repair action, and restoration to original coordinates. This is a functional interface repair flow, not the planned technician animation.
 
-The spatial interface now uses a Three.js **perspective camera** and six independently layered panel depths, with per-panel tilt and floating motion. Its panel movement and collisions remain backed by the existing **2D** Matter Engine. The checklist's 8/8 means the eight declared source-level rendering criteria are present; it does not mean full 3D physics or depth-aware collision exists.
+The spatial interface now uses a Three.js **perspective camera** and six independently layered panel depths, with per-panel tilt and floating motion. Matter handles panel movement and collision in X/Y; the new depth solver adds Z-axis collision resolution for panels whose X/Y projections overlap. The combined system is hybrid **2.5D**, not a full 6-DoF rigid-body engine.
 
-Perspective depth rendering is now present in source: responsive field-of-view camera, independent panel depth layers, animated tilt, and depth-aware panel placement. This has not yet been confirmed on a physical phone.
+Depth-axis collision is now integrated: projected X/Y overlap checks, mass-weighted positional correction, restitution impulses, anchored-body handling, and synchronization with Matter panel positions. This has not yet been confirmed by a full runtime regression or on a physical phone.
 
 Layout persistence is now implemented:
 - Versioned localStorage payload.
