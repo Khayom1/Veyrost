@@ -45,3 +45,29 @@ test("render loop and GPU resources are disposed", () => {
   assert.match(source, /renderer\?\.dispose/);
   assert.match(source, /geometry\?\.dispose/);
 });
+
+test("selected panels expose depth slider and accessible step buttons", () => {
+  assert.match(source, /_buildDepthControl\(\)/);
+  assert.match(source, /type = "range"/);
+  assert.match(source, /setAttribute\("aria-label", "Selected panel depth"\)/);
+  assert.match(source, /adjustSelectedDepth\(-0\.05, true\)/);
+  assert.match(source, /adjustSelectedDepth\(0\.05, true\)/);
+});
+
+test("mouse wheel adjusts selected panel depth with fine-control modifier", () => {
+  assert.match(source, /addEventListener\("wheel", this\._wheel, \{ passive: false \}\)/);
+  assert.match(source, /event\.preventDefault\(\)/);
+  assert.match(source, /event\.shiftKey \? 0\.01 : 0\.035/);
+  assert.match(source, /setPanelDepth\(id, body\.z \+ direction \* fine, true\)/);
+});
+
+test("depth manipulation is bounded and anchored controls cannot move", () => {
+  assert.match(source, /if \(!body \|\| body\.anchored \|\| !Number\.isFinite/);
+  assert.match(source, /Math\.max\(-1\.25, Math\.min\(1\.25/);
+});
+
+test("custom depth is serialized and restored with legacy layout compatibility", () => {
+  assert.match(source, /z: Number\(\(depthBody\?\.z \?\? 0\)\.toFixed\(4\)\)/);
+  assert.match(source, /if \(depthBody && Number\.isFinite\(item\.z\)\) depthBody\.z = item\.z/);
+  assert.match(source, /this\.depthControl\?\.remove\(\)/);
+});
