@@ -6,9 +6,15 @@ export const AURA_CONFIG = Object.freeze({
   visionModuleUrl: "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.2.2/vision_bundle.mjs",
   wasmRoot: "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.2.2/wasm",
   modelUrl: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+  // Pinch is measured against hand length, not raw camera pixels.
+  pinchEngageRatio: 0.28,
+  pinchReleaseRatio: 0.42,
   pinchThreshold: 0.055,
+  pinchStableFrames: 2,
   maxInferenceHz: 25,
-  smoothing: 0.34
+  smoothing: 0.5,
+  fastSmoothing: 0.72,
+  scrollGain: 2.2
 });
 
 export function distance2d(a, b) {
@@ -16,14 +22,27 @@ export function distance2d(a, b) {
   return Math.hypot((a.x ?? 0) - (b.x ?? 0), (a.y ?? 0) - (b.y ?? 0));
 }
 
-export function classifyHand(landmarks, pinchThreshold = AURA_CONFIG.pinchThreshold) {
+export function classifyHand(landmarks, pinchThreshold = AURA_CONFIG.pinchThreshold, previousGesture = "none") {
   if (!Array.isArray(landmarks) || landmarks.length < 21) return "none";
 
-  if (distance2d(landmarks[4], landmarks[8]) <= pinchThreshold) return "pinch";
+  // Normalize thumb/index distance by wrist-to-middle-knuckle length so
+  // the gesture remains usable when the hand moves closer to the camera.
+  const palmLength = distance2d(landmarks[0], landmarks[9]);
+  const pinchDistance = distance2d(landmarks[4], landmarks[8]);
+  const pinchRatio = palmLength > 0.08 ? pinchDistance / palmLength : pinchDistance;
+  const engage = palmLength > 0.08 ? AURA_CONFIG.pinchEngageRatio : pinchThreshold;
+  const release = palmLength > 0.08 ? AURA_CONFIG.pinchReleaseRatio : pinchThreshold * 1.45;
+
+  if (previousGesture === "pinch" ? pinchRatio <= release : pinchRatio <= engage) {
+    return "pinch";
+  }
 
   const extended = [8, 12, 16, 20].map((tip, index) => {
     const pip = [6, 10, 14, 18][index];
-    return Number(landmarks[tip]?.y) < Number(landmarks[pip]?.y) - 0.015;
+    const mcp = [5, 9, 13, 17][index];
+    const baseDistance = distance2d(landmarks[mcp], landmarks[pip]);
+    const tipDistance = distance2d(landmarks[mcp], landmarks[tip]);
+    return tipDistance > baseDistance * 1.12;
   });
   const count = extended.filter(Boolean).length;
 
@@ -33,7 +52,6 @@ export function classifyHand(landmarks, pinchThreshold = AURA_CONFIG.pinchThresh
   if (extended[0]) return "move";
   return "none";
 }
-
 export function mapHandToViewport(point, width, height) {
   const x = Math.min(1, Math.max(0, Number(point?.x) || 0));
   const y = Math.min(1, Math.max(0, Number(point?.y) || 0));
@@ -64,6 +82,8 @@ export class AuraController {
     this.lastVideoTime = -1;
     this.lastInferenceAt = 0;
     this.lastGesture = "none";
+    this.gestureCandidate = "none";
+    this.gestureCandidateFrames = 0;
     this.lastPosition = null;
     this.smoothedPosition = null;
     this._loop = this._loop.bind(this);
@@ -147,6 +167,8 @@ export class AuraController {
       this.lastVideoTime = -1;
       this.lastInferenceAt = 0;
       this.lastGesture = "none";
+      this.gestureCandidate = "none";
+      this.gestureCandidateFrames = 0;
       this.lastPosition = null;
       this.smoothedPosition = null;
       this.cursor.style.visibility = "hidden";
@@ -202,7 +224,8 @@ export class AuraController {
     if (!this.smoothedPosition) {
       this.smoothedPosition = viewport;
     } else {
-      const alpha = AURA_CONFIG.smoothing;
+      const movement = Math.hypot(viewport.x - this.smoothedPosition.x, viewport.y - this.smoothedPosition.y);
+      const alpha = movement > 35 ? AURA_CONFIG.fastSmoothing : AURA_CONFIG.smoothing;
       this.smoothedPosition = {
         x: this.smoothedPosition.x + (viewport.x - this.smoothedPosition.x) * alpha,
         y: this.smoothedPosition.y + (viewport.y - this.smoothedPosition.y) * alpha
@@ -214,7 +237,24 @@ export class AuraController {
     this.cursor.style.visibility = "visible";
     try { this.onCursorMove({ ...point }); } catch (_) {}
 
-    const gesture = classifyHand(landmarks);
+    const rawGesture = classifyHand(landmarks, AURA_CONFIG.pinchThreshold, this.lastGesture);
+    let gesture = rawGesture;
+    if (rawGesture !== this.lastGesture && (rawGesture === "pinch" || this.lastGesture === "pinch")) {
+      if (this.gestureCandidate === rawGesture) this.gestureCandidateFrames += 1;
+      else {
+        this.gestureCandidate = rawGesture;
+        this.gestureCandidateFrames = 1;
+      }
+      if (this.gestureCandidateFrames < AURA_CONFIG.pinchStableFrames) {
+        gesture = this.lastGesture;
+      } else {
+        this.gestureCandidate = "none";
+        this.gestureCandidateFrames = 0;
+      }
+    } else {
+      this.gestureCandidate = "none";
+      this.gestureCandidateFrames = 0;
+    }
     if (gesture === "pinch" && this.lastGesture !== "pinch") {
       this._gesture("pinch-start", { x: point.x, y: point.y });
     } else if (gesture !== "pinch" && this.lastGesture === "pinch") {
@@ -250,7 +290,7 @@ export class AuraController {
       this._activateAt(point.x, point.y);
     } else if (gesture === "scroll" && this.lastGesture === "scroll" && this.lastPosition) {
       const deltaY = point.y - this.lastPosition.y;
-      if (Math.abs(deltaY) > 1) this.window.scrollBy(0, -deltaY * 1.35);
+      if (Math.abs(deltaY) > 0.7) this.window.scrollBy(0, -deltaY * AURA_CONFIG.scrollGain);
     }
 
     this.lastPosition = point;
@@ -292,6 +332,8 @@ export class AuraController {
     if (this.cursor) this.cursor.style.visibility = "hidden";
     this.paused = false;
     this.lastGesture = "none";
+    this.gestureCandidate = "none";
+    this.gestureCandidateFrames = 0;
     this.lastPosition = null;
     this.smoothedPosition = null;
     if (notify) this._status("off", message);
