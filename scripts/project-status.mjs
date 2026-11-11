@@ -58,7 +58,7 @@ const checks = [
   ["LAY-01","Spatial layout persistence","Versioned local layout serialization","spatial-world.mjs",/version: 1, panels/],
   ["LAY-02","Spatial layout persistence","Saved layout validation and unknown-ID rejection","spatial-math.mjs",/validateSavedLayout[\s\S]*allowed\.has\(panel\.id\)/],
   ["LAY-03","Spatial layout persistence","Normalized panel coordinates restored from local storage","spatial-world.mjs",/localStorage\?\.getItem[\s\S]*item\.x \* this\.window\.innerWidth/],
-  ["LAY-04","Spatial layout persistence","Reset clears saved layout and restores initial layout","spatial-world.mjs",/removeItem\\(this\\.storageKey\\)[\\s\\S]*this\\.physics\\.reset\\(\\)/],
+  ["LAY-04","Spatial layout persistence","Reset clears saved layout and restores initial layout","spatial-world.mjs",/removeItem\(this\.storageKey\)[\s\S]*this\.physics\.reset\(\)/],
 
 
   ["CREW-01","Technician service sequence","Rigged realistic technician character models",null,null],
