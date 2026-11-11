@@ -13,7 +13,7 @@
       friction: clamp(finite(o.friction, .22), 0, 1),
       maxCompression: clamp(finite(o.maxCompression, .16), 0, .35),
       compression: 0, compressionAxis: "y", compressionVelocity: 0,
-      material: o.material || "hybrid", anchored: Boolean(o.anchored),
+      material: o.material || "hybrid", collisionEnabled: o.collisionEnabled !== false, anchored: Boolean(o.anchored),
       detached: Boolean(o.detached), detachAttempts: 0, dragging: false,
       pointerOffsetX: 0, pointerOffsetY: 0,
       initial: { x: finite(o.x, 0), y: finite(o.y, 0), anchored: Boolean(o.anchored) }
@@ -118,7 +118,7 @@
         b.compressionVelocity += (-30 * b.compression - 8 * b.compressionVelocity) * dt;
         b.compression = clamp(b.compression + b.compressionVelocity * dt, 0, b.maxCompression);
       }
-      for (let pass = 0; pass < 3; pass++) {
+      for (let pass = 0; pass < 8; pass++) {
         for (let i = 0; i < bodies.length; i++)
           for (let j = i + 1; j < bodies.length; j++) this._resolvePair(bodies[i], bodies[j]);
         for (const b of bodies) this._contain(b, .5);
@@ -138,6 +138,7 @@
       b.compressionVelocity = Math.max(b.compressionVelocity, amount * 5);
     }
     _resolvePair(a, b) {
+      if (!a.collisionEnabled || !b.collisionEnabled) return;
       const dx = (b.x + b.width/2) - (a.x + a.width/2);
       const dy = (b.y + b.height/2) - (a.y + a.height/2);
       const ox = (a.width + b.width)/2 - Math.abs(dx);
