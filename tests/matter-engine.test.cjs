@@ -19,6 +19,16 @@ test("screen edges contain bodies", () => {
   assert.ok(body.x <= 300); assert.ok(body.y <= 240);
 });
 
+test("hidden anchored components do not obstruct visible bodies", () => {
+  const world = new MatterWorld(500, 300);
+  const hidden = world.add({ id: "hidden", x: 0, y: 0, width: 100, height: 50, anchored: true, collisionEnabled: false });
+  const visible = world.add({ id: "visible", x: 10, y: 10, width: 100, height: 50 });
+  world.step(1/60);
+  assert.equal(visible.x, 10);
+  assert.equal(visible.y, 10);
+  assert.equal(hidden.anchored, true);
+});
+
 test("protected components resist first pull and detach on second", () => {
   const world = new MatterWorld(800, 600);
   const item = world.add({ id: "menu", x: 10, y: 10, width: 100, height: 40, anchored: true });
