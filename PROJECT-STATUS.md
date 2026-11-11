@@ -14,16 +14,16 @@
 | AURA hand controller | 13 | 13 | 100.00% |
 | Main-site AURA integration | 7 | 7 | 100.00% |
 | Spatial rendered interface (perspective depth-rendered scope) | 8 | 8 | 100.00% |
-| Depth-axis collision physics (hybrid 2.5D) | 5 | 5 | 100.00% |
+| Depth-axis collision physics (hybrid 2.5D) | 6 | 6 | 100.00% |
 | Spatial layout persistence | 4 | 4 | 100.00% |
 | Protected control lifecycle | 5 | 5 | 100.00% |
 | Technician service sequence | 0 | 8 | 0.00% |
 | Dialogue and spatial audio | 0 | 5 | 0.00% |
 | Validation and release | 4 | 6 | 66.67% |
-| **Total** | **63** | **78** | **80.77%** |
+| **Total** | **64** | **79** | **81.01%** |
 
-- Implemented source criteria: **63 / 78**
-- Pending source criteria: **15 / 78**
+- Implemented source criteria: **64 / 79**
+- Pending source criteria: **15 / 79**
 - New protected-control evidence mismatches: **0 / 5** (direct source-pattern verification; not a runtime test)
 - The last full CI pass (`43058327625`) predates the perspective-depth, protected-control, and depth-physics changes; it is not validation of the latest branch head.
 
@@ -39,7 +39,7 @@ The protected-control lifecycle is implemented for HOME and AI SYSTEMS: first-pu
 
 The spatial interface now uses a Three.js **perspective camera** and six independently layered panel depths, with per-panel tilt and floating motion. Matter handles panel movement and collision in X/Y; the new depth solver adds Z-axis collision resolution for panels whose X/Y projections overlap. The combined system is hybrid **2.5D**, not a full 6-DoF rigid-body engine.
 
-Depth-axis collision is now integrated: projected X/Y overlap checks, mass-weighted positional correction, restitution impulses, anchored-body handling, and synchronization with Matter panel positions. This has not yet been confirmed by a full runtime regression or on a physical phone.
+Depth-axis collision is now integrated: projected X/Y overlap checks, mass-weighted positional correction, restitution impulses, anchored-body handling, synchronization with Matter panel positions, and deterministic depth reset. This has not yet been confirmed by a full runtime regression or on a physical phone.
 
 Layout persistence is now implemented:
 - Versioned localStorage payload.
