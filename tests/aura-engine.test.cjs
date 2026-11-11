@@ -121,7 +121,7 @@ test("losing the hand releases an active pinch", async () => {
   setFinger(pinched, 8, 6, true);
   controller._consume({ landmarks: [pinched] });
   controller._consume({ landmarks: [] });
-  assert.ok(events.includes("pinch-end"));
+  assert.ok(events.includes("pinch-cancel"));
   assert.ok(events.includes("hand-lost"));
   assert.equal(controller.lastGesture, "none");
   assert.equal(controller.cursor.style.visibility, "hidden");
