@@ -36,6 +36,6 @@ jobs:
           node --check spatial-math.mjs
           node --check spatial-world.mjs
       - name: Run project regression tests
-        run: node --test tests/*.test.cjs
+        run: node --test tests/*.test.cjs tests/*.test.mjs
       - name: Calculate source-evidence progress
         run: node scripts/project-status.mjs
