@@ -236,7 +236,7 @@ export class AuraController {
 
     const rawGesture = classifyHand(landmarks, AURA_CONFIG.pinchThreshold, this.lastGesture);
     let gesture = rawGesture;
-    if (rawGesture !== this.lastGesture && (rawGesture === "pinch" || this.lastGesture === "pinch")) {
+    if (rawGesture === "pinch" && this.lastGesture !== "pinch") {
       if (this.gestureCandidate === rawGesture) this.gestureCandidateFrames += 1;
       else {
         this.gestureCandidate = rawGesture;
