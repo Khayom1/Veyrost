@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#070a12">
+<meta name="description" content="VEYROST AURA hand-control prototype. Private, browser-local hand tracking.">
+<title>VEYROST AURA — Hand Control Lab</title>
+<style>
+:root{color-scheme:dark;--bg:#070a12;--panel:#101725;--line:#29364b;--text:#eef3ff;--muted:#99a7be;--cyan:#75e8ff;--violet:#b3a5ff;--green:#83edbd;--amber:#ffcb7c;--red:#ff7885}
+*{box-sizing:border-box}html{min-height:100%;scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 78% 0%,#40558b30,transparent 38%),var(--bg);color:var(--text);font:14px/1.6 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:inherit;text-decoration:none}button{font:inherit;cursor:pointer;color:inherit}button:focus-visible,a:focus-visible{outline:2px solid var(--cyan);outline-offset:4px}
+.wrap{width:min(1100px,calc(100% - 34px));margin:auto}.top{height:70px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.brand{font-weight:900;letter-spacing:.16em;font-size:12px}.brand small{display:block;color:var(--muted);font-size:9px;letter-spacing:.19em}.back{font-size:11px;color:#c9d6ea;border:1px solid var(--line);border-radius:9px;padding:8px 12px}
+.hero{padding:65px 0 32px;display:grid;grid-template-columns:1.1fr .9fr;gap:35px;align-items:end}.eyebrow{color:var(--cyan);font-size:10px;font-weight:900;letter-spacing:.22em}.hero h1{font-size:clamp(43px,7vw,76px);line-height:.98;letter-spacing:-.07em;margin:17px 0}.hero h1 span{color:var(--violet)}.lead{max-width:590px;color:#b2bdd0;font-size:14px;line-height:1.85}.privacy{padding:17px;border:1px solid #75e8ff34;border-radius:14px;background:#75e8ff08;color:#b7d5e5;font-size:11px;line-height:1.8}.privacy strong{display:block;color:#8cecff;font-size:10px;letter-spacing:.12em;margin-bottom:5px}
+.control-panel{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:25px 0}.panel{border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,#131e30,#0d1420);padding:22px}.panel h2{font-size:15px;margin:0 0 8px}.panel p{font-size:11px;color:var(--muted);margin:0 0 18px;line-height:1.75}.actions{display:flex;flex-wrap:wrap;gap:9px}.btn{border:1px solid var(--line);border-radius:10px;background:#ffffff08;padding:11px 16px;font-size:11px;font-weight:850}.btn.primary{background:#ddfaff;color:#07111b;border-color:#a2f3ff}.btn.stop{border-color:#ff78855e;color:#ff9ca6}.btn:disabled{opacity:.38;cursor:not-allowed}
+.statusline{display:flex;align-items:center;gap:9px;margin-top:17px;color:#b4c2d5;font-size:11px;min-height:24px}.dot{width:8px;height:8px;border-radius:50%;background:#6c778a;box-shadow:0 0 0 4px #6c778a20}.dot.active{background:var(--green);box-shadow:0 0 0 4px #83edbd22}.dot.error{background:var(--red)}.dot.loading{background:var(--amber)}
+.gesture{display:inline-flex;padding:6px 9px;border:1px solid var(--line);border-radius:30px;color:#d7dff0;font-size:10px;font-weight:800;letter-spacing:.06em;margin-top:8px}
+.arena{position:relative;overflow:hidden;min-height:260px;padding:25px;border:1px solid #7f8aa62e;border-radius:20px;background:radial-gradient(ellipse at 50% 0%,#4b5dbb22,transparent 65%),linear-gradient(145deg,#111b2a,#0b111c);margin:15px 0 20px}
+.arena h2{font-size:19px;margin:0 0 6px}.arena>p{color:var(--muted);font-size:11px;margin:0 0 18px}.test-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.test-button{border:1px solid #78e9ff6b;background:#71e5ff14;border-radius:11px;padding:12px 14px;font-size:11px;font-weight:850}.counter{color:var(--muted);font-size:11px}.counter strong{color:white;font-variant-numeric:tabular-nums}
+.catch{position:absolute;right:25px;bottom:20px;display:none;border:1px solid #b3a5ff80;background:#b3a5ff16;color:#e2dcff;border-radius:12px;padding:10px 13px;font-size:10px;font-weight:900;letter-spacing:.1em;box-shadow:0 0 25px #b3a5ff20;transition:left .15s,top .15s}
+.scroll-demo{height:170px;overflow:hidden;border:1px solid var(--line);border-radius:13px;margin-top:20px;padding:16px;background:#090f19;color:#8e9db4;font-size:11px}.scroll-demo strong{display:block;color:#d8e5f5;margin-bottom:8px}.scroll-demo p{margin:0 0 15px;line-height:1.8}
+.instructions{padding:32px 0 65px}.instructions h2{font-size:18px;margin-bottom:15px}.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.step{border:1px solid var(--line);border-radius:12px;padding:14px;background:#ffffff04}.step strong{display:block;color:var(--cyan);font-size:10px;letter-spacing:.08em;margin-bottom:5px}.step span{font-size:10px;color:var(--muted);line-height:1.7}
+.cursor{position:fixed;z-index:10000;width:23px;height:23px;border:2px solid #baf7ff;border-radius:50%;background:#66e7ff25;box-shadow:0 0 12px #72eaff,0 0 34px #72eaff8a;transform:translate(-50%,-50%);pointer-events:none;visibility:hidden}
+.cursor:after{content:"";position:absolute;inset:5px;border-radius:50%;background:#e9fdff}
+.camera-source{position:fixed;width:1px;height:1px;left:-10000px;top:-10000px;opacity:0;pointer-events:none}
+footer{border-top:1px solid var(--line);padding:20px 0;color:#7f8ca2;font-size:10px}
+@media(max-width:720px){.hero{grid-template-columns:1fr;padding-top:48px;gap:23px}.control-panel{grid-template-columns:1fr}.steps{grid-template-columns:1fr 1fr}.catch{right:16px;bottom:16px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top wrap"><a class="brand" href="index.html">VEYROST<small>AURA / HAND CONTROL LAB</small></a><a class="back" href="index.html">← Main website</a></header>
+<main class="wrap">
+<section class="hero">
+<div><div class="eyebrow">SPATIAL INPUT SYSTEM / PROTOTYPE 01</div><h1>Control the interface.<br><span>Without touching it.</span></h1><p class="lead">AURA turns your front camera into a local hand-tracking input. Start the camera, hold one hand in view and test the gesture controls below.</p></div>
+<aside class="privacy"><strong>LOCAL CAMERA PROCESSING</strong>Camera permission is requested only when you start AURA. The camera feed stays hidden. Frames are processed on this device; this page does not upload or record them. The vision library and model are downloaded from their providers, and MediaPipe may send SDK usage/performance metrics.</aside>
+</section>
+<section class="control-panel">
+<div class="panel">
+<h2>AURA control</h2><p>Camera activation is manual. Use Stop AURA to release the camera immediately. AURA also stops the camera when this page is hidden or closed.</p>
+<div class="actions"><button class="btn primary" id="start-aura">Start AURA</button><button class="btn stop" id="stop-aura" disabled>Stop AURA</button></div>
+<div class="statusline"><span class="dot" id="status-dot"></span><span id="status-text" role="status" aria-live="polite">OFF — camera not active</span></div>
+<div class="gesture" id="gesture-state">WAITING FOR HAND</div>
+</div>
+<div class="panel">
+<h2>Gesture legend</h2><p>Keep your hand approximately 30–70 cm from the camera. Good lighting improves tracking. Move slowly until the cursor stabilizes.</p>
+<div class="gesture">INDEX — MOVE</div>
+<div class="gesture">PINCH — CLICK</div>
+<div class="gesture">TWO FINGERS — SCROLL</div>
+<div class="gesture">OPEN PALM — CANCEL / RESUME</div>
+<div class="gesture">FIST — EMERGENCY PAUSE</div>
+</div>
+</section>
+<section class="arena" id="arena">
+<h2>Interaction field</h2><p>Use your index finger to move the cursor, then pinch over the action button to activate it. The escape control appears only while AURA is active.</p>
+<div class="test-actions"><button class="test-button" id="test-action">Activate test control</button><span class="counter">Activated: <strong id="activation-count">0</strong> times</span></div>
+<button class="catch" id="catch-me" type="button">CATCH ME</button>
+</section>
+<section class="instructions">
+<h2>How to test</h2>
+<div class="steps">
+<div class="step"><strong>01 / START</strong><span>Press Start AURA and grant camera permission.</span></div>
+<div class="step"><strong>02 / MOVE</strong><span>Raise one hand and point with your index finger.</span></div>
+<div class="step"><strong>03 / CLICK</strong><span>Touch thumb and index finger together over the test button.</span></div>
+<div class="step"><strong>04 / PAUSE</strong><span>Close your hand into a fist. Open your palm to resume.</span></div>
+<div class="step"><strong>05 / STOP</strong><span>Press Stop AURA. The camera indicator should turn off.</span></div>
+</div>
+<div class="scroll-demo" aria-label="Scroll gesture test area"><strong>Scroll gesture area</strong><p>Extend your index and middle fingers. Move both fingers upward slowly to scroll the page. Keep the other fingers folded.</p><p>Two-finger scroll is page-level in this prototype. It will be mapped to spatial panels when AURA is integrated into the complete website.</p><p>Camera frames are not uploaded by this page. All frame inference is local to the browser.</p></div>
+</section>
+</main>
+<footer><div class="wrap">VEYROST AURA · Hand tracking prototype · Browser-local inference</div></footer>
+<video id="camera-source" class="camera-source" autoplay muted playsinline aria-hidden="true"></video>
+<div class="cursor" id="aura-cursor" aria-hidden="true"></div>
+<script type="module">
+import { AuraController } from "./aura-engine.mjs";
+
+const video = document.getElementById("camera-source");
+const cursor = document.getElementById("aura-cursor");
+const startButton = document.getElementById("start-aura");
+const stopButton = document.getElementById("stop-aura");
+const statusText = document.getElementById("status-text");
+const statusDot = document.getElementById("status-dot");
+const gestureState = document.getElementById("gesture-state");
+const catchButton = document.getElementById("catch-me");
+const arena = document.getElementById("arena");
+const count = document.getElementById("activation-count");
+let activations = 0;
+
+function setStatus(state, message) {
+  statusText.textContent = message || state.toUpperCase();
+  statusDot.className = "dot" + (state === "active" ? " active" : state === "error" ? " error" : ["starting","loading"].includes(state) ? " loading" : "");
+  startButton.disabled = ["starting","loading","active"].includes(state);
+  stopButton.disabled = state !== "active";
+  catchButton.style.display = state === "active" ? "block" : "none";
+  if (state === "off" || state === "error") gestureState.textContent = "WAITING FOR HAND";
+}
+
+function setGesture(name) {
+  const labels = {
+    none:"HAND NOT DETECTED", move:"INDEX / CURSOR MOVE", pinch:"PINCH / CLICK",
+    scroll:"TWO FINGERS / SCROLL", open_palm:"OPEN PALM / CANCEL",
+    fist:"FIST / PAUSE", "emergency-pause":"EMERGENCY PAUSE ACTIVE",
+    resume:"AURA RESUMED", cancel:"CANCEL EVENT"
+  };
+  gestureState.textContent = labels[name] || name.toUpperCase();
+}
+
+function moveCatchButton() {
+  const maxX = Math.max(8, arena.clientWidth - catchButton.offsetWidth - 16);
+  const maxY = Math.max(75, arena.clientHeight - catchButton.offsetHeight - 16);
+  catchButton.style.left = Math.round(8 + Math.random() * (maxX - 8)) + "px";
+  catchButton.style.top = Math.round(65 + Math.random() * Math.max(1, maxY - 65)) + "px";
+  catchButton.style.right = "auto";
+  catchButton.style.bottom = "auto";
+}
+catchButton.addEventListener("click", moveCatchButton);
+
+const controller = new AuraController({
+  video, cursor,
+  onStatus: setStatus,
+  onGesture: setGesture,
+  onCursorMove: ({x,y}) => {
+    if (catchButton.style.display === "block") {
+      const rect = catchButton.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      if (Math.hypot(x - cx, y - cy) < 88) moveCatchButton();
+    }
+  }
+});
+
+document.getElementById("test-action").addEventListener("click", () => {
+  activations += 1;
+  count.textContent = String(activations);
+});
+document.addEventListener("veyrost:aura-gesture", event => {
+  if (event.detail.gesture === "cancel") {
+    gestureState.textContent = "CANCEL EVENT — INTERACTION CLEARED";
+  }
+});
+
+startButton.addEventListener("click", async () => {
+  startButton.disabled = true;
+  try {
+    await controller.start();
+    moveCatchButton();
+  } catch (error) {
+    setStatus("error", error?.message || "AURA could not start.");
+  }
+});
+stopButton.addEventListener("click", () => {
+  void controller.stop();
+});
+window.addEventListener("pagehide", () => { void controller.stop({notify:false}); });
+</script>
+</body>
+</html>
