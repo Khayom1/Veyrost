@@ -458,7 +458,7 @@ export class SpatialWorldController {
       this.window.innerHeight,
       this.units
     );
-    socket.position.set(center.x, center.y, ([-0.9, 0.55, -0.35, 0.85, -0.65, 0.25][panelIndex] ?? 0) - 0.08);
+    socket.position.set(center.x, center.y, ([-0.22, 0.18, -0.12, 0.24, -0.18, 0.12][panelIndex] ?? 0) - 0.08);
     socket.visible = false;
     this.scene.add(socket);
     this.protectedSockets.set(definition.id, socket);
@@ -643,7 +643,13 @@ export class SpatialWorldController {
         body.vy = 0;
         body.dragging = false;
         this.physics.repair(id);
-        if (depthBody) { depthBody.anchored = true; depthBody.velocityZ = 0; }
+        if (depthBody) {
+          depthBody.anchored = true;
+          depthBody.z = depthBody.initialZ;
+          depthBody.velocityZ = 0;
+          const depthPanel = this.panelGroups.get(id);
+          if (depthPanel) depthPanel.group.userData.depth = depthBody.z;
+        }
         control.completeRepair();
         const socket = this.protectedSockets.get(id);
         if (socket) socket.visible = false;
