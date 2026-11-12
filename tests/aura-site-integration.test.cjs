@@ -47,6 +47,7 @@ test("shared AURA controller requests access only after the user activates the b
 test("layout editing is always available independently of AURA", () => {
   assert.ok(site.includes("editButton.hidden=false"));
   assert.ok(site.includes("editMode=Boolean(value);"));
+  assert.equal(site.includes("editMode=Boolean(value)&&Boolean(controller?.active)"), false);
   assert.ok(site.includes("layout-toggle"));
   assert.ok(site.includes("veyrost-layout-editing"));
   assert.ok(site.includes('startDrag(detail.x,detail.y,"hand")'));
@@ -86,7 +87,9 @@ test("the directory contains every repository record without exposing private so
 });
 
 test("shared script binds all three language buttons and keeps selectors valid", () => {
-  assert.ok(site.includes('$$("[data-lang]").forEach(button=>button.addEventListener("click"'));
+  assert.ok(site.includes('$("[data-lang]").forEach(button=>button.addEventListener("click"'));
+  assert.equal(site.includes("$$"), false);
+  assert.equal(/^\\s*\\$\\("\\[data-lang\\]"\\)/m.test(site), false);
   for (const locale of ["en","ru","tj"]) assert.ok(html.includes('data-lang="' + locale + '"'));
   assert.ok(site.includes('auraButton.addEventListener("click"'));
   assert.ok(site.includes('editButton?.addEventListener("click"'));
