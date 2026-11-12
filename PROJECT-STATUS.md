@@ -20,11 +20,11 @@ The checklist uses binary source evidence. It does not measure visual quality, u
 | Interactive depth controls | 7 | 7 | 100.00% |
 | Spatial layout persistence | 4 | 4 | 100.00% |
 | Protected control lifecycle | 9 | 9 | 100.00% |
-| Technician service sequence | 0 | 8 | 0.00% |
+| Technician service sequence | 4 | 8 | 50.00% |
 | Dialogue and spatial audio | 0 | 5 | 0.00% |
 | Engineering agent system | 0 | 3 | 0.00% |
 | Validation and release | 4 | 6 | 66.67% |
-| **Total** | **80** | **98** | **81.63%** |
+| **Total** | **84** | **98** | **85.71%** |
 
 - Implemented source criteria: **84 / 98**
 - Pending criteria: **14 / 98**
@@ -78,11 +78,9 @@ The current physics scope is hybrid **2.5D**: Matter owns X/Y movement and a sep
 
 ## What remains
 
-### VEYROST Service Crew — 0/8
+### VEYROST Service Crew — 4/8
 
-- Rigged technician characters.
-- Service vehicle arrival/departure.
-- Physical ladder extraction, unfolding and climbing.
+- Photorealistic scanned or fully rigged technician assets (current characters are procedural low-poly models).
 - Tug-of-war with a held detached interface component.
 - Technician-controlled maintenance lock.
 - Hand-animated cable reconnection and repair.
