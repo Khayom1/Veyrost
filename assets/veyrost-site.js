@@ -349,8 +349,10 @@ menuRepairButton.addEventListener("click",async()=>{
     const homeX=(menuHomePosition?.left??(targetX+window.scrollX))-window.scrollX;
     const homeY=(menuHomePosition?.top??(targetY+window.scrollY))-window.scrollY;
     techB.classList.add("is-wiring");
-    const wireRobotX=clamp(homeX+rect.width+14,4,vw-robotWidth-4);
-    const wireRobotY=clamp(homeY+rect.height/2-robotHeight+14,4,vh-robotHeight-4);
+    // Place the cable technician immediately beside the opening, on its left.
+    // Its right-hand tool then reaches toward the exposed cable roots instead of working in empty space.
+    const wireRobotX=clamp(homeX-robotWidth+18,4,vw-robotWidth-4);
+    const wireRobotY=clamp(homeY+rect.height/2-robotHeight/2,4,vh-robotHeight-4);
     move(techB,wireRobotX,wireRobotY);
 
     // Bring the carrier directly behind MENU. Both articulated grippers reach around its edges.
@@ -377,13 +379,14 @@ menuRepairButton.addEventListener("click",async()=>{
       const letters=["a","b","c","d","e","f","g"];
       for(let i=0;i<letters.length;i++){
         const lead=detachedMenuWires?.querySelector(".wire-"+letters[i]);
+        techB.classList.remove("wire-reach-0","wire-reach-1","wire-reach-2","wire-reach-3","wire-reach-4","wire-reach-5","wire-reach-6");
+        techB.classList.add("is-wire-reach","wire-reach-"+i);
         lead?.classList.add("is-connecting");
-        techB.classList.add("is-wire-reach");
-        await wait(270);
-        techB.classList.remove("is-wire-reach");
+        await wait(420);
         lead?.classList.remove("is-connecting");
         lead?.classList.add("is-connected");
-        await wait(120);
+        techB.classList.remove("is-wire-reach");
+        await wait(140);
       }
       techB.classList.remove("is-wire-reach");
       techB.classList.add("is-working");
