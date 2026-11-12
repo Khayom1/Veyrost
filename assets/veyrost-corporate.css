@@ -408,3 +408,36 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
 .veyrost-detached-wires.is-reconnecting .wire{animation-duration:.24s!important;filter:drop-shadow(0 0 3px rgba(111,230,208,.8))}
 @keyframes veyrost-wire-tech{to{transform:translateY(-2px) rotate(-1deg)}}
 @keyframes veyrost-wire-hand{to{translate:0 -2px}}
+
+/* Fully articulated repair robots: visible grippers, independent elbows and powered cable tool. */
+.veyrost-repair-layer .veyrost-tech-person{z-index:2147483646!important}
+.veyrost-repair-layer .veyrost-tech-person svg{overflow:visible!important}
+.veyrost-repair-layer .robot-arm{transform-box:view-box;transform-origin:center;transition:transform .42s cubic-bezier(.2,.8,.2,1)}
+.veyrost-repair-layer .robot-arm-left{transform-origin:31px 47px}
+.veyrost-repair-layer .robot-arm-right{transform-origin:69px 47px}
+.veyrost-repair-layer .robot-hand{transform-box:view-box;transform-origin:center;transition:transform .22s ease}
+.veyrost-repair-layer .robot-welder{opacity:0;transition:opacity .18s ease}
+.veyrost-repair-layer .robot-welder .welder-beam{opacity:0;stroke-dasharray:2 2}
+.veyrost-repair-layer .veyrost-tech-person.is-grabbing .robot-arm-left{transform:rotate(-38deg) translate(1px,2px)}
+.veyrost-repair-layer .veyrost-tech-person.is-grabbing .robot-arm-right{transform:rotate(38deg) translate(-1px,2px)}
+.veyrost-repair-layer .veyrost-tech-person.is-grabbing .robot-hand{transform:scale(.72)}
+.veyrost-repair-layer .veyrost-tech-person.is-carrying .robot-arm-left{transform:rotate(-48deg) translate(2px,3px)}
+.veyrost-repair-layer .veyrost-tech-person.is-carrying .robot-arm-right{transform:rotate(48deg) translate(-2px,3px)}
+.veyrost-repair-layer .veyrost-tech-person.is-carrying .robot-hand{transform:scale(.62)}
+.veyrost-repair-layer .veyrost-tech-person.is-setting-down .robot-arm-left{transform:rotate(-18deg)}
+.veyrost-repair-layer .veyrost-tech-person.is-setting-down .robot-arm-right{transform:rotate(18deg)}
+.veyrost-repair-layer .veyrost-tech-person.is-wiring .robot-arm-right{transform:rotate(27deg) translate(-1px,2px)}
+.veyrost-repair-layer .veyrost-tech-person.is-wiring .robot-arm-left{transform:rotate(-12deg)}
+.veyrost-repair-layer .veyrost-tech-person.is-wiring .robot-welder{opacity:1}
+.veyrost-repair-layer .veyrost-tech-person.is-wire-reach .robot-arm-right{transform:rotate(43deg) translate(-2px,4px)}
+.veyrost-repair-layer .veyrost-tech-person.is-wire-reach .robot-welder .welder-beam{opacity:1;animation:veyrost-welder-spark .16s steps(2,end) infinite}
+.veyrost-repair-layer .veyrost-tech-person.is-working .robot-arm-right{transform:rotate(32deg)}
+.veyrost-repair-layer .veyrost-carried-menu{z-index:2147483647!important;transform-origin:center;box-shadow:0 0 0 1px rgba(210,235,245,.18),0 8px 20px rgba(0,0,0,.45)}
+.veyrost-repair-layer .veyrost-carried-menu.is-lifting{transform:translateY(-8px) rotate(-4deg);filter:drop-shadow(0 0 13px rgba(111,230,208,.65))!important}
+.veyrost-detached-wires .wire{transition:filter .2s ease,opacity .2s ease}
+.veyrost-detached-wires .wire.is-connecting{filter:drop-shadow(0 0 5px rgba(117,239,222,.95))!important;animation:veyrost-wire-connect .24s ease-in-out infinite alternate}
+.veyrost-detached-wires .wire.is-connecting path:nth-child(3){stroke:#bffff5!important;stroke-width:2.1!important}
+.veyrost-detached-wires .wire.is-connected{filter:drop-shadow(0 0 2px rgba(117,239,222,.48))}
+@keyframes veyrost-wire-connect{from{opacity:.72}to{opacity:1}}
+@keyframes veyrost-welder-spark{0%{opacity:.1}50%{opacity:1}100%{opacity:.25}}
+@media(prefers-reduced-motion:reduce){.veyrost-repair-layer .robot-arm,.veyrost-repair-layer .robot-hand,.veyrost-repair-layer .robot-welder,.veyrost-detached-wires .wire{animation:none!important;transition:none!important}}
