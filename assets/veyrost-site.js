@@ -242,8 +242,9 @@ function syncDetachedMenuWires(detached){
   }
   // Size the break to the real MENU footprint; keep the aperture centered on its home position.
   // The aperture spans roughly x=20..110 and y=7..76 in the 176x112 SVG viewBox.
-  const wireWidth=menuHomePosition.width*(176/90);
-  const wireHeight=menuHomePosition.height*(112/69);
+  const holeScale=0.90;
+  const wireWidth=menuHomePosition.width*(176/90)*holeScale;
+  const wireHeight=menuHomePosition.height*(112/69)*holeScale;
   const apertureCenterX=65/176*wireWidth;
   const apertureCenterY=42/112*wireHeight;
   detachedMenuWires.style.width=wireWidth+"px";
