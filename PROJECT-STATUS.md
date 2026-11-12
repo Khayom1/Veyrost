@@ -15,7 +15,7 @@ The checklist uses binary source evidence. It does not measure visual quality, u
 | Matter Engine 2D | 9 | 9 | 100.00% |
 | AURA hand controller | 13 | 13 | 100.00% |
 | Main-site AURA integration | 8 | 8 | 100.00% |
-| 3D spatial engine source | 8 | 9 | 88.89% |
+| 3D spatial engine source | 9 | 9 | 100.00% |
 | Depth-axis collision physics | 6 | 6 | 100.00% |
 | Interactive depth controls | 7 | 7 | 100.00% |
 | Spatial layout persistence | 4 | 4 | 100.00% |
@@ -24,10 +24,10 @@ The checklist uses binary source evidence. It does not measure visual quality, u
 | Dialogue and spatial audio | 0 | 5 | 0.00% |
 | Engineering agent system | 0 | 3 | 0.00% |
 | Validation and release | 4 | 6 | 66.67% |
-| **Total** | **75** | **94** | **79.79%** |
+| **Total** | **76** | **94** | **80.85%** |
 
-- Implemented source criteria: **75 / 94**
-- Pending criteria: **19 / 94**
+- Implemented source criteria: **76 / 94**
+- Pending criteria: **18 / 94**
 - Failed source criteria: **0**
 - Any later source edit must be validated again before merge.
 
@@ -53,7 +53,7 @@ The checklist uses binary source evidence. It does not measure visual quality, u
 
 ## Critical integration boundary
 
-The 3D source modules exist and source-level checks cover renderer setup, panel physics, depth collision, controls and persistence. **The current corporate website does not mount SpatialWorldController from any public route.** Therefore the floating 3D scene and depth HUD are not yet live website features. One explicit integration acceptance item remains pending.
+The 3D source modules are mounted on a dedicated experimental route: `spatial.html` via `spatial-page.mjs`. The Workspace page links to this route, and the normal corporate pages remain unchanged. AURA pinch, hand movement, cancellation, hand-loss and pause/resume are connected to the spatial controller. The floating 3D scene and depth HUD are available only after explicitly opening this experimental route. One explicit integration acceptance item remains pending.
 
 The current physics scope is hybrid **2.5D**: Matter owns X/Y movement and a separate depth solver handles Z separation. This is not a full 6-DoF rigid-body engine.
 
@@ -87,7 +87,7 @@ The current repository contains GitHub Actions for syntax and regression checks,
 
 ### Validation — 4/6
 
-- Android physical-device camera and gesture acceptance remains pending.
+- Android physical-device camera and gesture acceptance remains pending. The new route has source-level regression coverage, not device certification.
 - Cross-browser, lighting and sustained-performance validation remains pending.
 
 ## Reproduce the audit
