@@ -23,7 +23,10 @@ jobs:
         with:
           node-version: 22
       - name: Check JavaScript syntax
-        run: node --check matter-engine.js
+        run: |
+          node --check matter-engine.js
+          node --check assets/veyrost-site.js
+          node --check assets/veyrost-i18n.js
       - name: Check embedded lab script syntax
         run: |
           node -e 'const fs=require("node:fs"); const html=fs.readFileSync("matter-lab.html","utf8"); const match=html.match(/<script>\s*([\s\S]*?)<\/script>/i); if(!match) throw new Error("Inline lab script not found"); fs.writeFileSync("/tmp/matter-lab-inline.js",match[1]);'
