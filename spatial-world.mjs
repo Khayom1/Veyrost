@@ -1403,6 +1403,11 @@ export class SpatialWorldController {
     if (!this.physics) return;
     try { this.window.localStorage?.removeItem(this.storageKey); } catch (_) {}
     this.hasCustomLayout = false;
+    this.repairSequence?.reset();
+    this.maintenanceLock = false;
+    this.repairTargetId = null;
+    if (this.repairVisual) this.repairVisual.visible = false;
+    if (this.repairButton) this.repairButton.disabled = false;
     this.physics.reset();
     this.depthPhysics?.reset();
     for (const [id, depthBody] of this.depthPhysics?.bodies ?? []) {
@@ -1464,6 +1469,16 @@ export class SpatialWorldController {
     this.depthValue = null;
     this.serviceCrew?.dispose();
     this.serviceCrew = null;
+    this.repairVisual?.removeFromParent();
+    this.repairCable?.geometry?.dispose?.();
+    this.repairCableMaterial?.dispose?.();
+    this.repairConnector?.geometry?.dispose?.();
+    this.repairConnector?.material?.dispose?.();
+    this.repairVisual = null;
+    this.repairCable = null;
+    this.repairConnector = null;
+    this.maintenanceLock = false;
+    this.repairTargetId = null;
     this.protectedSockets.clear();
     this.panelGroups.clear();
     this.panelMeshes = [];
