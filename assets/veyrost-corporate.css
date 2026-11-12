@@ -338,7 +338,7 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
 
 /* Transparent exposed cables: preserve the page's existing background without drawing a wall. */
 .veyrost-detached-wires{
- position:fixed;width:112px;height:72px;z-index:10040;pointer-events:none;
+ position:fixed;width:176px;height:112px;z-index:10040;pointer-events:none;
  opacity:1;filter:drop-shadow(0 3px 4px rgba(0,0,0,.52));
  animation:veyrost-wire-reveal .36s cubic-bezier(.18,.72,.24,1) both;
 }
