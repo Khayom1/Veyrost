@@ -87,3 +87,11 @@ test("search controls, document metadata and accessibility labels are localized"
     ]) assert.ok(Object.hasOwn(dictionaries[locale], value), `${locale}: missing page title "${value}"`);
   }
 });
+
+test("native select option labels are included in localization traversal", () => {
+  const site = fs.readFileSync("assets/veyrost-site.js", "utf8");
+  assert.match(site, /TEXTAREA\|INPUT\)/);
+  assert.doesNotMatch(site, /TEXTAREA\|INPUT\|OPTION/);
+  const page = fs.readFileSync("projects.html", "utf8");
+  assert.match(page, /<option>Core platform<\/option>/);
+});
