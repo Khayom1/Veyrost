@@ -66,6 +66,14 @@ export class ServiceCrewSequence {
     return this.snapshot();
   }
 
+  recall() {
+    if (this.phase !== SERVICE_CREW_PHASES.COMPLETE) return false;
+    this.phase = SERVICE_CREW_PHASES.ARRIVING;
+    this.elapsed = 0;
+    this.revision += 1;
+    return true;
+  }
+
   snapshot() {
     const duration = PHASE_DURATIONS[this.phase] ?? 0;
     return Object.freeze({
