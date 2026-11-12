@@ -8,7 +8,7 @@ const vm = require("node:vm");
 const source = fs.readFileSync(path.join(__dirname, "..", "assets", "veyrost-backend.js"), "utf8");
 const PUBLIC_KEY = "sb_publishable_EZp3LgM4zcqtFKBUkphGaQ_FmWpyOWz";
 
-function createClientHarness() {
+function createClientHarness(expiresIn = 3600) {
   let now = 1_000;
   const calls = [];
   const FakeDate = class extends Date { static now() { return now; } };
@@ -16,7 +16,7 @@ function createClientHarness() {
     calls.push({ url:String(url), init });
     if (String(url).endsWith("/veyrost-auth")) {
       const body = JSON.parse(init.body || "{}");
-      if (body.action === "sign_in") return Response.json({access_token:"user.jwt",refresh_token:"refresh-1",expires_in:1,publishable_key:PUBLIC_KEY});
+      if (body.action === "sign_in") return Response.json({access_token:"user.jwt",refresh_token:"refresh-1",expires_in:expiresIn,publishable_key:PUBLIC_KEY});
       if (body.action === "refresh") return Response.json({access_token:"refreshed.jwt",refresh_token:"refresh-2",expires_in:3600,publishable_key:PUBLIC_KEY});
       return Response.json({ok:true,publishable_key:PUBLIC_KEY});
     }
@@ -50,7 +50,7 @@ test("sign-in uses public Supabase key, then proxies requests with the user JWT 
 });
 
 test("expired user JWT is refreshed before the proxy request", async () => {
-  const h=createClientHarness();
+  const h=createClientHarness(1);
   await h.api.signIn("user@example.com","password123");
   h.setNow(3_000);
   await h.api.fetch("https://api.github.com/user/repos",{method:"GET"});
