@@ -291,9 +291,11 @@ display:flex;justify-content:space-between;align-items:center;color:#eee}
 <h3>⚙ Танзимот</h3>
 <label>Номи соҳиб</label>
 <input id="sOwner" placeholder="Номи шумо">
-<label>DeepSeek API Key</label>
+<label>DeepSeek API Key (танҳо барои ин сессия)</label>
 <input id="sDeep" type="password" placeholder="sk-...">
-<label>GitHub Token</label>
+<label>SiliconFlow API Key (танҳо барои ин сессия)</label>
+<input id="sSilicon" type="password" placeholder="sk-...">
+<label>GitHub Token (танҳо барои ин сессия)</label>
 <input id="sGh" type="password" placeholder="ghp_...">
 <label>Google API Key (барои Drive/Gmail)</label>
 <input id="sGKey" type="password" placeholder="AIza...">
@@ -330,7 +332,7 @@ display:flex;justify-content:space-between;align-items:center;color:#eee}
 </div>
 <div class="hint">Veyrost аввал аз модели дуюм advisory мегирад ва баъд execution-ро бо provider-и асосӣ иҷро мекунад. Агар provider-и дуюм дастрас набошад, fallback фаъол мемонад.</div>
 
-<div class="hint">Ҳама чиз дар localStorage-и браузери шумо нигоҳ дошта мешавад.</div>
+<div class="hint">Танзимоти ғайрисиррӣ дар браузер нигоҳ дошта мешаванд. API key ва token танҳо дар хотираи ҳамин сессия мемонанд ва баъди навсозии саҳифа бояд аз нав ворид шаванд. Дар версияи браузерӣ ин сиррҳо аз соҳиби дастгоҳ ва абзорҳои браузер пинҳон шуда наметавонанд; барои production backend proxy бо secret storage лозим аст.</div>
 <div class="row">
 <button id="cancelSet">Бекор</button>
 <button id="saveSet" class="primary">Нигоҳ доштан</button>
@@ -365,8 +367,8 @@ display:flex;justify-content:space-between;align-items:center;color:#eee}
 // ───────────────────────────── CONFIG ─────────────────────────────
 const DEFAULTS = {
 owner: "Соҳиб",
-deepKey: "[REDACTED_SECRET]",
-siliconKey: "[REDACTED_SECRET]",
+deepKey: "",
+siliconKey: "",
 siliconModel: "tencent/Hy4-preview",
 expertMode: true,
 ghToken: "",
@@ -437,7 +439,7 @@ if (!saved || typeof saved !== "object" || Array.isArray(saved)) saved = {};
 const m = { ...DEFAULTS, ...saved };
 m.owner = normStr(m.owner, DEFAULTS.owner).trim() || DEFAULTS.owner;
 m.deepKey = normStr(m.deepKey, DEFAULTS.deepKey);
-m.siliconKey = DEFAULTS.siliconKey;
+m.siliconKey = normStr(m.siliconKey, DEFAULTS.siliconKey);
 m.siliconModel = normStr(m.siliconModel, DEFAULTS.siliconModel).trim() || DEFAULTS.siliconModel;
 m.expertMode = normBool(m.expertMode, DEFAULTS.expertMode);
 m.ghToken = normStr(m.ghToken, DEFAULTS.ghToken);
@@ -454,7 +456,10 @@ return m;
 })();
 
 function saveCfg() {
-try { localStorage.setItem("veyrost_cfg", JSON.stringify(CFG)); }
+try {
+const safeConfig = { ...CFG, deepKey: "", siliconKey: "", ghToken: "", gKey: "" };
+localStorage.setItem("veyrost_cfg", JSON.stringify(safeConfig));
+}
 catch (e) { Debug.add("error", { at: "saveCfg", msg: String(e.message || e) }); }
 }
 
@@ -810,6 +815,7 @@ let s = Utils.safeText(text);
 
 const directSecrets = [
 Utils.safeText(CFG.deepKey).trim(),
+Utils.safeText(CFG.siliconKey).trim(),
 Utils.safeText(CFG.ghToken).trim(),
 Utils.safeText(CFG.gKey).trim()
 ].filter(v => v.length >= 8);
@@ -860,7 +866,7 @@ const out = {};
 const entries = Object.entries(value).slice(0, 500);
 
 for (const [k, v] of entries) {
-if (/^(?:authorization|api[_-]?key|access[_-]?token|refresh[_-]?token|password|passwd|secret|ghToken|deepKey|gKey)`$/i.test(k)) {
+if (/^(?:authorization|api[_-]?key|apikey|access[_-]?token|accesstoken|refresh[_-]?token|refreshtoken|password|passwd|secret|token|ghToken|githubToken|deepKey|siliconKey|gKey|googleApiKey)$/i.test(k)) {
 out[k] = "[REDACTED]";
 } else {
 out[k] = Utils.redactAny(v, depth + 1);
@@ -1090,7 +1096,9 @@ body.appendChild(div);
 
 body.scrollTop = body.scrollHeight;
 }
-};
+
+// One-time migration: scrub credentials previously stored in browser localStorage.
+saveCfg();
 
 // ───────────────────────────── STORAGE ─────────────────────────────
 const STORE_KEY = "veyrost_chats_v1";
@@ -5167,6 +5175,9 @@ CFG.owner;
 document.getElementById("sDeep").value =
 CFG.deepKey;
 
+document.getElementById("sSilicon").value =
+CFG.siliconKey;
+
 document.getElementById("sGh").value =
 CFG.ghToken;
 
@@ -5236,6 +5247,13 @@ CFG.deepKey =
 (
 document.getElementById(
 "sDeep"
+).value || ""
+).trim();
+
+CFG.siliconKey =
+(
+document.getElementById(
+"sSilicon"
 ).value || ""
 ).trim();
 
@@ -5501,7 +5519,8 @@ const VX = (() => {
       if (!text(value.baseURL)) errors.push("provider.baseURL is required");
       try {
         const u = new URL(value.baseURL);
-        if (!/^https?:$/.test(u.protocol)) errors.push("provider.baseURL must be HTTP(S)");
+        if (u.protocol !== "https:") errors.push("provider.baseURL must use HTTPS");
+        if (!Utils.isValidHttpUrl(u.href)) errors.push("provider.baseURL must target a public host");
         if (u.username || u.password) errors.push("provider.baseURL must not contain credentials");
       } catch (e) {
         errors.push("provider.baseURL is not a valid URL");
@@ -5613,7 +5632,8 @@ const VX = (() => {
     const out = clone(state) || clone(defaults);
     out.providers = (out.providers || []).slice(0, MAX.providers).map(p => {
       const x = { ...p };
-      if (x.apiKey) x.apiKey = x.apiKey;
+      // Provider credentials must never be written to localStorage.
+      delete x.apiKey;
       return x;
     });
     out.agents = (out.agents || []).slice(0, MAX.agents);
@@ -5811,12 +5831,12 @@ const VX = (() => {
         const saved = existing.get(provider.id);
         if (saved) {
           Object.assign(saved, provider, {
-            apiKey: saved.apiKey || (provider.id === "deepseek" ? CFG.deepKey : CFG.silKey)
+            apiKey: provider.id === "deepseek" ? CFG.deepKey : CFG.siliconKey
           });
         } else {
           memoryState.providers.push({
             ...provider,
-            apiKey: provider.id === "deepseek" ? CFG.deepKey : CFG.silKey,
+            apiKey: provider.id === "deepseek" ? CFG.deepKey : CFG.siliconKey,
             createdAt: now(),
             updatedAt: now()
           });
@@ -5852,6 +5872,9 @@ const VX = (() => {
       const p = find("providers", id);
       if (!p) return { ok: false, error: "provider_not_found" };
       if (!p.apiKey) return { ok: false, error: "api_key_missing" };
+      if (!Utils.isValidHttpUrl(p.baseURL) || new URL(p.baseURL).protocol !== "https:") {
+        return { ok: false, error: "invalid_provider_url_https_public_host_required" };
+      }
       const started = performance.now();
       try {
         const r = await httpJson(
@@ -6391,7 +6414,7 @@ const VX = (() => {
     },
     async testSupabase(url, key, signal) {
       const base = text(url).trim().replace(/\/$/,"");
-      if (!/^https:\/\//i.test(base)) return { ok:false,error:"Supabase URL must use HTTPS" };
+      if (!/^https:\/\//i.test(base) || !Utils.isValidHttpUrl(base)) return { ok:false,error:"Supabase URL must use HTTPS and a public hostname" };
       if (!text(key).trim()) return { ok:false,error:"Supabase publishable/anon key missing" };
       const started=performance.now();
       try {
@@ -6485,7 +6508,7 @@ const VX = (() => {
       add("purify","DOMPurify",!!window.DOMPurify);
       add("highlight","Highlight.js",!!window.hljs);
       add("deep","DeepSeek configured",!!text(CFG.deepKey));
-      add("sil","SiliconFlow configured",!!text(CFG.silKey));
+      add("sil","SiliconFlow configured",!!text(CFG.siliconKey));
       add("agent","Primary agent",!!Agents.get("orchestrator"));
       add("expert","Expert agent",!!Agents.get("silicon-expert"));
       add("tools","Tool registry",Tools.all().length>0,`${Tools.all().length} tools`);
@@ -6500,10 +6523,10 @@ const VX = (() => {
   const SecurityCenter = {
     secretInventory() {
       return [
-        {id:"deepseek",present:!!text(CFG.deepKey),source:"existing configuration",redacted:true},
-        {id:"siliconflow",present:!!text(CFG.silKey),source:"existing configuration",redacted:true},
-        {id:"github",present:!!text(CFG.ghToken),source:"existing configuration",redacted:true},
-        {id:"google",present:!!text(CFG.gKey),source:"existing configuration",redacted:true}
+        {id:"deepseek",present:!!text(CFG.deepKey),source:"current session",redacted:true},
+        {id:"siliconflow",present:!!text(CFG.siliconKey),source:"current session",redacted:true},
+        {id:"github",present:!!text(CFG.ghToken),source:"current session",redacted:true},
+        {id:"google",present:!!text(CFG.gKey),source:"current session",redacted:true}
       ];
     },
     policy() {
@@ -6871,7 +6894,7 @@ const VXUI = (() => {
   function openProviderForm(){
     const name=prompt("Provider name:","Custom AI");if(!name)return;
     const baseURL=prompt("Chat Completions URL:","https://example.com/v1/chat/completions");if(!baseURL)return;
-    const apiKey=prompt("API key (stored locally; never sent to another agent):","");
+    const apiKey=prompt("API key (kept in memory for this session only; re-enter after reload):","");
     const model=prompt("Default model:","model-name");if(!model)return;
     try{VX.Providers.save({id:name,name,baseURL,apiKey,models:[model],defaultModel:model,capabilities:["chat","stream"]});renderPage("providers");toast("Provider added");}catch(e){toast(text(e.message||e));}
   }
