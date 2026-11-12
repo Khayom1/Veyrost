@@ -233,56 +233,60 @@ function updateMenuRepairNotice(){
 let menuRepairing=false;
 menuRepairButton.addEventListener("click",()=>{
   if(!menu||menuRepairing||!menuIsDetached())return;
-  menuRepairing=true;
-  menuRepairButton.disabled=true;
-  menuRepairNotice.classList.add("is-repairing");
-  const rect=menu.getBoundingClientRect(),delta=offset(menu);
-  const homeX=rect.left-delta.x+rect.width/2-36,homeY=rect.top-delta.y+rect.height/2-42;
-  const overlay=document.createElement("div");
-  overlay.className="veyrost-repair-layer";overlay.setAttribute("aria-hidden","true");
+  menuRepairing=true;menuRepairButton.disabled=true;menuRepairNotice.classList.add("is-repairing");
+  const rect=menu.getBoundingClientRect();
+  const overlay=document.createElement("div");overlay.className="veyrost-repair-layer";overlay.setAttribute("aria-hidden","true");
   const vehicle=document.createElement("div");vehicle.className="veyrost-tech-vehicle";
   vehicle.innerHTML='<svg viewBox="0 0 220 100" aria-hidden="true"><path d="M16 58h126l24-29h26l15 29h7v20H16z" fill="#17263a" stroke="#7de6ed" stroke-width="2"/><path d="M145 57l22-24h22l12 24z" fill="#233d54" stroke="#9defff" stroke-width="2"/><path d="M20 64h186" stroke="#a9b8d2" stroke-width="3"/><rect x="28" y="38" width="76" height="22" rx="5" fill="#26354c" stroke="#9b91ff" stroke-width="2"/><path d="M39 49h53M39 55h33" stroke="#8de8ed" stroke-width="2"/><circle cx="52" cy="80" r="13" fill="#080d17" stroke="#9da9c1" stroke-width="4"/><circle cx="52" cy="80" r="4" fill="#70e7df"/><circle cx="176" cy="80" r="13" fill="#080d17" stroke="#9da9c1" stroke-width="4"/><circle cx="176" cy="80" r="4" fill="#70e7df"/><path d="M4 65h12M207 65h10" stroke="#6fe6d0" stroke-width="4" stroke-linecap="round"/><path d="M4 48h10" stroke="#a99aff" stroke-width="3" stroke-linecap="round"/></svg><span>VEYROST • TECHNICAL UNIT</span>';
-  const makeRobot=(label,accent)=>{const el=document.createElement("div");el.className="veyrost-repair-robot veyrost-tech-person";el.innerHTML='<svg viewBox="0 0 72 84" aria-hidden="true"><path d="M36 8V3" stroke="'+accent+'" stroke-width="3" stroke-linecap="round"/><circle cx="36" cy="3" r="3" fill="'+accent+'"/><rect x="13" y="12" width="46" height="36" rx="12" fill="#B9B4FF" stroke="#F0EEFF" stroke-width="2"/><rect x="19" y="20" width="34" height="20" rx="7" fill="#111827"/><circle cx="28" cy="30" r="3.5" fill="'+accent+'"/><circle cx="44" cy="30" r="3.5" fill="'+accent+'"/><path d="M29 37Q36 41 43 37" fill="none" stroke="'+accent+'" stroke-width="2"/><rect x="23" y="50" width="26" height="19" rx="6" fill="#777fc1"/><path class="robot-arm robot-arm-left" d="M23 54L12 65L19 70M49 54L60 65L53 70" fill="none" stroke="#B9B4FF" stroke-width="5" stroke-linecap="round"/><path d="M29 69L25 80M43 69L47 80" stroke="'+accent+'" stroke-width="5" stroke-linecap="round"/></svg><span>'+label+'</span>';return el;};
+  const makeRobot=(label,accent)=>{const el=document.createElement("div");el.className="veyrost-repair-robot veyrost-tech-person";el.innerHTML='<svg viewBox="0 0 72 84" aria-hidden="true"><path d="M36 8V3" stroke="'+accent+'" stroke-width="3" stroke-linecap="round"/><circle cx="36" cy="3" r="3" fill="'+accent+'"/><rect x="13" y="12" width="46" height="36" rx="12" fill="#B9B4FF" stroke="#F0EEFF" stroke-width="2"/><rect x="19" y="20" width="34" height="20" rx="7" fill="#111827"/><circle cx="28" cy="30" r="3.5" fill="'+accent+'"/><circle cx="44" cy="30" r="3.5" fill="'+accent+'"/><path d="M29 37Q36 41 43 37" fill="none" stroke="'+accent+'" stroke-width="2"/><rect x="23" y="50" width="26" height="19" rx="6" fill="#777fc1"/><path d="M23 54L12 65L19 70M49 54L60 65L53 70" fill="none" stroke="#B9B4FF" stroke-width="5" stroke-linecap="round"/><path d="M29 69L25 80M43 69L47 80" stroke="'+accent+'" stroke-width="5" stroke-linecap="round"/></svg><span>'+label+'</span>';return el;};
   const techA=makeRobot("TECHNICIAN 01","#6FE6D0"),techB=makeRobot("TECHNICIAN 02","#9DEBFF");
   overlay.append(vehicle,techA,techB);document.documentElement.append(overlay);
-  const vehicleY=Math.max(90,Math.min(window.innerHeight-132,rect.top+rect.height/2-50));
-  const vehicleTarget=Math.max(12,Math.min(window.innerWidth-230,rect.left-225));
-  vehicle.style.left=(window.innerWidth+240)+"px";vehicle.style.top=vehicleY+"px";
-  techA.style.left=(window.innerWidth+270)+"px";techA.style.top=(vehicleY-25)+"px";
-  techB.style.left=(window.innerWidth+315)+"px";techB.style.top=(vehicleY-25)+"px";
-  const arrive=1550,exitVehicle=450,repair=1450,returnTime=850,depart=1150;
+  const vw=window.innerWidth,vh=window.innerHeight;
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const vehicleY=clamp(rect.top+rect.height/2-50,90,Math.max(90,vh-132));
+  const vehicleTarget=clamp(rect.left-225,12,Math.max(12,vw-232));
+  const robotW=76,robotH=92;
+  const parkAX=clamp(vehicleTarget+35,4,Math.max(4,vw-robotW-4));
+  const parkBX=clamp(vehicleTarget+112,4,Math.max(4,vw-robotW-4));
+  const workAX=clamp(rect.left-robotW-8,4,Math.max(4,vw-robotW-4));
+  const workBX=clamp(rect.left+rect.width+8,4,Math.max(4,vw-robotW-4));
+  const workY=clamp(rect.top+rect.height/2-robotH/2,70,Math.max(70,vh-robotH-8));
+  const homeX=clamp(rect.left,4,Math.max(4,vw-rect.width-4));
+  vehicle.style.left=(vw+230)+"px";vehicle.style.top=vehicleY+"px";
+  techA.style.left=(vw+230)+"px";techA.style.top=vehicleY+"px";techA.style.opacity="0";
+  techB.style.left=(vw+230)+"px";techB.style.top=vehicleY+"px";techB.style.opacity="0";
+  const arrive=1450,deploy=650,repair=1450,board=700,depart=1150;
   requestAnimationFrame(()=>requestAnimationFrame(()=>{vehicle.style.left=vehicleTarget+"px";}));
   window.setTimeout(()=>{
     vehicle.classList.add("is-parked");
-    const aX=Math.max(8,Math.min(window.innerWidth-90,rect.left-105));
-    const bX=Math.max(8,Math.min(window.innerWidth-90,rect.left-55));
-    techA.style.left=aX+"px";techA.style.top=Math.max(80,homeY+30)+"px";
-    techB.style.left=bX+"px";techB.style.top=Math.max(80,homeY+65)+"px";
-    techA.classList.add("is-deployed");techB.classList.add("is-deployed");
+    techA.style.opacity="1";techB.style.opacity="1";
+    techA.style.left=parkAX+"px";techA.style.top=(vehicleY-robotH+12)+"px";
+    techB.style.left=parkBX+"px";techB.style.top=(vehicleY-robotH+12)+"px";
   },arrive);
+  window.setTimeout(()=>{
+    techA.style.left=workAX+"px";techA.style.top=workY+"px";
+    techB.style.left=workBX+"px";techB.style.top=workY+"px";
+    techA.classList.add("is-deployed");techB.classList.add("is-deployed");
+  },arrive+deploy);
   window.setTimeout(()=>{
     techA.classList.add("is-working");techB.classList.add("is-working");
     menu.style.transition="translate 1350ms cubic-bezier(.2,.8,.2,1)";
     menu.style.translate="0px 0px";
-    techA.style.left=homeX-24+"px";techA.style.top=homeY+"px";
-    techB.style.left=homeX+28+"px";techB.style.top=homeY+12+"px";
-    techA.classList.add("is-lifting");techB.classList.add("is-lifting");
-  },arrive+exitVehicle);
+  },arrive+deploy+700);
   window.setTimeout(()=>{
     menu.style.transition="";menu.dataset.detached="false";updateMenuRepairNotice();
-    techA.classList.remove("is-working","is-lifting");techB.classList.remove("is-working","is-lifting");
-    techA.style.left=(vehicleTarget+72)+"px";techA.style.top=(vehicleY-20)+"px";
-    techB.style.left=(vehicleTarget+128)+"px";techB.style.top=(vehicleY-20)+"px";
-  },arrive+exitVehicle+repair);
+    techA.classList.remove("is-working");techB.classList.remove("is-working");
+    techA.style.left=parkAX+"px";techA.style.top=(vehicleY-robotH+12)+"px";
+    techB.style.left=parkBX+"px";techB.style.top=(vehicleY-robotH+12)+"px";
+  },arrive+deploy+700+repair);
   window.setTimeout(()=>{
-    techA.remove();techB.remove();vehicle.classList.add("is-driving-away");
-    vehicle.style.left=(window.innerWidth+250)+"px";
-  },arrive+exitVehicle+repair+returnTime);
+    techA.style.opacity="0";techB.style.opacity="0";
+    vehicle.classList.add("is-driving-away");vehicle.style.left=(vw+240)+"px";
+  },arrive+deploy+700+repair+board);
   window.setTimeout(()=>{
-    overlay.remove();menuRepairing=false;menuRepairButton.disabled=false;
-    menuRepairNotice.classList.remove("is-repairing");
+    overlay.remove();menuRepairing=false;menuRepairButton.disabled=false;menuRepairNotice.classList.remove("is-repairing");
     toast((translations[language]||translations.en).menuRestored);
-  },arrive+exitVehicle+repair+returnTime+depart);
+  },arrive+deploy+700+repair+board+depart);
 });
 
 function offset(el){
