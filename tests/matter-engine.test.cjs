@@ -59,3 +59,45 @@ test("collisions separate bodies and compression stays within material limits", 
   assert.ok(a.compression >= 0 && a.compression <= a.maxCompression);
   assert.ok(b.compression >= 0 && b.compression <= b.maxCompression);
 });
+
+test("rejects missing and blank body identifiers", () => {
+  const world = new MatterWorld(300, 200);
+  assert.throws(() => world.add({ x: 0, y: 0 }), /non-empty id/);
+  assert.throws(() => world.add({ id: "   " }), /non-empty id/);
+  assert.throws(() => createBody({ id: null }), /non-empty id/);
+});
+
+test("starting a second drag releases the previous body", () => {
+  const world = new MatterWorld(500, 300);
+  const first = world.add({ id: "first", x: 10, y: 10, width: 50, height: 30 });
+  const second = world.add({ id: "second", x: 100, y: 10, width: 50, height: 30 });
+  assert.equal(world.beginDrag("first", 15, 15), true);
+  assert.equal(world.beginDrag("second", 105, 15), true);
+  assert.equal(first.dragging, false);
+  assert.equal(second.dragging, true);
+  assert.equal(world.draggedId, "second");
+  assert.equal(world.endDrag(0, 0), true);
+});
+
+test("repair and removal clear active drag ownership", () => {
+  const world = new MatterWorld(500, 300);
+  const item = world.add({ id: "repairable", x: 10, y: 10, width: 50, height: 30 });
+  world.beginDrag("repairable", 15, 15);
+  assert.equal(world.repair("repairable"), true);
+  assert.equal(item.dragging, false);
+  assert.equal(world.draggedId, null);
+  world.beginDrag("repairable", 15, 15);
+  assert.equal(world.remove("repairable"), true);
+  assert.equal(world.draggedId, null);
+});
+
+test("bounded substeps prevent high-speed planar bodies tunnelling through each other", () => {
+  const world = new MatterWorld(500, 200, { positionCorrection: 1 });
+  const a = world.add({ id: "fast-a", x: 100, y: 70, width: 30, height: 30, elasticity: 0 });
+  const b = world.add({ id: "fast-b", x: 150, y: 70, width: 30, height: 30, elasticity: 0 });
+  a.vx = 1800;
+  b.vx = -1800;
+  world.step(1 / 30);
+  const overlap = Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x);
+  assert.ok(overlap <= 0.1, `expected separated bodies, got overlap ${overlap}`);
+});
