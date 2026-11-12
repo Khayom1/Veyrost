@@ -281,24 +281,24 @@ menuRepairButton.addEventListener("click",async()=>{
     const el=document.createElement("div");el.className="veyrost-tech-person";
     el.innerHTML=`<svg viewBox="0 0 100 116" aria-hidden="true">
 <defs>
-<linearGradient id="robot-metal-\${number}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#edf4f8"/><stop offset=".38" stop-color="#91a1af"/><stop offset=".72" stop-color="#536473"/><stop offset="1" stop-color="#263441"/></linearGradient>
-<linearGradient id="robot-dark-\${number}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#263947"/><stop offset="1" stop-color="#0a121a"/></linearGradient>
-<linearGradient id="robot-glass-\${number}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#18384a"/><stop offset="1" stop-color="#07131e"/></linearGradient>
+<linearGradient id="robot-metal-${number}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#edf4f8"/><stop offset=".38" stop-color="#91a1af"/><stop offset=".72" stop-color="#536473"/><stop offset="1" stop-color="#263441"/></linearGradient>
+<linearGradient id="robot-dark-${number}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#263947"/><stop offset="1" stop-color="#0a121a"/></linearGradient>
+<linearGradient id="robot-glass-${number}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#18384a"/><stop offset="1" stop-color="#07131e"/></linearGradient>
 </defs>
-<path d="M50 2v9m-7-6 7 5 7-5" fill="none" stroke="\${accent}" stroke-width="2.4" stroke-linecap="round"/><circle cx="50" cy="3" r="2.5" fill="\${accent}"/>
-<path d="M32 24l4-10 8-4h12l8 4 4 10-5 9H37z" fill="url(#robot-metal-\${number})" stroke="#e3edf4" stroke-width="1.8"/>
-<path d="M35 23l6-5h18l6 5-3 7H38z" fill="url(#robot-glass-\${number})" stroke="\${accent}" stroke-width="1.7"/>
-<rect x="41" y="22" width="7" height="4" rx="1.5" fill="\${accent}"/><rect x="52" y="22" width="7" height="4" rx="1.5" fill="\${accent}"/>
+<path d="M50 2v9m-7-6 7 5 7-5" fill="none" stroke="${accent}" stroke-width="2.4" stroke-linecap="round"/><circle cx="50" cy="3" r="2.5" fill="${accent}"/>
+<path d="M32 24l4-10 8-4h12l8 4 4 10-5 9H37z" fill="url(#robot-metal-${number})" stroke="#e3edf4" stroke-width="1.8"/>
+<path d="M35 23l6-5h18l6 5-3 7H38z" fill="url(#robot-glass-${number})" stroke="${accent}" stroke-width="1.7"/>
+<rect x="41" y="22" width="7" height="4" rx="1.5" fill="${accent}"/><rect x="52" y="22" width="7" height="4" rx="1.5" fill="${accent}"/>
 <path d="M50 31v5m-4-1h8" stroke="#dce7ef" stroke-width="2" stroke-linecap="round"/>
-<path d="M38 37l-7 5 2 21 8 7h18l8-7 2-21-7-5z" fill="url(#robot-dark-\${number})" stroke="#aebdca" stroke-width="1.8"/>
-<path d="M39 40l11-4 11 4-2 9H41z" fill="url(#robot-metal-\${number})" stroke="\${accent}" stroke-width="1.7"/>
-<path d="M42 52h16l3 10-11 6-11-6z" fill="#101b25" stroke="\${accent}" stroke-width="1.5"/>
-<path d="M46 53v8m8-8v8m-4-20v7" stroke="\${accent}" stroke-width="2" stroke-linecap="round"/><circle cx="50" cy="58" r="2.5" fill="\${accent}"/>
-<path d="M38 73l-4 8 5 5 11-7 11 7 5-5-4-8" fill="none" stroke="url(#robot-metal-\${number})" stroke-width="5" stroke-linejoin="round"/><path d="M40 78h20" stroke="\${accent}" stroke-width="1.4"/>
-<g class="robot-arm robot-arm-left"><path d="M33 44L23 53" stroke="url(#robot-metal-\${number})" stroke-width="7" stroke-linecap="round"/><circle cx="23" cy="53" r="4.2" fill="#263746" stroke="\${accent}" stroke-width="1.6"/><path d="M23 53L19 67" stroke="url(#robot-metal-\${number})" stroke-width="6" stroke-linecap="round"/><circle cx="19" cy="67" r="3.2" fill="#172532" stroke="#dce7ef" stroke-width="1.2"/><g class="robot-hand robot-hand-left"><path d="M19 67l-2 8-5 3m7-3 3 5m-8-2 5 1" fill="none" stroke="#e0e9ef" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="19" cy="67" r="2.2" fill="\${accent}"/></g></g>
-<g class="robot-arm robot-arm-right"><path d="M67 44L77 53" stroke="url(#robot-metal-\${number})" stroke-width="7" stroke-linecap="round"/><circle cx="77" cy="53" r="4.2" fill="#263746" stroke="\${accent}" stroke-width="1.6"/><path d="M77 53L81 67" stroke="url(#robot-metal-\${number})" stroke-width="6" stroke-linecap="round"/><circle cx="81" cy="67" r="3.2" fill="#172532" stroke="#dce7ef" stroke-width="1.2"/><g class="robot-hand robot-hand-right"><path d="M81 67l2 8 5 3m-7-3-3 5m8-2-5 1" fill="none" stroke="#e0e9ef" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="81" cy="67" r="2.2" fill="\${accent}"/></g><g class="robot-welder"><path d="M82 76l4 5-2 7" fill="none" stroke="#dce7ef" stroke-width="2.2" stroke-linecap="round"/><path d="M82 86l5 2-2 4-5-2z" fill="#263746" stroke="\${accent}" stroke-width="1.2"/><path class="welder-beam" d="M85 92l4 5m-4-3 6 1m-6 1 1 6" stroke="\${accent}" stroke-width="1.5" stroke-linecap="round"/></g></g>
-<path d="M42 88l-4 13 5 4 7-13 7 13 5-4-4-13" fill="none" stroke="url(#robot-metal-\${number})" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M37 105h10m6 0h10" stroke="\${accent}" stroke-width="2.5" stroke-linecap="round"/><circle cx="50" cy="75" r="2" fill="\${accent}"/>
-</svg><span>UNIT \${number}</span>`;
+<path d="M38 37l-7 5 2 21 8 7h18l8-7 2-21-7-5z" fill="url(#robot-dark-${number})" stroke="#aebdca" stroke-width="1.8"/>
+<path d="M39 40l11-4 11 4-2 9H41z" fill="url(#robot-metal-${number})" stroke="${accent}" stroke-width="1.7"/>
+<path d="M42 52h16l3 10-11 6-11-6z" fill="#101b25" stroke="${accent}" stroke-width="1.5"/>
+<path d="M46 53v8m8-8v8m-4-20v7" stroke="${accent}" stroke-width="2" stroke-linecap="round"/><circle cx="50" cy="58" r="2.5" fill="${accent}"/>
+<path d="M38 73l-4 8 5 5 11-7 11 7 5-5-4-8" fill="none" stroke="url(#robot-metal-${number})" stroke-width="5" stroke-linejoin="round"/><path d="M40 78h20" stroke="${accent}" stroke-width="1.4"/>
+<g class="robot-arm robot-arm-left"><path d="M33 44L23 53" stroke="url(#robot-metal-${number})" stroke-width="7" stroke-linecap="round"/><circle cx="23" cy="53" r="4.2" fill="#263746" stroke="${accent}" stroke-width="1.6"/><path d="M23 53L19 67" stroke="url(#robot-metal-${number})" stroke-width="6" stroke-linecap="round"/><circle cx="19" cy="67" r="3.2" fill="#172532" stroke="#dce7ef" stroke-width="1.2"/><g class="robot-hand robot-hand-left"><path d="M19 67l-2 8-5 3m7-3 3 5m-8-2 5 1" fill="none" stroke="#e0e9ef" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="19" cy="67" r="2.2" fill="${accent}"/></g></g>
+<g class="robot-arm robot-arm-right"><path d="M67 44L77 53" stroke="url(#robot-metal-${number})" stroke-width="7" stroke-linecap="round"/><circle cx="77" cy="53" r="4.2" fill="#263746" stroke="${accent}" stroke-width="1.6"/><path d="M77 53L81 67" stroke="url(#robot-metal-${number})" stroke-width="6" stroke-linecap="round"/><circle cx="81" cy="67" r="3.2" fill="#172532" stroke="#dce7ef" stroke-width="1.2"/><g class="robot-hand robot-hand-right"><path d="M81 67l2 8 5 3m-7-3-3 5m8-2-5 1" fill="none" stroke="#e0e9ef" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="81" cy="67" r="2.2" fill="${accent}"/></g><g class="robot-welder"><path d="M82 76l4 5-2 7" fill="none" stroke="#dce7ef" stroke-width="2.2" stroke-linecap="round"/><path d="M82 86l5 2-2 4-5-2z" fill="#263746" stroke="${accent}" stroke-width="1.2"/><path class="welder-beam" d="M85 92l4 5m-4-3 6 1m-6 1 1 6" stroke="${accent}" stroke-width="1.5" stroke-linecap="round"/></g></g>
+<path d="M42 88l-4 13 5 4 7-13 7 13 5-4-4-13" fill="none" stroke="url(#robot-metal-${number})" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M37 105h10m6 0h10" stroke="${accent}" stroke-width="2.5" stroke-linecap="round"/><circle cx="50" cy="75" r="2" fill="${accent}"/>
+</svg><span>UNIT ${number}</span>`;
     return el;
   };
   const techA=makeTechnician("01","#6FE6D0"),techB=makeTechnician("02","#A98CFF");
@@ -307,13 +307,14 @@ menuRepairButton.addEventListener("click",async()=>{
   Object.assign(carried.style,{position:"fixed",left:rect.left+"px",top:rect.top+"px",width:rect.width+"px",height:rect.height+"px",margin:"0",zIndex:"2147483647",pointerEvents:"none",translate:"none",transform:"none",transition:"left 1450ms cubic-bezier(.2,.75,.2,1),top 1450ms cubic-bezier(.2,.75,.2,1),opacity 250ms ease"});
   overlay.append(vehicle,techA,techB,carried);document.documentElement.append(overlay);
   const vw=window.innerWidth,vh=window.innerHeight,clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
-  const vehicleWidth=220,vehicleHeight=100,robotWidth=82,robotHeight=96;
+  const robotSize=vw<=760?58:82;
+  const robotWidth=robotSize,robotHeight=Math.round(robotSize*1.16);
+  const vehicleWidth=220,vehicleHeight=100;
   const lineY=clamp(rect.top+rect.height/2-vehicleHeight/2,12,Math.max(12,vh-vehicleHeight-12));
   // The service vehicle enters from the right on the same horizontal level as the detached MENU.
   const vehicleX=clamp(rect.right+14,8,Math.max(8,vw-vehicleWidth-8));
   const startVehicleX=vw+vehicleWidth+24;
   // Door anchors are measured from the parked vehicle's cabin, not the viewport edges.
-  const robotSize=vw<=760?58:82;
   const doorAX=vehicleX+38,doorBX=vehicleX+124;
   const cabinY=lineY+7;
   const robotStartY=cabinY;
