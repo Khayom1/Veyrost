@@ -133,6 +133,11 @@ tj: {
 let language="en";
 try{language=localStorage.getItem("veyrost-language")||"en"}catch(_){}
 if(!dictionaries[language])language="en";
+const translations={
+ en:{move:"MOVE ITEMS",done:"FINISH EDIT",auraOn:"AURA ON",auraOff:"AURA OFF",editHint:"Layout editing is active. Drag cards or categories to rearrange them.",saved:"Workspace arrangement saved."},
+ ru:{move:"ПЕРЕМЕСТИТЬ БЛОКИ",done:"ЗАВЕРШИТЬ РЕДАКТИРОВАНИЕ",auraOn:"AURA ВКЛ",auraOff:"AURA ВЫКЛ",editHint:"Режим редактирования активен. Перетаскивайте карточки и категории.",saved:"Расположение сохранено."},
+ tj:{move:"ҶОЙИВАЗКУНИИ ҚИСМҲО",done:"АНҶОМИ ТАҲРИР",auraOn:"AURA ФАЪОЛ",auraOff:"AURA ХОМӮШ",editHint:"Реҷаи таҳрир фаъол аст. Кортҳо ва гурӯҳҳоро ҷойиваз кунед.",saved:"Тарҳ нигоҳ дошта шуд."}
+};
 const originalText=new WeakMap();
 const originalAttrs=new WeakMap();
 function translateDocument(){
@@ -170,7 +175,7 @@ function applyLanguage(){
   translateDocument();
   const t=dictionaries[language]||dictionaries.en;
   const edit=$("#layout-toggle");
-  if(edit)edit.textContent=editMode?(t["FINISH EDIT"]||"FINISH EDIT"):(t["MOVE ITEMS"]||"MOVE ITEMS");
+  if(edit)edit.textContent=edit.getAttribute("aria-pressed")==="true"?(translations[language]||translations.en).done:(translations[language]||translations.en).move;
 }
 $$("[data-lang]").forEach(button=>button.addEventListener("click",()=>{
   const next=button.dataset.lang||"en";
@@ -180,6 +185,8 @@ $$("[data-lang]").forEach(button=>button.addEventListener("click",()=>{
   applyLanguage();
 }));
 applyLanguage();
+const languageObserver=new MutationObserver(records=>{if(records.some(record=>record.addedNodes.length))translateDocument()});
+languageObserver.observe(document.body,{childList:true,subtree:true});
 
 // Layout editor: all categories, cards and workspace modules can be repositioned.
 const LAYOUT_KEY="veyrost:corporate-layout:v1";
