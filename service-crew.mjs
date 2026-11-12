@@ -151,6 +151,23 @@ export class ServiceCrew3D {
     this.departed = false;
   }
 
+  recall() {
+    if (!this.sequence.recall()) return false;
+    this.departed = false;
+    this.vehicle.position.set(-12, -4.55, 0.18);
+    this.ladderPivot.rotation.z = 0;
+    this.leadTechnician.position.set(-2.5, -4.6, 0.55);
+    this.supportTechnician.position.set(-1.45, -4.6, 0.55);
+    this.leadTechnician.rotation.set(0, 0, 0);
+    this.supportTechnician.rotation.set(0, 0, 0);
+    for (const technician of [this.leadTechnician, this.supportTechnician]) {
+      for (const limb of Object.values(technician.userData.limbs)) limb.rotation.set(0, 0, 0);
+    }
+    this.lastPhase = SERVICE_CREW_PHASES.ARRIVING;
+    this.onState("crew-recalled");
+    return true;
+  }
+
   depart() {
     const accepted = this.sequence.depart();
     if (accepted) this.onState("crew-folding-ladder");
