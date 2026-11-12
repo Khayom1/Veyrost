@@ -24,9 +24,10 @@ test("legacy config secrets are scrubbed during startup", () => {
 });
 
 test("legacy provider API keys are removed before provider initialization", () => {
-  const seed = source.match(/function seed\(\)\s*\{([\s\S]*?)\n\s*\}/);
-  assert.ok(seed, "workspace seed function must exist");
-  const body = seed[1];
+  const seedStart = source.indexOf("function seed()");
+  const seedEnd = source.indexOf("function getState()", seedStart);
+  assert.ok(seedStart >= 0 && seedEnd > seedStart, "workspace seed function must exist");
+  const body = source.slice(seedStart, seedEnd);
   assert.ok(body.indexOf("delete provider.apiKey") >= 0);
   assert.ok(body.indexOf("delete provider.apiKey") < body.indexOf("Providers.init()"));
 });
