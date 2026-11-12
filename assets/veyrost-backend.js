@@ -4,7 +4,8 @@
   const AUTH_URL = BASE + "/veyrost-auth";
   const PROXY_URL = BASE + "/veyrost-proxy";
   let session = null;
-  let publishableKey = "";
+  // Supabase publishable keys are intentionally public; provider credentials stay server-side.
+  let publishableKey = "sb_publishable_EZp3LgM4zcqtFKBUkphGaQ_FmWpyOWz";
 
   function setPublishableKey(value) {
     const candidate = String(value || "").trim();
@@ -47,7 +48,6 @@
       if (current) await authRequest({ action: "sign_out", access_token: current.accessToken });
     } finally {
       session = null;
-      publishableKey = "";
     }
   }
   function isAuthenticated() {
@@ -68,7 +68,6 @@
       if (!result.access_token) throw authError();
     } catch (error) {
       session = null;
-      publishableKey = "";
       throw error;
     }
   }
@@ -111,7 +110,7 @@
   }
 
   window.VeyrostBackend = Object.freeze({
-    signIn, signUp, signOut, isAuthenticated, accessToken, setPublishableKey,
+    signIn, signUp, signOut, isAuthenticated, accessToken,
     fetch: fetchThroughProxy, health,
     authUrl: AUTH_URL, proxyUrl: PROXY_URL
   });
