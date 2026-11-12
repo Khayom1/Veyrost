@@ -96,6 +96,18 @@ test("shared script binds all three language buttons and keeps selectors valid",
   assert.ok(css.includes("@media(max-width:760px)") && css.includes(".language-switch{display:flex}"));
 });
 
+test("navigation menu and settings entry are visible and available on every page", () => {
+  for (const page of ["index.html","projects.html","studio.html","company.html","research.html","contact.html"]) {
+    const html = readFileSync(new URL("../" + page, import.meta.url), "utf8");
+    assert.match(html, /id="menu-toggle"/);
+    assert.match(html, /id="mobile-nav"/);
+    assert.match(html, /href="studio.html#workspace-settings"/);
+    assert.match(html, /veyrost-corporate\\.css\\?v=20261112-6/);
+  }
+  assert.match(css, /\\.menu-toggle\\{display:inline-flex/);
+  assert.match(css, /\\.mobile-nav\\.open\\{display:grid/);
+  assert.match(studio, /id="workspace-settings"/);
+});
 test("shared initialization uses querySelectorAll for every multi-element control list", () => {
   for (const selector of [
     '[data-close-menu]',
