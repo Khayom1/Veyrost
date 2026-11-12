@@ -215,3 +215,21 @@ html.veyrost-layout-editing button:not(#layout-toggle):not(#aura-toggle):not(.me
 
 /* Directional soft-body silhouette deformation for catalog cards. */
 html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,clip-path;}
+
+/* Two-person technical repair crew arriving in a tracked service vehicle. */
+.veyrost-repair-layer .veyrost-tech-vehicle{position:fixed;left:0;top:0;width:220px;height:100px;z-index:2147483646;display:flex;flex-direction:column;align-items:center;gap:0;will-change:left,top;transition:left 1500ms cubic-bezier(.2,.75,.2,1);filter:drop-shadow(0 9px 16px #0009)}
+.veyrost-tech-vehicle svg{display:block;width:220px;height:100px}
+.veyrost-tech-vehicle span{margin-top:-5px;padding:3px 6px;border:1px solid #75e6e080;border-radius:5px;background:#0c1723;color:#9defff;font:700 7px/1.2 monospace;letter-spacing:.08em;white-space:nowrap}
+.veyrost-tech-vehicle.is-parked{filter:drop-shadow(0 0 13px #6fe6d055)}
+.veyrost-tech-vehicle.is-driving-away{opacity:.9}
+.veyrost-repair-layer .veyrost-tech-person{z-index:2147483647;transition:left 700ms cubic-bezier(.2,.75,.25,1),top 700ms cubic-bezier(.2,.75,.25,1),opacity 300ms ease}
+.veyrost-repair-layer .veyrost-tech-person svg{width:54px!important;height:64px!important}
+.veyrost-repair-layer .veyrost-tech-person span{font-size:6px!important}
+.veyrost-repair-layer .veyrost-tech-person.is-working svg{animation:veyrost-robot-hover .42s ease-in-out infinite alternate}
+@media(max-width:760px){
+ .veyrost-repair-layer .veyrost-tech-vehicle{transform:scale(.82);transform-origin:left top}
+ .veyrost-repair-layer .veyrost-tech-person svg{width:48px!important;height:58px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .veyrost-repair-layer .veyrost-tech-vehicle,.veyrost-repair-layer .veyrost-tech-person{transition-duration:100ms!important}
+}
