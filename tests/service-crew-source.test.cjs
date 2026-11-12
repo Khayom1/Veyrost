@@ -52,3 +52,9 @@ test("service crew exposes controlled ladder folding and vehicle departure", () 
 test("service crew disposal detaches its scene graph", () => {
   assert.match(visual, /dispose\(\)[\s\S]*this\.scene\.remove\(this\.group\)/);
 });
+
+test("service crew can be recalled after departure for a later protected repair", () => {
+  assert.match(visual, /recall\(\)[\s\S]*this\.sequence\.recall\(\)/);
+  assert.match(visual, /this\.departed = false/);
+  assert.match(runtime, /this\.serviceCrew\.recall\(\)/);
+});
