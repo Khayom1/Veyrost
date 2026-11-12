@@ -252,8 +252,9 @@ if(projectGrid&&Array.isArray(window.VEYROST_PROJECTS)){
   const render=()=>{
     const query=(input?.value||"").trim().toLowerCase();
     const group=filter?.value||"All";
+    const localeDictionary=dictionaries[language]||{};
     const list=all.filter(p=>(group==="All"||p.group===group)&&
-      [p.name,p.repo,p.group,p.type,p.language,p.description,dict[p.group],dict[p.type],dict[p.status],dict[p.description]].filter(Boolean).join(" ").toLowerCase().includes(query));
+      [p.name,p.repo,p.group,p.type,p.language,p.description,localeDictionary[p.group],localeDictionary[p.type],localeDictionary[p.status],localeDictionary[p.description]].filter(Boolean).join(" ").toLowerCase().includes(query));
     projectGrid.innerHTML=list.length?list.map(p=>`
       <article class="card project-card" data-veyrost-layout-item data-layout-id="project-${p.id}">
         <div class="card-foot"><span class="tag purple">${escapeHTML(p.group)}</span><span class="tag">${escapeHTML(p.status)}</span></div>
