@@ -441,3 +441,18 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
 @keyframes veyrost-wire-connect{from{opacity:.72}to{opacity:1}}
 @keyframes veyrost-welder-spark{0%{opacity:.1}50%{opacity:1}100%{opacity:.25}}
 @media(prefers-reduced-motion:reduce){.veyrost-repair-layer .robot-arm,.veyrost-repair-layer .robot-hand,.veyrost-repair-layer .robot-welder,.veyrost-detached-wires .wire{animation:none!important;transition:none!important}}
+
+/* Synchronize carrier travel with the MENU clone so its hands visibly hold the moving control. */
+.veyrost-repair-layer .veyrost-tech-person.is-carrying{
+ transition:left 1850ms cubic-bezier(.22,.72,.25,1),top 1850ms cubic-bezier(.22,.72,.25,1),opacity 260ms ease!important
+}
+.veyrost-repair-layer .veyrost-tech-person.is-grabbing .robot-hand,
+.veyrost-repair-layer .veyrost-tech-person.is-carrying .robot-hand{filter:drop-shadow(0 0 5px rgba(121,240,222,.9))}
+.veyrost-repair-layer .veyrost-tech-person.is-grabbing .robot-arm-left,
+.veyrost-repair-layer .veyrost-tech-person.is-grabbing .robot-arm-right{transition-duration:.32s!important}
+.veyrost-repair-layer .veyrost-tech-person.is-wiring .robot-welder{filter:drop-shadow(0 0 5px currentColor)}
+.veyrost-repair-layer .veyrost-tech-person.is-wire-reach .robot-welder .welder-beam{filter:drop-shadow(0 0 5px currentColor);stroke-width:2.3}
+@media(max-width:760px){
+ .veyrost-repair-layer .veyrost-tech-person{width:58px!important;min-width:58px!important}
+ .veyrost-repair-layer .veyrost-tech-person svg{width:58px!important;height:67px!important}
+}
