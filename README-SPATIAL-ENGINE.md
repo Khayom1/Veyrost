@@ -70,3 +70,9 @@ The CI suite validates module syntax and deterministic source-level behavior. It
 ## Phase 1 — engine stabilization
 
 The code-level stabilization pass covers saved-layout coordinate validation, pause-safe simulation, bounded procedural motion, viewport-resize recentering with bounds clamping, and interaction cancellation on lost pointer capture, window blur, or hidden-page transitions. Automated regression and CI checks are required before the phase is marked complete. Physical Android camera/gesture acceptance remains a separate device-level gate and must not be inferred from CI.
+
+## Phase 2 — Matter 2.5D solver hardening
+
+The planar Matter solver now advances in bounded substeps (up to 120 Hz) to reduce high-speed X/Y tunnelling, and its drag ownership is exclusive and cleaned up on repair/removal/reset. Empty body identifiers are rejected. The depth solver now validates tuning parameters, canonicalizes IDs, bounds velocity before integration, uses bounded substeps, resolves projected Z contacts iteratively, and reports unique contact pairs rather than counting repeated solver passes.
+
+The 2.5D contract remains explicit: Matter resolves planar X/Y motion and this depth solver resolves Z separation only where projected X/Y bounds overlap. This is not a general 6-DoF engine. CI and regression tests validate deterministic engine behavior; they do not certify GPU performance or device-specific browser rendering.
