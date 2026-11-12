@@ -6641,6 +6641,10 @@ const VX = (() => {
 
   function seed() {
     memoryState=loadLocal();
+    // Remove credentials written by older versions before any UI, export or tool can read them.
+    for (const provider of memoryState.providers) {
+      if (provider && typeof provider === "object") delete provider.apiKey;
+    }
     Providers.init();
     Agents.init();
     Integrations.init();
