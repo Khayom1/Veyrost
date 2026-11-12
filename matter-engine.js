@@ -113,7 +113,7 @@
           b.vx *= damping; b.vy *= damping;
           if (Math.abs(b.vx) < 2) b.vx = 0;
           if (Math.abs(b.vy) < 2) b.vy = 0;
-          this._contain(b, .72);
+          this._contain(b, 0);
         }
         b.compressionVelocity += (-30 * b.compression - 8 * b.compressionVelocity) * dt;
         b.compression = clamp(b.compression + b.compressionVelocity * dt, 0, b.maxCompression);
@@ -121,15 +121,15 @@
       for (let pass = 0; pass < 8; pass++) {
         for (let i = 0; i < bodies.length; i++)
           for (let j = i + 1; j < bodies.length; j++) this._resolvePair(bodies[i], bodies[j]);
-        for (const b of bodies) this._contain(b, .5);
+        for (const b of bodies) this._contain(b, 0);
       }
     }
     _contain(b, restitution) {
       const maxX = Math.max(0, this.width - b.width), maxY = Math.max(0, this.height - b.height);
-      if (b.x < 0) { b.x = 0; if (b.vx < 0) b.vx = -b.vx * restitution; this._compress(b, "x", Math.abs(b.vx)); }
-      else if (b.x > maxX) { b.x = maxX; if (b.vx > 0) b.vx = -b.vx * restitution; this._compress(b, "x", Math.abs(b.vx)); }
-      if (b.y < 0) { b.y = 0; if (b.vy < 0) b.vy = -b.vy * restitution; this._compress(b, "y", Math.abs(b.vy)); }
-      else if (b.y > maxY) { b.y = maxY; if (b.vy > 0) b.vy = -b.vy * restitution; this._compress(b, "y", Math.abs(b.vy)); }
+      if (b.x < 0) { b.x = 0; if (b.vx < 0) b.vx = restitution > 0 ? -b.vx * restitution : 0; this._compress(b, "x", Math.abs(b.vx)); }
+      else if (b.x > maxX) { b.x = maxX; if (b.vx > 0) b.vx = restitution > 0 ? -b.vx * restitution : 0; this._compress(b, "x", Math.abs(b.vx)); }
+      if (b.y < 0) { b.y = 0; if (b.vy < 0) b.vy = restitution > 0 ? -b.vy * restitution : 0; this._compress(b, "y", Math.abs(b.vy)); }
+      else if (b.y > maxY) { b.y = maxY; if (b.vy > 0) b.vy = restitution > 0 ? -b.vy * restitution : 0; this._compress(b, "y", Math.abs(b.vy)); }
     }
     _compress(b, axis, speed) {
       b.compressionAxis = axis;
