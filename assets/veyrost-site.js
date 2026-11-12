@@ -144,7 +144,7 @@ function savePositions(){
     if(x||y)positions[el.dataset.layoutId]={x,y};
     else delete positions[el.dataset.layoutId];
   });
-  try{localStorage.setItem(LAYOUT_KEY,JSON.stringify(positions));toast((translations[language]||translations.en).saved)}catch(_){toast("Could not save this layout on the device.")};
+  try{localStorage.setItem(LAYOUT_KEY,JSON.stringify(positions));toast("Workspace arrangement saved.")}catch(_){toast("Could not save this layout on the device.")};
 }
 let editMode=false,drag=null;
 const editButton=$("#layout-toggle");
