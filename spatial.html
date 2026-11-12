@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#030916"><meta name="description" content="Experimental VEYROST 3D spatial workspace with Matter-backed panel physics and optional AURA hand interaction.">
+<link rel="canonical" href="https://veyrost.is-a.dev/spatial.html"><title>Spatial Workspace · VEYROST</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#030916;color:#eaf7ff}
+*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#030916}
+#spatial-world{position:fixed;inset:0;overflow:hidden;background:radial-gradient(ellipse at 50% 48%,#0b2034 0%,#030916 68%)}
+#spatial-world canvas{display:block;width:100%;height:100%;touch-action:none}
+.hud{position:fixed;z-index:30;left:max(16px,env(safe-area-inset-left));right:max(16px,env(safe-area-inset-right));top:max(14px,env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;gap:12px;pointer-events:none}
+.brand,.actions{display:flex;align-items:center;gap:10px}.brand{font-size:12px;font-weight:800;letter-spacing:.16em}.brand b{display:grid;place-items:center;width:34px;height:34px;border:1px solid #65dff4;border-radius:10px;color:#7beaff}
+.actions{pointer-events:auto;flex-wrap:wrap;justify-content:flex-end}
+button,a{font:700 10px/1 system-ui,sans-serif;letter-spacing:.1em;color:#dff8ff;text-decoration:none;background:rgba(5,20,35,.88);border:1px solid rgba(112,221,255,.35);border-radius:999px;padding:12px 15px;cursor:pointer;backdrop-filter:blur(12px)}
+button:focus-visible,a:focus-visible{outline:2px solid #8cecff;outline-offset:3px}
+button.primary{background:#0b5269;border-color:#58d9f4}button[aria-pressed=true]{background:#164b55;border-color:#74eaff}
+.info{position:fixed;z-index:20;left:50%;top:50%;transform:translate(-50%,-50%);width:min(390px,calc(100vw - 36px));text-align:center;pointer-events:none;text-shadow:0 2px 16px #000}
+.info h1{font-size:clamp(20px,4vw,32px);letter-spacing:.14em;margin:0 0 10px}.info p{font-size:12px;line-height:1.6;color:#91aec4;margin:0}
+.status{position:fixed;z-index:30;left:50%;bottom:max(16px,env(safe-area-inset-bottom));transform:translateX(-50%);padding:9px 13px;border:1px solid #244b63;border-radius:999px;background:#061522e8;color:#9ddff0;font-size:10px;letter-spacing:.08em;white-space:nowrap;max-width:calc(100vw - 28px);overflow:hidden;text-overflow:ellipsis}
+#aura-camera{position:fixed;width:1px;height:1px;opacity:0;pointer-events:none}
+#aura-pointer{position:fixed;z-index:40;width:24px;height:32px;left:0;top:0;visibility:hidden;pointer-events:none;transform:translate(-2px,-2px)}
+#aura-pointer svg{width:100%;height:100%}
+@media(max-width:600px){.brand span{display:none}.actions{gap:6px}button,a{padding:11px 10px;font-size:9px}.info{top:48%}.status{font-size:9px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style></head>
+<body>
+<div id="spatial-world" aria-label="VEYROST three-dimensional workspace"></div>
+<header class="hud"><a class="brand" href="studio.html"><b>V</b><span>VEYROST / SPATIAL LAB</span></a>
+<div class="actions"><button id="aura-toggle" class="primary" type="button" aria-pressed="false">AURA OFF</button><button id="reset-layout" type="button">RESET</button><a href="studio.html">EXIT 3D</a></div></header>
+<video id="aura-camera" autoplay muted playsinline aria-hidden="true"></video>
+<div id="aura-pointer" aria-hidden="true"><svg viewBox="0 0 24 32"><path d="M2 1 L2 27 L8 20.5 L12.4 30 L16.2 28.2 L22 18.3 Z" fill="#fff" stroke="#101827" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+<section class="info"><h1>SPATIAL INTERFACE</h1><p>Drag panels to move them. Select a panel to adjust its depth. Activate AURA for camera-based pinch interaction. Camera processing remains on this device.</p></section>
+<div id="spatial-status" class="status" role="status" aria-live="polite">INITIALIZING SPATIAL ENGINE…</div>
+<script type="module" src="spatial-page.mjs"></script>
+</body></html>
