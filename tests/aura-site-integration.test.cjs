@@ -101,7 +101,7 @@ test("project directory has real search, category filters and count feedback", (
 
 test("interface language controls expose English, Russian and Tajik", () => {
   for (const lang of ["en","ru","tj"]) assert.match(html,new RegExp(`data-lang="${lang}"`));
-  assert.match(site,/translations=/);
+  assert.match(site,/const\s+translations\s*=/);
 });
 
 test("layout editor and project filtering are available on mobile", () => {
