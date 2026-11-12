@@ -86,7 +86,8 @@ function applyLanguage(){
   if(edit)edit.textContent=edit.getAttribute("aria-pressed")==="true"?(translations[language]||translations.en).done:(translations[language]||translations.en).move;
   const hint=$("#edit-hint");
   if(hint)hint.textContent=(translations[language]||translations.en).editHint;
-  if(status?.dataset.message)status.textContent=(dictionaries[language]||{})[status.dataset.message]||status.dataset.message;
+  const statusNode=$("#aura-status");
+  if(statusNode?.dataset.message)statusNode.textContent=(dictionaries[language]||{})[statusNode.dataset.message]||statusNode.dataset.message;
   const toastNode=$("#site-toast");
   if(toastNode?.classList.contains("show")&&toastNode.dataset.sourceMessage)toastNode.textContent=(dictionaries[language]||{})[toastNode.dataset.sourceMessage]||toastNode.dataset.sourceMessage;
   window.dispatchEvent(new Event("veyrost:languagechange"));
