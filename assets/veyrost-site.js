@@ -293,17 +293,31 @@ menuRepairButton.addEventListener("click",async()=>{
     move(techA,clamp(targetX-robotWidth+8,4,vw-robotWidth-4),clamp(targetY+rect.height/2-robotHeight/2,4,vh-robotHeight-4));
     move(techB,clamp(targetX+rect.width-8,4,vw-robotWidth-4),clamp(targetY+rect.height/2-robotHeight/2,4,vh-robotHeight-4));
     await wait(1550);
-    // Set the real control back at its exact layout position after the carried control arrives.
+    // At the original position, both technicians set the MENU down and visibly repair it.
+    techA.classList.remove("is-carrying");techB.classList.remove("is-carrying");
+    techA.classList.add("is-working");techB.classList.add("is-working");
+    const repairFx=document.createElement("div");repairFx.className="veyrost-menu-repair-fx";
+    repairFx.innerHTML='<svg viewBox="0 0 120 90" aria-hidden="true"><path d="M19 22l10 10-8 8-10-10a14 14 0 0018 18l28 28 9-9-28-28a14 14 0 00-19-17zM91 8l-8 8 7 7-18 18 7 7 18-18 7 7 8-8-21-21z" fill="none" stroke="#8ff4e4" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M60 4v12M44 11l7 8M76 11l-7 8M60 66v15M47 70l-7 8M73 70l7 8" stroke="#d7fbff" stroke-width="3" stroke-linecap="round"/></svg><span>SYSTEM REPAIR</span>';
+    const carriedRect=carried.getBoundingClientRect();
+    Object.assign(repairFx.style,{position:"fixed",left:(carriedRect.left+carriedRect.width/2-60)+"px",top:(carriedRect.top-48)+"px",width:"120px",height:"90px",zIndex:"2147483647",pointerEvents:"none"});
+    overlay.append(repairFx);carried.classList.add("is-being-repaired");
+    await wait(1750);
+    repairFx.classList.add("is-complete");
+    await wait(500);
+    // Reveal the real MENU only after the repair sequence is complete.
     menu.style.transition="none";menu.style.translate="0px 0px";menu.style.visibility="";
     menu.dataset.detached="false";updateMenuRepairNotice();
     carried.style.opacity="0";
-    techA.classList.remove("is-carrying");techB.classList.remove("is-carrying");
-    await wait(280);
+    await wait(260);
+    techA.classList.remove("is-working");techB.classList.remove("is-working");
     techA.classList.add("is-walking");techB.classList.add("is-walking");
     move(techA,doorX+16,robotStartY);move(techB,doorX+84,robotStartY);
     await wait(760);
+    // Board the service vehicle: each technician disappears behind its side panel before departure.
+    techA.classList.add("is-boarding");techB.classList.add("is-boarding");
+    await wait(340);
     techA.style.opacity="0";techB.style.opacity="0";
-    await wait(220);
+    await wait(420);
     vehicle.classList.add("is-driving-away");vehicle.style.left=startVehicleX+"px";
     await wait(1250);
     toast((translations[language]||translations.en).menuRestored);
