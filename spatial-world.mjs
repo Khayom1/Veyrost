@@ -145,6 +145,7 @@ export class SpatialWorldController {
     this.activeDrag = null;
     this.pointer = { x: 0, y: 0 };
     this.lastFrame = 0;
+    this.animationTime = 0;
     this.units = SPATIAL_UNITS_PER_PIXEL;
     this.storageKey = "veyrost:spatial-layout:v1";
     this.hasCustomLayout = false;
@@ -1018,46 +1019,54 @@ export class SpatialWorldController {
 
   _animate() {
     if (!this.running || !this.renderer) return;
-    const delta = Math.min(this.clock.getDelta(), 1 / 30);
-    const elapsed = this.clock.elapsedTime;
-    this.physics.step(delta);
-    if (this.depthPhysics) {
-      for (const [id, depthBody] of this.depthPhysics.bodies) {
-        const planar = this.physics.get(id);
-        if (!planar) continue;
-        depthBody.x = planar.x + planar.width / 2;
-        depthBody.y = planar.y + planar.height / 2;
-        depthBody.width = planar.width;
-        depthBody.height = planar.height;
-      }
-      this.depthPhysics.step(delta);
-      for (const depthBody of this.depthPhysics.bodies.values()) {
-        const boundedZ = Math.max(-1.25, Math.min(1.25, depthBody.z));
-        if (boundedZ !== depthBody.z) {
-          depthBody.z = boundedZ;
-          depthBody.velocityZ = 0;
+    const frameDelta = Math.min(this.clock.getDelta(), 1 / 30);
+    if (!this.paused) this.animationTime += frameDelta;
+    const delta = this.paused ? 0 : frameDelta;
+    const elapsed = this.animationTime;
+
+    // Pause freezes simulation and procedural motion, but keeps rendering alive
+    // so the HUD and the user's explicit resume interaction remain responsive.
+    if (!this.paused) {
+      this.physics.step(delta);
+      if (this.depthPhysics) {
+        for (const [id, depthBody] of this.depthPhysics.bodies) {
+          const planar = this.physics.get(id);
+          if (!planar) continue;
+          depthBody.x = planar.x + planar.width / 2;
+          depthBody.y = planar.y + planar.height / 2;
+          depthBody.width = planar.width;
+          depthBody.height = planar.height;
+        }
+        this.depthPhysics.step(delta);
+        for (const depthBody of this.depthPhysics.bodies.values()) {
+          const boundedZ = Math.max(-1.25, Math.min(1.25, depthBody.z));
+          if (boundedZ !== depthBody.z) {
+            depthBody.z = boundedZ;
+            depthBody.velocityZ = 0;
+          }
         }
       }
+
+      for (const [id, panel] of this.panelGroups) {
+        const body = this.physics.get(id);
+        this._syncPanel(body, panel);
+        const index = this.layout.panels.findIndex(item => item.id === id);
+        panel.group.rotation.z = Math.sin(elapsed * 0.42 + index * 1.1) * 0.012;
+        const depthBody = this.depthPhysics?.get(id);
+        if (depthBody) panel.group.position.z = depthBody.z + Math.sin(elapsed * 0.8 + index) * 0.035;
+        panel.group.rotation.x += Math.sin(elapsed * 0.31 + index) * 0.00008;
+        panel.group.rotation.y += Math.cos(elapsed * 0.27 + index * 0.7) * 0.00007;
+      }
+      if (this.selectedId || this.hoveredId) this._refreshDepthControl();
+
+      this.core.rotation.y = elapsed * 0.24;
+      this.core.rotation.x = Math.sin(elapsed * 0.19) * 0.18;
+      this.rings.forEach((ring, index) => {
+        ring.rotation.z = elapsed * (index % 2 ? -0.18 : 0.13) * (index + 1);
+      });
+      this.stars.rotation.z = Math.sin(elapsed * 0.025) * 0.025;
     }
 
-    for (const [id, panel] of this.panelGroups) {
-      const body = this.physics.get(id);
-      this._syncPanel(body, panel);
-      const index = this.layout.panels.findIndex(item => item.id === id);
-      panel.group.rotation.z = Math.sin(elapsed * 0.42 + index * 1.1) * 0.012;
-      const depthBody = this.depthPhysics?.get(id);
-      if (depthBody) panel.group.position.z = depthBody.z + Math.sin(elapsed * 0.8 + index) * 0.035;
-      panel.group.rotation.x += Math.sin(elapsed * 0.31 + index) * 0.00008;
-      panel.group.rotation.y += Math.cos(elapsed * 0.27 + index * 0.7) * 0.00007;
-    }
-    if (this.selectedId || this.hoveredId) this._refreshDepthControl();
-
-    this.core.rotation.y = elapsed * 0.24;
-    this.core.rotation.x = Math.sin(elapsed * 0.19) * 0.18;
-    this.rings.forEach((ring, index) => {
-      ring.rotation.z = elapsed * (index % 2 ? -0.18 : 0.13) * (index + 1);
-    });
-    this.stars.rotation.z = Math.sin(elapsed * 0.025) * 0.025;
     this.renderer.render(this.scene, this.camera);
   }
 
