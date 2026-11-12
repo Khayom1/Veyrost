@@ -1,4 +1,4 @@
-import "../matter-engine.js";
+import "../matter-engine.js?v=20261112-2";
 import { AuraController } from "../aura-engine.mjs";
 
 const $ = (selector, root=document) => root.querySelector(selector);
