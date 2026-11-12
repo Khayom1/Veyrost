@@ -9,7 +9,8 @@ const sequence = fs.readFileSync("repair-interaction.mjs", "utf8");
 test("repair action begins a guarded technician sequence instead of bypassing maintenance", () => {
   assert.match(runtime, /button\.addEventListener\("click", \(\) => this\.startProtectedRepair\(\)\)/);
   assert.match(runtime, /startProtectedRepair\(\)/);
-  assert.match(runtime, /this\.serviceCrew\?\.sequence\?\.snapshot\?\.\(\)\.phase !== "ready"/);
+  assert.match(runtime, /const crewPhase = this\.serviceCrew\?\.sequence\?\.snapshot\?\.\(\)\.phase/);
+  assert.match(runtime, /if \(crewPhase !== "ready"\)/);
 });
 
 test("maintenance lock blocks user drag while technicians handle the detached panel", () => {
