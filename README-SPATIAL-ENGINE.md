@@ -76,3 +76,10 @@ The code-level stabilization pass covers saved-layout coordinate validation, pau
 The planar Matter solver now advances in bounded substeps (up to 120 Hz) to reduce high-speed X/Y tunnelling, and its drag ownership is exclusive and cleaned up on repair/removal/reset. Empty body identifiers are rejected. The depth solver now validates tuning parameters, canonicalizes IDs, bounds velocity before integration, uses bounded substeps, resolves projected Z contacts iteratively, and reports unique contact pairs rather than counting repeated solver passes.
 
 The 2.5D contract remains explicit: Matter resolves planar X/Y motion and this depth solver resolves Z separation only where projected X/Y bounds overlap. This is not a general 6-DoF engine. CI and regression tests validate deterministic engine behavior; they do not certify GPU performance or device-specific browser rendering.
+
+
+## Phase 3 — protected component integrity
+
+Protected controls now validate and canonicalize identifiers, reject duplicate registry keys, and expose immutable snapshots. The lifecycle supports an explicit repair rollback path. Spatial detachment is coordinated with the Matter solver: the first pull must remain anchored, and the second pull must produce a matching detached state in both systems. A mismatch triggers a safe reset instead of leaving the visual, lifecycle and physics states divergent. Repair requires both planar and depth bodies and only completes after the planar mount has been restored; failed repair transitions return to the detached state.
+
+These checks harden the source lifecycle. They do not replace browser interaction testing or Android camera/gesture acceptance.
