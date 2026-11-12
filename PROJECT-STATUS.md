@@ -1,7 +1,7 @@
 # VEYROST — verified engineering status
 
-**Audit date:** 2026-11-11  
-**Branch:** feat/engineering-command-center  
+**Audit date:** 2026-11-12  
+**Branch:** fix/aura-pause-layout-and-spatial-loop  
 **Audit source:** node scripts/project-status.mjs  
 **CI:** source syntax, regression tests and source-evidence audit are required before merge.
 
@@ -19,15 +19,15 @@ The checklist uses binary source evidence. It does not measure visual quality, u
 | Depth-axis collision physics | 6 | 6 | 100.00% |
 | Interactive depth controls | 7 | 7 | 100.00% |
 | Spatial layout persistence | 4 | 4 | 100.00% |
-| Protected control lifecycle | 5 | 5 | 100.00% |
+| Protected control lifecycle | 9 | 9 | 100.00% |
 | Technician service sequence | 0 | 8 | 0.00% |
 | Dialogue and spatial audio | 0 | 5 | 0.00% |
 | Engineering agent system | 0 | 3 | 0.00% |
 | Validation and release | 4 | 6 | 66.67% |
-| **Total** | **76** | **94** | **80.85%** |
+| **Total** | **80** | **98** | **81.63%** |
 
-- Implemented source criteria: **76 / 94**
-- Pending criteria: **18 / 94**
+- Implemented source criteria: **80 / 98**
+- Pending criteria: **18 / 98**
 - Failed source criteria: **0**
 - Any later source edit must be validated again before merge.
 
@@ -50,6 +50,14 @@ The checklist uses binary source evidence. It does not measure visual quality, u
 - AURA requests camera access only after the user activates it; the shared site controller provides a conventional arrow cursor and hand gestures.
 - Layout editing is opt-in and the project directory/category cards are movable with mouse, touch and hand pinch.
 - Browser-storage failures are handled without aborting language/settings initialization.
+
+## Phase 3 — protected component integrity
+
+- Protected component IDs are validated, trimmed and canonicalized; duplicate registry keys are rejected.
+- Lifecycle snapshots are immutable, and failed repair operations can return safely to the detached state.
+- The two-stage release now verifies that the lifecycle and Matter physics agree before allowing detachment. A mismatch restores the protected mount rather than leaving inconsistent state.
+- Repair requires both planar and depth bodies and completes only after the planar mount is restored.
+- Four additional source-evidence checks cover these integrity guarantees.
 
 ## Critical integration boundary
 
