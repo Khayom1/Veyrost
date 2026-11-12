@@ -348,8 +348,6 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
 .veyrost-detached-wires .hole-rim{filter:drop-shadow(0 3px 3px #000b)}
 .veyrost-detached-wires .wire-jacket{stroke-linejoin:round}
 .veyrost-detached-wires .wire-core{stroke:#e7b45d;stroke-linejoin:round}
-.veyrost-detached-wires .wire-core:nth-of-type(2){stroke:#63d6cf}
-.veyrost-detached-wires .wire-core:nth-of-type(3){stroke:#d66c58}
 .veyrost-detached-wires .wire-spark{opacity:.75;animation:veyrost-wire-spark .9s ease-in-out infinite alternate}
 @keyframes veyrost-wall-reveal{from{opacity:0;transform:translateY(7px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes veyrost-wire-spark{from{opacity:.18}to{opacity:.9}}
