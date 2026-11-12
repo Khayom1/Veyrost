@@ -51,8 +51,23 @@
   function authError() {
     return Object.assign(new Error("Аввал бо ҳисоби Supabase ворид шавед."), { code: "not_configured", retryable: false });
   }
+  async function ensureSession() {
+    if (!session || !session.accessToken) throw authError();
+    if (session.expiresAt > Date.now() + 60_000) return;
+    if (!session.refreshToken) { session = null; throw authError(); }
+    try {
+      const result = await authRequest({ action: "refresh", refresh_token: session.refreshToken });
+      if (!result.access_token) throw authError();
+    } catch (error) {
+      session = null;
+      publishableKey = "";
+      throw error;
+    }
+  }
+
   async function proxyRequest(payload, signal) {
-    if (!isAuthenticated() || !publishableKey) throw authError();
+    await ensureSession();
+    if (!publishableKey) throw authError();
     return fetch(PROXY_URL, {
       method: "POST",
       headers: {
