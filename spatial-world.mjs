@@ -3,6 +3,7 @@ import "./matter-engine.js";
 import { DepthPhysicsWorld } from "./spatial-depth-physics.mjs";
 import { createProtectedControlRegistry, PROTECTED_CONTROL_STATES } from "./protected-control.mjs";
 import { ServiceCrew3D } from "./service-crew.mjs";
+import { RepairInteractionSequence, REPAIR_PHASES } from "./repair-interaction.mjs";
 import {
   computeSpatialLayout,
   screenToWorld,
@@ -17,6 +18,7 @@ const COPY = {
     reset: "RESET LAYOUT",
     exit: "AURA OFF",
     repair: "REPAIR MOUNT",
+    repairing: "MAINTENANCE IN PROGRESS",
     depth: "PANEL DEPTH",
     depthHint: "Wheel or adjust to move the selected panel in depth.",
     status: "3D SPATIAL MODE ACTIVE",
@@ -35,6 +37,7 @@ const COPY = {
     reset: "СБРОСИТЬ РАСКЛАДКУ",
     exit: "ВЫКЛЮЧИТЬ AURA",
     repair: "ВОССТАНОВИТЬ КРЕПЛЕНИЕ",
+    repairing: "ИДЁТ ОБСЛУЖИВАНИЕ",
     depth: "ГЛУБИНА ПАНЕЛИ",
     depthHint: "Колесо мыши или ползунок меняют глубину выбранной панели.",
     status: "АКТИВЕН 3D-РЕЖИМ",
@@ -53,6 +56,7 @@ const COPY = {
     reset: "БАРҚАРОРИ ЧИДАШ",
     exit: "AURA-РО ХОМӮШ КУН",
     repair: "ПАЙВАСТКУНИРО БАРҚАРОР КУН",
+    repairing: "ТАЪМИР ДАВОМ ДОРАД",
     depth: "ЧУҚУРИИ ПАНЕЛ",
     depthHint: "Бо чархи муш ё лағжонак чуқурии панели интихобшударо тағйир деҳ.",
     status: "ҲОЛАТИ ФАЗОИИ 3D ФАЪОЛ АСТ",
@@ -136,6 +140,15 @@ export class SpatialWorldController {
     this.protectedControls = createProtectedControlRegistry(this.protectedIds);
     this.protectedSockets = new Map();
     this.repairButton = null;
+    this.repairSequence = new RepairInteractionSequence();
+    this.maintenanceLock = false;
+    this.repairTargetId = null;
+    this.repairVisual = null;
+    this.repairCable = null;
+    this.repairConnector = null;
+    this.repairCableMaterial = null;
+    this._repairStart = new THREE.Vector3();
+    this._repairEnd = new THREE.Vector3();
     this.depthControl = null;
     this.depthRange = null;
     this.depthValue = null;
@@ -210,6 +223,7 @@ export class SpatialWorldController {
     this._buildEnvironment();
     this._buildPanels();
     this.serviceCrew = new ServiceCrew3D(THREE, this.scene, { onState: name => this._emitStatus(name) });
+    this._buildRepairVisual();
     this._buildProtectedRepairControl();
     this._buildDepthControl();
     this._restoreLayout();
@@ -492,7 +506,7 @@ export class SpatialWorldController {
       cursor: "pointer",
       touchAction: "manipulation"
     });
-    button.addEventListener("click", () => this.repairDetachedControls());
+    button.addEventListener("click", () => this.startProtectedRepair());
     this.mount.appendChild(button);
     this.repairButton = button;
   }
@@ -901,7 +915,7 @@ export class SpatialWorldController {
   }
 
   _beginPress(x, y, source) {
-    if (!this.running || this.paused || this.activeDrag) return false;
+    if (!this.running || this.paused || this.maintenanceLock || this.activeDrag) return false;
     const overlay = this.document?.elementFromPoint?.(x, y)?.closest?.(".spatial-depth-control, .spatial-repair-control");
     if (overlay) return false;
     const id = this._raycastPanel(x, y);
@@ -1078,6 +1092,7 @@ export class SpatialWorldController {
     if (!this.paused) {
       this.physics.step(delta);
       this.serviceCrew?.update(delta);
+      this._updateRepairInteraction(delta);
       if (this.depthPhysics) {
         for (const [id, depthBody] of this.depthPhysics.bodies) {
           const planar = this.physics.get(id);
@@ -1133,7 +1148,7 @@ export class SpatialWorldController {
     setText("spatial-help", copy.help);
     setText("spatial-reset", copy.reset);
     setText("spatial-exit", copy.exit);
-    if (this.repairButton) this.repairButton.textContent = copy.repair;
+    if (this.repairButton) this.repairButton.textContent = this.maintenanceLock ? copy.repairing : copy.repair;
     if (this.depthControl) {
       const title = this.depthControl.querySelector("div > span");
       const hint = this.depthControl.querySelector("div + div + div");
