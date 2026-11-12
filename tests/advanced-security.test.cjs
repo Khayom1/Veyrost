@@ -49,7 +49,7 @@ test("provider and integration credentials are injected only from Edge Function 
 });
 test("proxy allowlists upstream hosts and restricts GitHub routes", () => {
   for (const host of ["api.deepseek.com", "api.siliconflow.com", "api.github.com", "www.googleapis.com", "s.jina.ai", "r.jina.ai"]) {
-    assert.ok(new RegExp('host===["\\\\"]' + host.replace(/\\./g,"\\\\.") + '["\\\\"]').test(proxy), "missing allowlisted host " + host);
+    assert.ok(proxy.includes('host==="' + host + '"'), "missing allowlisted host " + host);
   }
   assert.match(proxy, /function githubRoute/);
   assert.match(proxy, /actions\/secrets/);
