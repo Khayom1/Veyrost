@@ -60,16 +60,6 @@ The checklist uses binary source evidence. It does not measure visual quality, u
 - Repair requires both planar and depth bodies and completes only after the planar mount is restored.
 - Four additional source-evidence checks cover these integrity guarantees.
 
-## Phase 5 — interaction and repair
-
-- Added a guarded repair transaction with bounded stages: maintenance lock, technician tug-of-war, panel alignment, cable reconnection, verification and mount restoration.
-- The maintenance lock prevents mouse, touch and AURA input from moving the protected panel while technicians handle it.
-- Both technicians animate their arm poses during the tugging and cable-connection work.
-- A live 3D cable is drawn between the fixed mount and the detached panel; its connector travels to the panel and changes state after verification.
-- The detached panel remains under the planar and depth physics lifecycle; the sequence secures it, simulates bounded tug forces, and restores both physics bodies and the protected-control state only after verification.
-- Multiple detached protected controls are repaired sequentially. The service crew folds the ladder and departs after the final mount is restored.
-- Pause freezes the sequence; layout reset cancels it; scene disposal releases its visual resources.
-
 ## Phase 4 — service crew 3D
 
 - Added a procedural 3D service vehicle with cab, windows, wheels and an amber warning beacon.
@@ -80,6 +70,16 @@ The checklist uses binary source evidence. It does not measure visual quality, u
 - Crew animation updates only while the spatial simulation is active and is cleaned up with the scene.
 
 The models are procedural low-poly geometry, not scanned or photorealistic rigged characters. Tug-of-war, maintenance lock, cable reconnection and post-repair UI restoration remain pending for later work.
+
+## Phase 5 — interaction and repair
+
+- Added a guarded repair transaction with bounded stages: maintenance lock, technician tug-of-war, panel alignment, cable reconnection, verification and mount restoration.
+- The maintenance lock prevents mouse, touch and AURA input from moving the protected panel while technicians handle it.
+- Both technicians animate their arm poses during the tugging and cable-connection work.
+- A live 3D cable is drawn between the fixed mount and the detached panel; its connector travels to the panel and changes state after verification.
+- The detached panel remains under the planar and depth physics lifecycle; the sequence secures it, simulates bounded tug forces, and restores both physics bodies and the protected-control state only after verification.
+- Multiple detached protected controls are repaired sequentially. The service crew folds the ladder and departs after the final mount is restored.
+- Pause freezes the sequence; layout reset cancels it; scene disposal releases its visual resources.
 
 ## Critical integration boundary
 
