@@ -99,12 +99,12 @@ const checks = [
   ["CREW-07","Technician service sequence","Hand-animated cable reconnection and repair",null,null],
   ["CREW-08","Technician service sequence","Ladder folding, vehicle exit and UI restoration",null,null],
 
-  ["INT-01","Interaction and repair","Physical tug-of-war animation with a held protected panel","spatial-world.mjs",/REPAIR_PHASES\\.TUG_OF_WAR[\\s\\S]*offsetX = pull \\* 24/],
-  ["INT-02","Interaction and repair","Technician maintenance lock blocks user manipulation","spatial-world.mjs",/_beginPress\\(x, y, source\\)[\\s\\S]*this\\.maintenanceLock/],
-  ["INT-03","Interaction and repair","Dynamic cable geometry joins fixed mount and moving panel","spatial-world.mjs",/new THREE\\.Line\\([\\s\\S]*repairCable\\.geometry\\.attributes\\.position[\\s\\S]*attribute\\.setXYZ/],
-  ["INT-04","Interaction and repair","Two technicians animate arm poses during tugging and cable connection","spatial-world.mjs",/leadTechnician\\.userData\\.limbs[\\s\\S]*supportTechnician\\.userData\\.limbs[\\s\\S]*lead\\.leftArm\\.rotation\\.z/],
-  ["INT-05","Interaction and repair","Verified repair restores planar and depth mounts before crew departure","spatial-world.mjs",/snapshot\\.phase === REPAIR_PHASES\\.COMPLETE[\\s\\S]*repairDetachedControls\\(id\\)[\\s\\S]*this\\.serviceCrew\\?\\.depart\\(\\)/],
-  ["INT-06","Interaction and repair","Repair sequence is bounded, pausable, resettable and disposed safely","spatial-world.mjs",/this\\.repairSequence\\?\\.reset\\(\\)[\\s\\S]*this\\.maintenanceLock = false[\\s\\S]*this\\.repairVisual\\?\\.removeFromParent\\(\\)/],
+  ["INT-01","Interaction and repair","Physical tug-of-war animation with a held protected panel","spatial-world.mjs",/REPAIR_PHASES\.TUG_OF_WAR[\s\S]*offsetX = pull \* 24/],
+  ["INT-02","Interaction and repair","Technician maintenance lock blocks user manipulation","spatial-world.mjs",/_beginPress\(x, y, source\)[\s\S]*this\.maintenanceLock/],
+  ["INT-03","Interaction and repair","Dynamic cable geometry joins fixed mount and moving panel","spatial-world.mjs",/new THREE\.Line\([\s\S]*repairCable\.geometry\.attributes\.position[\s\S]*attribute\.setXYZ/],
+  ["INT-04","Interaction and repair","Two technicians animate arm poses during tugging and cable connection","spatial-world.mjs",/leadTechnician\.userData\.limbs[\s\S]*supportTechnician\.userData\.limbs[\s\S]*lead\.leftArm\.rotation\.z/],
+  ["INT-05","Interaction and repair","Verified repair restores planar and depth mounts before crew departure","spatial-world.mjs",/snapshot\.phase === REPAIR_PHASES\.COMPLETE[\s\S]*repairDetachedControls\(id\)[\s\S]*this\.serviceCrew\?\.depart\(\)/],
+  ["INT-06","Interaction and repair","Repair sequence is bounded, pausable, resettable and disposed safely","spatial-world.mjs",/this\.repairSequence\?\.reset\(\)[\s\S]*this\.maintenanceLock = false[\s\S]*this\.repairVisual\?\.removeFromParent\(\)/],
 
   ["AUD-01","Dialogue and spatial audio","Localized character voice lines (EN/RU/TJ)",null,null],
   ["AUD-02","Dialogue and spatial audio","Emotion and dialogue state machine",null,null],
