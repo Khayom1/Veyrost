@@ -276,7 +276,7 @@ menuRepairButton.addEventListener("click",async()=>{
   const targetX=rect.left-deltaX,targetY=rect.top-deltaY;
   const overlay=document.createElement("div");overlay.className="veyrost-repair-layer";overlay.setAttribute("aria-hidden","true");
   const vehicle=document.createElement("div");vehicle.className="veyrost-tech-vehicle";
-  vehicle.innerHTML='<svg viewBox="0 0 220 100" aria-hidden="true"><path d="M16 58h126l24-29h26l15 29h7v20H16z" fill="#17263a" stroke="#7de6ed" stroke-width="2"/><path d="M145 57l22-24h22l12 24z" fill="#233d54" stroke="#9defff" stroke-width="2"/><path d="M20 64h186" stroke="#a9b8d2" stroke-width="3"/><rect x="28" y="38" width="76" height="22" rx="5" fill="#26354c" stroke="#9b91ff" stroke-width="2"/><path d="M39 49h53M39 55h33" stroke="#8de8ed" stroke-width="2"/><circle cx="52" cy="80" r="13" fill="#080d17" stroke="#9da9c1" stroke-width="4"/><circle cx="52" cy="80" r="4" fill="#70e7df"/><circle cx="176" cy="80" r="13" fill="#080d17" stroke="#9da9c1" stroke-width="4"/><circle cx="176" cy="80" r="4" fill="#70e7df"/><path d="M4 65h12M207 65h10" stroke="#6fe6d0" stroke-width="4" stroke-linecap="round"/></svg><span>VEYROST SERVICE UNIT</span>';
+  vehicle.innerHTML='<svg viewBox="0 0 220 100" aria-hidden="true"><path d="M16 58h126l24-29h26l15 29h7v20H16z" fill="#17263a" stroke="#7de6ed" stroke-width="2"/><path d="M145 57l22-24h22l12 24z" fill="#233d54" stroke="#9defff" stroke-width="2"/><path d="M20 64h186" stroke="#a9b8d2" stroke-width="3"/><rect x="28" y="38" width="76" height="22" rx="5" fill="#26354c" stroke="#9b91ff" stroke-width="2"/><path d="M39 49h53M39 55h33" stroke="#8de8ed" stroke-width="2"/><circle cx="52" cy="80" r="13" fill="#080d17" stroke="#9da9c1" stroke-width="4"/><circle cx="52" cy="80" r="4" fill="#70e7df"/><circle cx="176" cy="80" r="13" fill="#080d17" stroke="#9da9c1" stroke-width="4"/><circle cx="176" cy="80" r="4" fill="#70e7df"/><path d="M4 65h12M207 65h10" stroke="#6fe6d0" stroke-width="4" stroke-linecap="round"/><g class="vehicle-door vehicle-door-a"><path d="M42 39h39l-2 35H42z" fill="#21384a" stroke="#8de8ed" stroke-width="1.5"/><path d="M46 43h30v12H46z" fill="#102333" stroke="#6faec2" stroke-width="1"/><path d="M76 59v11" stroke="#a9fff1" stroke-width="1.8" stroke-linecap="round"/><circle cx="76" cy="59" r="1.7" fill="#a9fff1"/></g><g class="vehicle-door vehicle-door-b"><path d="M122 39h39v35h-37z" fill="#21384a" stroke="#8de8ed" stroke-width="1.5"/><path d="M127 43h29v12h-29z" fill="#102333" stroke="#6faec2" stroke-width="1"/><path d="M127 59v11" stroke="#a9fff1" stroke-width="1.8" stroke-linecap="round"/><circle cx="127" cy="59" r="1.7" fill="#a9fff1"/></g></svg><span>VEYROST SERVICE UNIT</span>';
   const makeTechnician=(number,accent)=>{
     const el=document.createElement("div");el.className="veyrost-tech-person";
     el.innerHTML=`<svg viewBox="0 0 100 116" aria-hidden="true">
@@ -299,6 +299,7 @@ menuRepairButton.addEventListener("click",async()=>{
 <g class="robot-arm robot-arm-right"><path d="M67 44L77 53" stroke="url(#robot-metal-${number})" stroke-width="7" stroke-linecap="round"/><circle cx="77" cy="53" r="4.2" fill="#263746" stroke="${accent}" stroke-width="1.6"/><path d="M77 53L81 67" stroke="url(#robot-metal-${number})" stroke-width="6" stroke-linecap="round"/><circle cx="81" cy="67" r="3.2" fill="#172532" stroke="#dce7ef" stroke-width="1.2"/><g class="robot-hand robot-hand-right"><path d="M81 67l2 8 5 3m-7-3-3 5m8-2-5 1" fill="none" stroke="#e0e9ef" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="81" cy="67" r="2.2" fill="${accent}"/></g><g class="robot-welder"><path d="M82 76l4 5-2 7" fill="none" stroke="#dce7ef" stroke-width="2.2" stroke-linecap="round"/><path d="M82 86l5 2-2 4-5-2z" fill="#263746" stroke="${accent}" stroke-width="1.2"/><path class="welder-beam" d="M85 92l4 5m-4-3 6 1m-6 1 1 6" stroke="${accent}" stroke-width="1.5" stroke-linecap="round"/></g></g>
 <path d="M42 88l-4 13 5 4 7-13 7 13 5-4-4-13" fill="none" stroke="url(#robot-metal-${number})" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M37 105h10m6 0h10" stroke="${accent}" stroke-width="2.5" stroke-linecap="round"/><circle cx="50" cy="75" r="2" fill="${accent}"/>
 </svg><span>UNIT ${number}</span>`;
+    el.insertAdjacentHTML("afterbegin", '<i class="robot-ground-shadow" aria-hidden="true"></i>');
     return el;
   };
   const techA=makeTechnician("01","#6FE6D0"),techB=makeTechnician("02","#A98CFF");
@@ -333,14 +334,19 @@ menuRepairButton.addEventListener("click",async()=>{
     vehicle.style.left=vehicleX+"px";
     await wait(1580);
     vehicle.classList.add("is-parked");
-    // Technicians emerge from the vehicle's near-side service door, never from a screen corner.
+    // Open both side doors before the robots step down from the cabin.
+    await wait(180);
+    vehicle.classList.add("is-door-open");
+    await wait(440);
     techA.style.opacity="1";techB.style.opacity="1";
-    await wait(220);
+    await wait(160);
     // Step out from the vehicle's near-side door before walking to the detached control.
     techA.classList.add("is-walking");techB.classList.add("is-walking");
     move(techA,doorAX-8,robotExitY);
     move(techB,doorBX-8,robotExitY);
     await wait(620);
+    vehicle.classList.remove("is-door-open");
+    await wait(180);
     move(techA,robotAX,robotAY);move(techB,robotBX,robotBY);
     await wait(780);
     techA.classList.remove("is-walking");techB.classList.remove("is-walking");
@@ -420,11 +426,14 @@ menuRepairButton.addEventListener("click",async()=>{
     // Return to the exact cabin anchors. The robots move fully inside the vehicle body.
     move(techA,doorAX,robotStartY);move(techB,doorBX,robotStartY);
     await wait(720);
-    // Only after reaching the cabin do they board and disappear inside.
+    // Reopen both doors, fold the robots into the cabin, then close and depart.
+    vehicle.classList.add("is-door-open");
+    await wait(380);
     techA.classList.add("is-boarding");techB.classList.add("is-boarding");
     await wait(460);
     techA.style.opacity="0";techB.style.opacity="0";
-    await wait(520);
+    vehicle.classList.remove("is-door-open");
+    await wait(480);
     vehicle.classList.add("is-driving-away");vehicle.style.left=startVehicleX+"px";
     await wait(1250);
     toast((translations[language]||translations.en).menuRestored);
