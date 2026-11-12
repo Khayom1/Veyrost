@@ -216,9 +216,30 @@ function menuIsDetached(){
   const y=Number.parseFloat(parts[1])||0;
   return Math.abs(x)>2||Math.abs(y)>2;
 }
+let detachedMenuWires=null;
+function syncDetachedMenuWires(detached){
+  if(!menu)return;
+  if(!detached){
+    detachedMenuWires?.remove();detachedMenuWires=null;return;
+  }
+  const raw=(menu.style.translate||"0px 0px").trim().split(/\\s+/);
+  const dx=Number.parseFloat(raw[0])||0,dy=Number.parseFloat(raw[1])||0;
+  const rect=menu.getBoundingClientRect();
+  const x=rect.left-dx,y=rect.top-dy;
+  if(!detachedMenuWires){
+    detachedMenuWires=document.createElement("div");
+    detachedMenuWires.className="veyrost-detached-wires";
+    detachedMenuWires.setAttribute("aria-hidden","true");
+    detachedMenuWires.innerHTML='<svg viewBox="0 0 92 74" focusable="false"><path class="wire-sleeve" d="M9 13h25v48H9z"/><path class="wire-core" d="M34 23h20l7-6 7 7-7 7H47l-5 5H34M34 38h13l8-6 7 7-8 7H45l-4 5h-7M34 53h18l7-5 7 7-7 7H47l-5 4h-8"/><path class="wire-spark" d="M69 10l-4 7 7-1-4 8M77 37l-5 5 7 1-5 5"/></svg>';
+    document.body.append(detachedMenuWires);
+  }
+  detachedMenuWires.style.left=(x-38)+"px";
+  detachedMenuWires.style.top=(y-20)+"px";
+}
 function updateMenuRepairNotice(){
   if(!menu)return;
   const detached=menuIsDetached();
+  syncDetachedMenuWires(detached);
   menu.dataset.detached=String(detached);
   menuRepairNotice.hidden=!detached;
   menu.setAttribute("aria-disabled",String(detached));
