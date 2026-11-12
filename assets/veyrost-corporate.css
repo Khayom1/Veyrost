@@ -349,19 +349,19 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
 
 
 /* Subtle cable life: short, flexible leads with restrained independent movement. */
-.veyrost-detached-wires svg path:nth-of-type(5),
-.veyrost-detached-wires svg path:nth-of-type(6),
+.veyrost-detached-wires svg path:nth-of-type(7),
+.veyrost-detached-wires svg path:nth-of-type(8),
 .veyrost-detached-wires svg path:nth-of-type(7){
   transform-box:fill-box;transform-origin:center;
 }
-.veyrost-detached-wires svg path:nth-of-type(5){animation:veyrost-cable-upper 2.8s ease-in-out infinite alternate}
-.veyrost-detached-wires svg path:nth-of-type(6){animation:veyrost-cable-lower 3.2s ease-in-out infinite alternate}
-.veyrost-detached-wires svg path:nth-of-type(7){animation:veyrost-cable-side 2.5s ease-in-out infinite alternate}
+.veyrost-detached-wires svg path:nth-of-type(7){animation:veyrost-cable-upper 2.8s ease-in-out infinite alternate}
+.veyrost-detached-wires svg path:nth-of-type(8){animation:veyrost-cable-lower 3.2s ease-in-out infinite alternate}
+.veyrost-detached-wires svg path:nth-of-type(9){animation:veyrost-cable-side 2.5s ease-in-out infinite alternate}
 @keyframes veyrost-cable-upper{from{translate:0 0}to{translate:-1.2px -1px}}
 @keyframes veyrost-cable-lower{from{translate:0 0}to{translate:1px 1.4px}}
 @keyframes veyrost-cable-side{from{translate:0 0}to{translate:1.5px -.6px}}
 @media(prefers-reduced-motion:reduce){
- .veyrost-detached-wires svg path:nth-of-type(5),
- .veyrost-detached-wires svg path:nth-of-type(6),
+ .veyrost-detached-wires svg path:nth-of-type(7),
+ .veyrost-detached-wires svg path:nth-of-type(8),
  .veyrost-detached-wires svg path:nth-of-type(7){animation:none!important}
 }
