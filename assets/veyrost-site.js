@@ -207,15 +207,8 @@ menuRepairButton.type="button";
 menuRepairButton.className="menu-repair-button";
 menuRepairNotice.append(menuRepairText,menuRepairButton);
 document.body.append(menuRepairNotice);
-function menuIsDetached(){
-  if(!menu)return false;
-  const raw=(menu.style.translate||"").trim();
-  if(!raw||raw==="none")return false;
-  const parts=raw.split(/\s+/);
-  const x=Number.parseFloat(parts[0])||0;
-  const y=Number.parseFloat(parts[1])||0;
-  return Math.abs(x)>2||Math.abs(y)>2;
-}
+let detachedMenuState=false;
+function menuIsDetached(){return Boolean(menu&&detachedMenuState);}
 let detachedMenuWires=null;
 let menuHomePosition=null;
 function captureMenuHomePosition(){
@@ -402,7 +395,7 @@ function moveDrag(x,y,source){
   }else drag.el.style.translate=(drag.baseX+dx)+"px "+(drag.baseY+dy)+"px";
   // Reveal the wall opening on the very first movement that detaches MENU,
   // instead of waiting for pointerup after the drag ends.
-  if(drag.el===menu)updateMenuRepairNotice();
+  if(drag.el===menu&&drag.moved){detachedMenuState=true;updateMenuRepairNotice();}
 }
 function finishDrag(){
   if(!drag)return;
@@ -410,7 +403,14 @@ function finishDrag(){
   if(drag.body&&physicsWorld)physicsWorld.endDrag(drag.vx,drag.vy);
   drag=null;
   if(moved)savePositions();
-  if(movedElement===menu&&moved){menu.setAttribute("aria-expanded","false");mobile?.classList.remove("open");}
+  if(movedElement===menu&&moved){
+    const parts=(menu.style.translate||"0px 0px").trim().split(/\s+/);
+    const dx=Number.parseFloat(parts[0])||0,dy=Number.parseFloat(parts[1])||0;
+    // Reconnect only on release, with a deliberate 18px magnetic tolerance.
+    if(Math.hypot(dx,dy)<=18){menu.style.translate="0px 0px";detachedMenuState=false;}
+    else detachedMenuState=true;
+    menu.setAttribute("aria-expanded","false");mobile?.classList.remove("open");
+  }
   updateMenuRepairNotice();
 }
 function setEditMode(value){
