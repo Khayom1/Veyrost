@@ -1054,8 +1054,10 @@ export class SpatialWorldController {
         panel.group.rotation.z = Math.sin(elapsed * 0.42 + index * 1.1) * 0.012;
         const depthBody = this.depthPhysics?.get(id);
         if (depthBody) panel.group.position.z = depthBody.z + Math.sin(elapsed * 0.8 + index) * 0.035;
-        panel.group.rotation.x += Math.sin(elapsed * 0.31 + index) * 0.00008;
-        panel.group.rotation.y += Math.cos(elapsed * 0.27 + index * 0.7) * 0.00007;
+        // Assign bounded procedural offsets; incremental rotation accumulates
+        // forever and eventually destroys the intended panel orientation.
+        panel.group.rotation.x = Math.sin(elapsed * 0.31 + index) * 0.00008;
+        panel.group.rotation.y = Math.cos(elapsed * 0.27 + index * 0.7) * 0.00007;
       }
       if (this.selectedId || this.hoveredId) this._refreshDepthControl();
 
