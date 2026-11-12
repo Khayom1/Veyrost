@@ -540,3 +540,25 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
   .veyrost-repair-layer .veyrost-tech-person.is-walking .robot-arm-right,
   .veyrost-repair-layer .veyrost-tech-person.is-walking .robot-ground-shadow{animation:none!important}
 }
+
+
+/* Alternating articulated legs complete the robot's walking cycle. */
+.veyrost-repair-layer .veyrost-tech-person.is-walking .robot-leg{
+  transform-box:view-box!important;
+  transform-origin:50% 88px!important;
+}
+.veyrost-repair-layer .veyrost-tech-person.is-walking .robot-leg-left{
+  transform-origin:44px 88px!important;
+  animation:veyrost-robot-step .32s ease-in-out infinite alternate!important;
+}
+.veyrost-repair-layer .veyrost-tech-person.is-walking .robot-leg-right{
+  transform-origin:56px 88px!important;
+  animation:veyrost-robot-step .32s ease-in-out infinite alternate-reverse!important;
+}
+@keyframes veyrost-robot-step{
+  from{transform:rotate(-23deg) translateY(0)}
+  to{transform:rotate(23deg) translateY(-1px)}
+}
+@media(prefers-reduced-motion:reduce){
+  .veyrost-repair-layer .veyrost-tech-person.is-walking .robot-leg{animation:none!important}
+}
