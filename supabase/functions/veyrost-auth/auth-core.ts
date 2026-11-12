@@ -8,7 +8,7 @@ function publicKey(env:Env):string{
 }
 function cors(origin:string|null,env:Env):Record<string,string>{
   const list=(env.get("VEYROST_ALLOWED_ORIGINS")||"").split(",").map(x=>x.trim()).filter(Boolean);
-  return {"access-control-allow-origin":!origin?"*":(!list.length?"*":(list.includes(origin)?origin:"null")),"access-control-allow-headers":"content-type","access-control-allow-methods":"POST, OPTIONS","access-control-max-age":"600","vary":"Origin"};
+  return {"access-control-allow-origin":!origin?"*":(!list.length?"*":(list.includes(origin)?origin:"null")),"access-control-allow-headers":"apikey, content-type","access-control-allow-methods":"POST, OPTIONS","access-control-max-age":"600","vary":"Origin"};
 }
 export function createAuthHandler(options:Options){
   const fetchImpl=options.fetchImpl||fetch,now=options.now||Date.now,buckets=new Map<string,{start:number,count:number}>();
@@ -29,6 +29,7 @@ export function createAuthHandler(options:Options){
     if(!["refresh","sign_out"].includes(String(action))&&password.length<8)return json({error:"invalid_password"},400,ch);
     const base=(options.env.get("SUPABASE_URL")||"").replace(/\/+$/,""),key=publicKey(options.env);
     if(!base||!key)return json({error:"auth_service_not_configured"},503,ch);
+    if(req.headers.get("apikey")!==key)return json({error:"invalid_publishable_key"},401,ch);
     let endpoint="",body:Record<string,unknown>={};
     if(action==="sign_up"){endpoint="/auth/v1/signup";body={email,password};}
     if(action==="sign_in"){endpoint="/auth/v1/token?grant_type=password";body={email,password};}
