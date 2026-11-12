@@ -400,6 +400,9 @@ function moveDrag(x,y,source){
     drag.vx=(x-drag.lastX)/dt;drag.vy=(y-drag.lastY)/dt;
     drag.lastX=x;drag.lastY=y;drag.lastTime=now;physicsWorld.dragTo(x+window.scrollX,y+window.scrollY);
   }else drag.el.style.translate=(drag.baseX+dx)+"px "+(drag.baseY+dy)+"px";
+  // Reveal the wall opening on the very first movement that detaches MENU,
+  // instead of waiting for pointerup after the drag ends.
+  if(drag.el===menu)updateMenuRepairNotice();
 }
 function finishDrag(){
   if(!drag)return;
