@@ -38,7 +38,7 @@ function translateDocument(){
   let node;
   while((node=walker.nextNode())){
     const parent=node.parentElement;
-    if(!parent||/^(SCRIPT|STYLE|NOSCRIPT|CODE|PRE|TEXTAREA|INPUT|OPTION)$/.test(parent.tagName))continue;
+    if(!parent||/^(SCRIPT|STYLE|NOSCRIPT|CODE|PRE|TEXTAREA|INPUT)$/.test(parent.tagName))continue;
     if(!originalText.has(node))originalText.set(node,node.nodeValue);
     const source=originalText.get(node);
     const trimmed=source.trim();
