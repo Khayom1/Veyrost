@@ -86,7 +86,7 @@ const checks = [
   ["PRO-05","Protected control lifecycle","Repair action is localized in EN/RU/TJ","spatial-world.mjs",/repair: "REPAIR MOUNT"[\s\S]*repair: "ВОССТАНОВИТЬ КРЕПЛЕНИЕ"[\s\S]*repair: "ПАЙВАСТКУНИРО БАРҚАРОР КУН"/],
   ["PRO-06","Protected control lifecycle","Protected component IDs are non-empty and canonicalized","protected-control.mjs",/normalizeControlId[\s\S]*Protected control ID must be non-empty/],
   ["PRO-07","Protected control lifecycle","Lifecycle snapshots are immutable","protected-control.mjs",/Object\.freeze\(\{[\s\S]*id: this\.id[\s\S]*revision: this\.revision/],
-  ["PRO-08","Protected control lifecycle","Protected detachment synchronizes state machine and Matter physics","spatial-world.mjs",/const synchronized = result\.reason[\s\S]*this\.physics\.tryDetach\(id\)/],
+  ["PRO-08","Protected control lifecycle","Protected detachment synchronizes state machine and Matter physics","spatial-world.mjs",/const release = isValidAttempt[\s\S]*this\.physics\.tryDetach\(id\)[\s\S]*const synchronized = result\.reason/],
   ["PRO-09","Protected control lifecycle","Failed repairs roll back to detached state","protected-control.mjs",/cancelRepair\(\)[\s\S]*PROTECTED_CONTROL_STATES\.REPAIRING[\s\S]*PROTECTED_CONTROL_STATES\.DETACHED/],
 
 
