@@ -320,3 +320,18 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
   .veyrost-repair-layer .veyrost-tech-person{width:58px!important;min-width:58px!important}
   .veyrost-repair-layer .veyrost-tech-person svg{width:58px!important;height:68px!important}
 }
+
+/* Repair crew v3: explicit viewport anchors and cabin boarding; no legacy robot selectors. */
+.veyrost-repair-layer .veyrost-tech-person{
+ position:fixed!important;display:flex!important;flex-direction:column!important;align-items:center!important;
+ right:auto!important;bottom:auto!important;margin:0!important;transform:none!important;translate:none!important;
+ opacity:0;z-index:2147483647!important;pointer-events:none!important;
+ transition:left 650ms cubic-bezier(.2,.75,.25,1),top 650ms cubic-bezier(.2,.75,.25,1),opacity 260ms ease!important;
+}
+.veyrost-repair-layer .veyrost-tech-person svg{display:block!important;width:82px!important;height:96px!important;max-width:none!important}
+.veyrost-repair-layer .veyrost-tech-person.is-boarding{opacity:0!important;transform:scale(.3)!important;transform-origin:center center!important;transition:opacity 460ms ease,transform 460ms ease!important}
+.veyrost-repair-layer .veyrost-tech-vehicle{position:fixed!important;display:flex!important;left:0;top:0;width:220px;height:100px;z-index:2147483646!important;transition:left 1580ms cubic-bezier(.2,.75,.2,1)!important}
+@media(max-width:760px){
+ .veyrost-repair-layer .veyrost-tech-person{width:58px!important;min-width:58px!important}
+ .veyrost-repair-layer .veyrost-tech-person svg{width:58px!important;height:68px!important}
+}
