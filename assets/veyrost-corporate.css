@@ -336,17 +336,22 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
  .veyrost-repair-layer .veyrost-tech-person svg{width:58px!important;height:68px!important}
 }
 
-/* Exposed severed wiring left behind when the physical Menu switch is detached. */
+/* Wall-mounted junction damage: the plaster and cable roots stay at MENU's original anchor. */
 .veyrost-detached-wires{
- position:fixed;width:92px;height:74px;z-index:10040;pointer-events:none;
- opacity:1;filter:drop-shadow(0 2px 5px #000b);
- animation:veyrost-wire-reveal .32s ease-out both;
+ position:fixed;width:160px;height:112px;z-index:10040;pointer-events:none;
+ opacity:1;filter:drop-shadow(0 7px 9px rgba(0,0,0,.48));
+ animation:veyrost-wall-reveal .42s cubic-bezier(.18,.72,.24,1) both;
 }
 .veyrost-detached-wires svg{display:block;width:100%;height:100%;overflow:visible}
-.veyrost-detached-wires .wire-sleeve{fill:#172638;stroke:#8295ad;stroke-width:2}
-.veyrost-detached-wires .wire-core{fill:none;stroke:#e8b75f;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
-.veyrost-detached-wires .wire-core:nth-child(2){stroke:#69d9d1}
-.veyrost-detached-wires .wire-spark{fill:none;stroke:#b9f7ff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.8;animation:veyrost-wire-spark .9s ease-in-out infinite alternate}
-@keyframes veyrost-wire-reveal{from{opacity:0;transform:translateY(5px) scale(.88)}to{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes veyrost-wire-spark{from{opacity:.25}to{opacity:1}}
+.veyrost-detached-wires .wall-surface{stroke:#d0c2a7;stroke-opacity:.5;stroke-width:2}
+.veyrost-detached-wires .wall-grain,.veyrost-detached-wires .wall-crack{pointer-events:none}
+.veyrost-detached-wires .hole-rim{filter:drop-shadow(0 3px 3px #000b)}
+.veyrost-detached-wires .wire-jacket{stroke-linejoin:round}
+.veyrost-detached-wires .wire-core{stroke:#e7b45d;stroke-linejoin:round}
+.veyrost-detached-wires .wire-core:nth-of-type(2){stroke:#63d6cf}
+.veyrost-detached-wires .wire-core:nth-of-type(3){stroke:#d66c58}
+.veyrost-detached-wires .wire-spark{opacity:.75;animation:veyrost-wire-spark .9s ease-in-out infinite alternate}
+@keyframes veyrost-wall-reveal{from{opacity:0;transform:translateY(7px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes veyrost-wire-spark{from{opacity:.18}to{opacity:.9}}
+@media(max-width:480px){.veyrost-detached-wires{width:142px;height:100px}}
 @media(prefers-reduced-motion:reduce){.veyrost-detached-wires,.veyrost-detached-wires .wire-spark{animation:none}}
