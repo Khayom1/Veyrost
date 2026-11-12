@@ -294,7 +294,7 @@ display:flex;justify-content:space-between;align-items:center;color:#eee}
 <h3 style="margin-top:18px;font-size:14px">Supabase account · Backend access</h3>
 <div class="hint">Воридшавӣ ба proxy-и серверӣ. API key-ҳои провайдерҳо дар Supabase Edge Function Secrets нигоҳ дошта мешаванд.</div>
 <label>Email</label><input id="sAuthEmail" type="email" autocomplete="username" placeholder="you@example.com">
-<label>Password</label><input id="sAuthPassword" type="password" autocomplete="current-password" placeholder="Ҳадди ақал 8 аломат">
+<label>Password</label><input id="sAuthPassword" type="(?:key|authorization|api[_-]?key|apikey|access[_-]?token|accesstoken|refresh[_-]?token|refreshtoken|password|passwd|secret|token|ghToken|githubToken|deepKey|siliconKey|gKey|googleApiKey)" autocomplete="current-password" placeholder="Ҳадди ақал 8 аломат">
 <div class="row"><button id="sAuthSignIn" type="button">Ворид шудан</button><button id="sAuthSignUp" type="button">Сохтани ҳисоб</button><button id="sAuthSignOut" type="button">Баромадан</button></div>
 <div class="hint" id="sAuthStatus" role="status">Ҳолат: ворид нашудаед.</div>
 <label>System Prompt</label>
@@ -6470,10 +6470,8 @@ const VX = (() => {
   const SecurityCenter = {
     secretInventory() {
       return [
-        {id:"deepseek",present:window.VeyrostBackend.isAuthenticated(),source:"Supabase Edge Function secret store",redacted:true},
-{id:"siliconflow",present:window.VeyrostBackend.isAuthenticated(),source:"Supabase Edge Function secret store",redacted:true},
-{id:"github",present:window.VeyrostBackend.isAuthenticated(),source:"Supabase Edge Function secret store",redacted:true},
-{id:"google",present:window.VeyrostBackend.isAuthenticated(),source:"Supabase Edge Function secret store",redacted:true}
+        {id:"supabase-proxy-session",present:window.VeyrostBackend.isAuthenticated(),source:"JWT exists in page memory only",redacted:true},
+        {id:"provider-secrets",present:null,source:"Supabase Edge Function Secrets; never readable by browser",redacted:true}
       ];
     },
     policy() {
@@ -6788,7 +6786,7 @@ const VXUI = (() => {
     const root=el("advSecurity"); if(!root)return;
     const inv=VX.SecurityCenter.secretInventory();
     const policy=VX.SecurityCenter.policy();
-    root.innerHTML=`<div class="advGrid"><div class="advCard"><h4>Secret inventory</h4><div class="advList">${inv.map(x=>`<div class="advListRow"><div class="grow"><div class="title">${esc(x.id)}</div><div class="sub">${esc(x.source)}</div></div>${pill(x.present?"PRESENT":"NOT SET",x.present?"ok":"warn")}</div>`).join("")}</div></div><div class="advCard"><h4>Security controls</h4><div class="advList">${Object.entries(policy).map(([k,v])=>`<div class="advListRow"><div class="grow"><div class="title">${esc(k)}</div></div>${pill(v?"ENABLED":"OFF",v?"ok":"err")}</div>`).join("")}</div></div></div><div style="height:10px"></div><div class="advCard"><h4>Important</h4><p>Browser-side API keys are inherently inspectable by the user and by page/network tooling. This workspace redacts secrets from model prompts, logs and rendered tool results, but it cannot turn a browser credential into a server-side secret.</p></div>`;
+    root.innerHTML=`<div class="advGrid"><div class="advCard"><h4>Secret inventory</h4><div class="advList">${inv.map(x=>`<div class="advListRow"><div class="grow"><div class="title">${esc(x.id)}</div><div class="sub">${esc(x.source)}</div></div>${pill(x.present===null?"SERVER-ONLY":x.present?"PRESENT":"NOT SET",x.present===null?"":x.present?"ok":"warn")}</div>`).join("")}</div></div><div class="advCard"><h4>Security controls</h4><div class="advList">${Object.entries(policy).map(([k,v])=>`<div class="advListRow"><div class="grow"><div class="title">${esc(k)}</div></div>${pill(v?"ENABLED":"OFF",v?"ok":"err")}</div>`).join("")}</div></div></div><div style="height:10px"></div><div class="advCard"><h4>Important</h4><p>Provider API keys and GitHub tokens are held by Supabase Edge Function Secrets. The browser receives only a user JWT in page memory and a public Supabase publishable key for authenticated proxy requests.</p></div>`;
   }
 
   function renderDiagnostics(){
@@ -9675,7 +9673,7 @@ const VXCapabilityReport = {
   build(){
     return {
       workspace:VX.VERSION,
-      aiProviders:VX.Providers.all().map(p=>({id:p.id,name:p.name,models:p.models,capabilities:p.capabilities,configured:!!p.apiKey})),
+      aiProviders:VX.Providers.all().map(p=>({id:p.id,name:p.name,models:p.models,capabilities:p.capabilities,serverManaged:!!p.builtin,proxySession:window.VeyrostBackend.isAuthenticated()})),
       agents:VX.Agents.all().map(a=>({id:a.id,name:a.name,provider:a.providerId,model:a.model,role:a.role,permissions:a.permissions})),
       fileKnowledge:VXKnowledge.stats(),
       tools:VX.Tools.all().map(t=>({id:t.id,name:t.name,permissions:t.permissions,destructive:t.destructive,enabled:t.enabled})),
