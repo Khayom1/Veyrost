@@ -1,0 +1,7 @@
+project_id = "bgfcpnlxztziigrsyuqp"
+
+[functions.veyrost-auth]
+verify_jwt = false
+
+[functions.veyrost-proxy]
+verify_jwt = true
