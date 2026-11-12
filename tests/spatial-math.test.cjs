@@ -64,6 +64,17 @@ test("saved spatial layouts reject invalid records and unknown panel IDs", async
   assert.equal(validateSavedLayout({ version: 2, panels: [{ id: "home", x: 0, y: 0 }] }), null);
 });
 
+test("saved spatial layouts reject normalized coordinates outside the viewport", async () => {
+  const { validateSavedLayout } = await apiPromise;
+  assert.deepEqual(validateSavedLayout({ version: 1, panels: [
+    { id: "home", x: -0.01, y: 0.5 },
+    { id: "projects", x: 1.01, y: 0.5 },
+    { id: "ai-systems", x: 0.5, y: -0.01 },
+    { id: "matter", x: 0.5, y: 1.01 },
+    { id: "founder", x: 0.5, y: 0.5 }
+  ] }), [{ id: "founder", x: 0.5, y: 0.5 }]);
+});
+
 test("responsive layout scaling preserves normalized panel positions", async () => {
   const { scalePanelLayout } = await apiPromise;
   const scaled = scalePanelLayout([{ id: "home", x: 100, y: 200, width: 120, height: 50 }], 400, 800, 800, 400);
