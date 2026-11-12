@@ -136,3 +136,31 @@ html.veyrost-menu-detached.veyrost-layout-editing #menu-toggle[data-veyrost-layo
 html.veyrost-menu-detached.veyrost-layout-editing #menu-toggle[data-veyrost-layout-item]:active {
   cursor: grabbing !important;
 }
+
+
+/* VEYROST repair robot: walks to the detached Menu and escorts it home. */
+.veyrost-repair-robot{
+  position:fixed;left:0;top:0;width:72px;z-index:2147483000;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  pointer-events:none;will-change:transform;
+  transition:transform 720ms cubic-bezier(.2,.75,.25,1),opacity 260ms ease;
+  filter:drop-shadow(0 8px 18px rgba(0,0,0,.55));
+}
+.veyrost-repair-robot svg{width:66px;height:78px;overflow:visible}
+.veyrost-repair-robot span{
+  padding:3px 6px;border:1px solid rgba(157,235,255,.4);border-radius:5px;
+  background:#101522;color:#9DEBFF;font:700 7px/1.2 monospace;letter-spacing:1px;
+}
+.veyrost-repair-robot.is-working svg{animation:veyrost-robot-hover .45s ease-in-out infinite alternate}
+.veyrost-repair-robot.is-working .robot-arm-left{transform-origin:23px 54px;animation:veyrost-robot-grab .35s ease-in-out infinite alternate}
+.veyrost-repair-robot.is-working .robot-arm-right{transform-origin:49px 54px;animation:veyrost-robot-grab .35s ease-in-out infinite alternate-reverse}
+.veyrost-repair-robot.is-lifting{filter:drop-shadow(0 0 14px rgba(111,230,208,.8))}
+.veyrost-repair-robot.is-leaving{opacity:0;transform:translate3d(105vw,-30px,0)!important}
+.menu-repair-notice.is-repairing .menu-repair-button{opacity:.55;cursor:wait}
+.menu-repair-button:disabled{pointer-events:none}
+@keyframes veyrost-robot-hover{from{transform:translateY(0)}to{transform:translateY(-5px)}}
+@keyframes veyrost-robot-grab{from{rotate:-8deg}to{rotate:18deg}}
+@media(prefers-reduced-motion:reduce){
+ .veyrost-repair-robot{transition-duration:80ms!important}
+ .veyrost-repair-robot.is-working svg,.veyrost-repair-robot .robot-arm{animation:none!important}
+}
