@@ -186,7 +186,6 @@ menuRepairButton.addEventListener("click",()=>{
   if(!menu)return;
   menu.style.translate="0px 0px";
   menu.dataset.detached="false";
-  twoStepArmed.delete(menu);
   updateMenuRepairNotice();
   toast((translations[language]||translations.en).menuRestored);
 });
@@ -262,6 +261,7 @@ document.addEventListener("click",event=>{
   }
 },true);
 restorePositions();
+updateMenuRepairNotice();
 
 // AURA camera controller: single normal arrow cursor; gestures control real site elements.
 const video=$("#aura-camera");
