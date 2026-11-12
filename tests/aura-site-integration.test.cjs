@@ -22,7 +22,8 @@ test("main page is a corporate multi-page overview, not a single-page overlay", 
 
 test("main navigation retains AURA and a separate opt-in layout control", () => {
   assert.match(html, /id="aura-toggle"[^>]*aria-pressed="false"/);
-  assert.match(html, /id="layout-toggle"[^>]*hidden/);
+  assert.match(html, /id="layout-toggle"[^>]*aria-pressed="false"/);
+  assert.doesNotMatch(html, /id="layout-toggle"[^>]*hidden/);
   assert.match(html, /href="projects\.html"/);
   assert.match(html, /href="studio\.html"/);
 });
@@ -43,13 +44,14 @@ test("shared AURA controller requests access only after the user activates the b
   assert.match(auraEngine, /getUserMedia/);
 });
 
-test("layout editing requires AURA and the explicit MOVE ITEMS control", () => {
-  assert.match(site, /editButton\.hidden=false/);
-  assert.match(site, /editMode=Boolean\(value\)&&Boolean\(controller\?\.active\)/);
+test("layout editing is always available independently of AURA", () => {
+  assert.match(site, /editButton\\.hidden=false/);
+  assert.match(site, /editMode=Boolean\\(value\\)/);
+  assert.doesNotMatch(site, /editMode=Boolean\\(value\\)&&Boolean\\(controller\\?\\.active\\)/);
   assert.match(site, /layout-toggle/);
   assert.match(site, /veyrost-layout-editing/);
-  assert.match(site, /startDrag\(detail\.x,detail\.y,"hand"\)/);
-  assert.match(site, /moveDrag\(x,y,"hand"\)/);
+  assert.match(site, /startDrag\\(detail\\.x,detail\\.y,"hand"\\)/);
+  assert.match(site, /moveDrag\\(x,y,"hand"\\)/);
 });
 
 test("workspace categories and project cards are movable, including the private category", () => {
