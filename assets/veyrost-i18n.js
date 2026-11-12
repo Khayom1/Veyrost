@@ -400,4 +400,12 @@ Object.assign(tj,{
 "Preference saved on this device.":"Танзимот дар ҳамин дастгоҳ нигоҳ дошта шуд.","Preference changed for this session; browser storage is unavailable.":"Танзимот танҳо барои ҳамин сеанс тағйир ёфт: хотираи браузер дастрас нест."
 });
 
+
+Object.assign(ru,{
+"Workspace arrangement saved.":"Расположение рабочей среды сохранено.","Camera is off. Camera tracks released.":"Камера выключена. Потоки камеры отключены."
+});
+Object.assign(tj,{
+"Workspace arrangement saved.":"Тартиби муҳити корӣ нигоҳ дошта шуд.","Camera is off. Camera tracks released.":"Камера хомӯш аст. Ҷараёнҳои камера қатъ карда шуданд."
+});
+
 export const dictionaries = { en, ru, tj };
