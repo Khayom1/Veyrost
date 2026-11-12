@@ -1,7 +1,7 @@
 // VEYROST interface translations. English is the canonical source language.
 const en = {};
 const ru = {
-"Overview":"Обзор","Projects":"Проекты","Workspace":"Рабочая среда","Company":"Компания","Research":"Исследования","Contact":"Контакты",
+"Settings":"Настройки","Overview":"Обзор","Projects":"Проекты","Workspace":"Рабочая среда","Company":"Компания","Research":"Исследования","Contact":"Контакты",
 "ENGINEERING GROUP":"ИНЖЕНЕРНАЯ ГРУППА","AURA OFF":"AURA ВЫКЛ","AURA ON":"AURA ВКЛ","MOVE ITEMS":"ПЕРЕМЕСТИТЬ БЛОКИ","FINISH EDIT":"ЗАВЕРШИТЬ РЕДАКТИРОВАНИЕ",
 "INDEPENDENT TECHNOLOGY INITIATIVE · TAJIKISTAN":"НЕЗАВИСИМАЯ ТЕХНОЛОГИЧЕСКАЯ ИНИЦИАТИВА · ТАДЖИКИСТАН",
 "WHAT'S NEXT.":"ЧТО ДАЛЬШЕ?","VEYROST is an independent engineering ecosystem: focused products, applied research and software systems built around real problems. One platform connects every project, discipline and experiment.":"VEYROST — независимая инженерная экосистема: специализированные продукты, прикладные исследования и программные системы для решения реальных задач. Одна платформа объединяет проекты, направления и эксперименты.",
@@ -67,7 +67,7 @@ const ru = {
 "Email":"Электронная почта","Telegram":"Телеграм","GitHub ↗":"GitHub ↗"
 };
 const tj = {
-"Overview":"Шарҳи умумӣ","Projects":"Лоиҳаҳо","Workspace":"Муҳити корӣ","Company":"Ширкат","Research":"Таҳқиқот","Contact":"Тамос",
+"Settings":"Танзимот","Overview":"Шарҳи умумӣ","Projects":"Лоиҳаҳо","Workspace":"Муҳити корӣ","Company":"Ширкат","Research":"Таҳқиқот","Contact":"Тамос",
 "ENGINEERING GROUP":"ГУРӮҲИ МУҲАНДИСӢ","AURA OFF":"AURA ХОМӮШ","AURA ON":"AURA ФАЪОЛ","MOVE ITEMS":"ҶОЙИВАЗКУНИИ ҚИСМҲО","FINISH EDIT":"АНҶОМИ ТАҲРИР",
 "INDEPENDENT TECHNOLOGY INITIATIVE · TAJIKISTAN":"ТАШАББУСИ МУСТАҚИЛИ ТЕХНОЛОГӢ · ТОҶИКИСТОН",
 "WHAT'S NEXT.":"ҚАДАМИ БАЪДӢ ЧИСТ?","VEYROST is an independent engineering ecosystem: focused products, applied research and software systems built around real problems. One platform connects every project, discipline and experiment.":"VEYROST экосистемаи мустақили муҳандисӣ мебошад: маҳсулоти ҳадафнок, таҳқиқоти амалӣ ва системаҳои нармафзор барои ҳалли масъалаҳои воқеӣ. Як платформа ҳамаи лоиҳаҳо, самтҳо ва таҷрибаҳоро муттаҳид мекунад.",
