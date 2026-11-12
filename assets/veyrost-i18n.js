@@ -388,4 +388,16 @@ Object.assign(tj,{
 "Configurable VEYROST workspace with movable engineering categories, local layout persistence and AURA hand interaction.":"Муҳити кории танзимшавандаи VEYROST бо гурӯҳҳои муҳандисии ҷойивазшаванда, нигоҳдории маҳаллии тарҳ ва идоракунии дастии AURA."
 });
 
+
+Object.assign(ru,{
+"PUBLIC":"ПУБЛИЧНЫХ","PRIVATE":"ЗАКРЫТЫХ","PRIVATE REPOSITORY":"ЗАКРЫТЫЙ РЕПОЗИТОРИЙ","OWNER ACCESS ONLY":"ТОЛЬКО ДЛЯ ВЛАДЕЛЬЦА","SOURCE REPOSITORY ↗":"ИСХОДНЫЙ РЕПОЗИТОРИЙ ↗",
+"No projects match this search. Try another term or category.":"По запросу ничего не найдено. Попробуйте другое слово или категорию.",
+"Preference saved on this device.":"Настройка сохранена на этом устройстве.","Preference changed for this session; browser storage is unavailable.":"Настройка изменена только на этот сеанс: хранилище браузера недоступно."
+});
+Object.assign(tj,{
+"PUBLIC":"КУШОДА","PRIVATE":"ХУСУСӢ","PRIVATE REPOSITORY":"РЕПОЗИТОРИИ ХУСУСӢ","OWNER ACCESS ONLY":"ТАНҲО БАРОИ СОҲИБ","SOURCE REPOSITORY ↗":"РЕПОЗИТОРИИ МАНБАЪ ↗",
+"No projects match this search. Try another term or category.":"Ягон лоиҳа ёфт нашуд. Калима ё гурӯҳи дигарро санҷед.",
+"Preference saved on this device.":"Танзимот дар ҳамин дастгоҳ нигоҳ дошта шуд.","Preference changed for this session; browser storage is unavailable.":"Танзимот танҳо барои ҳамин сеанс тағйир ёфт: хотираи браузер дастрас нест."
+});
+
 export const dictionaries = { en, ru, tj };
