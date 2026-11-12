@@ -850,7 +850,7 @@ const out = {};
 const entries = Object.entries(value).slice(0, 500);
 
 for (const [k, v] of entries) {
-if (/^(?:authorization|api[_-]?key|apikey|access[_-]?token|accesstoken|refresh[_-]?token|refreshtoken|password|passwd|secret|token|ghToken|githubToken|deepKey|siliconKey|gKey|googleApiKey)$/i.test(k)) {
+if (/^(?:key|authorization|api[_-]?key|apikey|access[_-]?token|accesstoken|refresh[_-]?token|refreshtoken|password|passwd|secret|token|ghToken|githubToken|deepKey|siliconKey|gKey|googleApiKey)$/i.test(k)) {
 out[k] = "[REDACTED]";
 } else {
 out[k] = Utils.redactAny(v, depth + 1);
