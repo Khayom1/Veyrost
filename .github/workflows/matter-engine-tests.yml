@@ -28,6 +28,10 @@ jobs:
         run: |
           node -e 'const fs=require("node:fs"); const html=fs.readFileSync("matter-lab.html","utf8"); const match=html.match(/<script>\s*([\s\S]*?)<\/script>/i); if(!match) throw new Error("Inline lab script not found"); fs.writeFileSync("/tmp/matter-lab-inline.js",match[1]);'
           node --check /tmp/matter-lab-inline.js
+      - name: Check advanced workspace script syntax
+        run: |
+          node -e 'const fs=require("node:fs"); const html=fs.readFileSync("index_advanced.html","utf8"); const matches=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].filter(x=>x[1].trim()); if(!matches.length) throw new Error("Advanced inline script not found"); fs.writeFileSync("/tmp/index-advanced-inline.js",matches[0][1]);'
+          node --check /tmp/index-advanced-inline.js
       - name: Run project regression tests
         run: node --test tests/*.test.cjs tests/*.test.mjs
       - name: Set up Python
