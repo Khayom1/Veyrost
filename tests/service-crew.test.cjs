@@ -15,7 +15,9 @@ test("arrival, parking, ladder deployment and technician climb are ordered", asy
   const sequence = new ServiceCrewSequence();
   sequence.update(0.25); // bounded frame delta
   assert.equal(sequence.snapshot().phase, SERVICE_CREW_PHASES.ARRIVING);
-  for (let i = 0; i < 60; i++) sequence.update(0.1);
+  for (let i = 0; i < 32; i++) sequence.update(0.1);
+  assert.equal(sequence.snapshot().phase, SERVICE_CREW_PHASES.PARKING);
+  for (let i = 0; i < 7; i++) sequence.update(0.1);
   assert.equal(sequence.snapshot().phase, SERVICE_CREW_PHASES.DEPLOYING);
   for (let i = 0; i < 18; i++) sequence.update(0.1);
   assert.equal(sequence.snapshot().phase, SERVICE_CREW_PHASES.CLIMBING);
@@ -58,7 +60,7 @@ test("departure cannot begin before the crew reaches its service position", asyn
 test("departure folds the ladder before vehicle departure completes", async () => {
   const { ServiceCrewSequence, SERVICE_CREW_PHASES } = await api;
   const sequence = new ServiceCrewSequence();
-  for (let i = 0; i < 80; i++) sequence.update(0.1);
+  for (let i = 0; i < 90; i++) sequence.update(0.1);
   assert.equal(sequence.snapshot().phase, SERVICE_CREW_PHASES.READY);
   assert.equal(sequence.depart(), true);
   assert.equal(sequence.snapshot().phase, SERVICE_CREW_PHASES.FOLDING);
