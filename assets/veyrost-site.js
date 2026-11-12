@@ -158,15 +158,17 @@ function renderButtonPhysics(){
     const origin=body.__origin,base=body.__base;
     el.style.translate=(base.x+body.x-origin.x)+"px "+(base.y+body.y-origin.y)+"px";
     const d=body.deformation||{top:0,right:0,bottom:0,left:0},at=body.deformationAt||{top:.5,right:.5,bottom:.5,left:.5};
-    const p=(v)=>Math.max(0,Math.min(12,v*100))+"%";
-    const top=(at.top||.5)*100,right=(at.right||.5)*100,bottom=(at.bottom||.5)*100,left=(at.left||.5)*100;
-    const poly=[
-      "0% 0%",(top-18)+"% "+p(d.top*.35),(top)+"% "+p(d.top*100),(top+18)+"% "+p(d.top*.35),"100% 0%",
-      "100% "+(right-18)+"%",(100-p(d.right*100))+"% "+right+"%","100% "+(right+18)+"%",
-      "100% 100%",(bottom+18)+"% "+(100-p(d.bottom*35)),bottom+"% "+(100-p(d.bottom*100)),(bottom-18)+"% "+(100-p(d.bottom*35)),"0% 100%",
-      p(d.left*100)+"% "+(left+18)+"%",p(d.left*100)+"% "+left+"%",p(d.left*35)+"% "+(left-18)+"%"
+    const depth=(side,factor=1)=>Math.max(0,Math.min(12,(d[side]||0)*100*factor));
+    const pct=v=>v.toFixed(2)+"%";
+    const t=(at.top||.5)*100,rr=(at.right||.5)*100,b=(at.bottom||.5)*100,l=(at.left||.5)*100;
+    const td=depth("top"),rd=depth("right"),bd=depth("bottom"),ld=depth("left");
+    const points=[
+      [0,0],[t-18,td*.35],[t,td],[t+18,td*.35],[100,0],
+      [100,rr-18],[100-rd,rr],[100,rr+18],
+      [100,100],[b+18,100-bd*.35],[b,100-bd],[b-18,100-bd*.35],[0,100],
+      [ld*.35,l+18],[ld,l],[ld*.35,l-18]
     ];
-    el.style.clipPath="polygon("+poly.join(",")+")";
+    const poly=points.map(([x,y])=>pct(Math.max(0,Math.min(100,x)))+" "+pct(Math.max(0,Math.min(100,y))));    el.style.clipPath="polygon("+poly.join(",")+")";
   }
   physicsFrame=requestAnimationFrame(renderButtonPhysics);
 }
