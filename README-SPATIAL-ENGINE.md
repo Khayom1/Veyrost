@@ -83,3 +83,8 @@ The 2.5D contract remains explicit: Matter resolves planar X/Y motion and this d
 Protected controls now validate and canonicalize identifiers, reject duplicate registry keys, and expose immutable snapshots. The lifecycle supports an explicit repair rollback path. Spatial detachment is coordinated with the Matter solver: the first pull must remain anchored, and the second pull must produce a matching detached state in both systems. A mismatch triggers a safe reset instead of leaving the visual, lifecycle and physics states divergent. Repair requires both planar and depth bodies and only completes after the planar mount has been restored; failed repair transitions return to the detached state.
 
 These checks harden the source lifecycle. They do not replace browser interaction testing or Android camera/gesture acceptance.
+
+
+## Phase 4 — service crew 3D scene
+
+The spatial route now mounts a procedural 3D maintenance vehicle and two articulated technicians with helmets, safety vests and tool gear. The vehicle enters and parks; a roof-mounted metal ladder unfolds; the lead technician climbs while the support technician remains at ground level. The sequence uses a deterministic, bounded state machine and pauses with the spatial simulation. A guarded departure action folds the ladder before the crew and vehicle leave. Tug-of-war, protected-control locking during maintenance, cable repair, dialogue and sound remain later-phase work. The character assets are procedural low-poly models, not scanned or photorealistic rigged characters.
