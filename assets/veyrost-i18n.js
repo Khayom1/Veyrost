@@ -362,4 +362,12 @@ Object.assign(tj,{
 "ENGINEERING":"МУҲАНДИСӢ","OUR ENGINEERING MODEL":"МОДЕЛИ МУҲАНДИСИИ МО","OPEN WORKSPACE":"КУШОДАНИ МУҲИТИ КОРӢ","ECOSYSTEM SNAPSHOT":"ВАЗЪИ ЭКОСИСТЕМА","LIVE DIRECTORY":"ФЕҲРИСТИ ҶОРӢ","01 / THE ECOSYSTEM":"01 / ЭКОСИСТЕМА","VEYROST CORE":"VEYROST CORE","PRODUCT ENGINEERING":"ТАҲИЯИ МАҲСУЛОТ","TRUST & INTELLIGENCE":"ЭЪТИМОД ВА ЗЕҲН","ENGINEERING TOOLS":"АБЗОРҲОИ МУҲАНДИСӢ","DESIGN ENGINEERING":"ТАРҲИ МУҲАНДИСӢ","EXPLORATION":"ОМӮЗИШ","02 / SELECTED SYSTEMS":"02 / СИСТЕМАҲОИ ИНТИХОБШУДА","AI SECURITY / SKILLGUARD":"АМНИЯТИ ЗС / SKILLGUARD","MULTI-TENANT PLATFORM / WAYLINE":"ПЛАТФОРМАИ БИСЁРТАШКИЛОТӢ / WAYLINE","EN / RU / TJ":"EN / RU / TJ","03 / ENGINEERING WORKSPACE":"03 / МУҲИТИ МУҲАНДИСӢ","© 2026 VEYROST":"© 2026 VEYROST"
 });
 
+
+Object.assign(ru,{
+"OPEN WORKSPACE ↗":"ОТКРЫТЬ РАБОЧУЮ СРЕДУ ↗","VIEW 19 PUBLIC REPOSITORIES ↗":"ПОСМОТРЕТЬ 19 ПУБЛИЧНЫХ РЕПОЗИТОРИЕВ ↗","OPEN SOURCE REPOSITORY ↗":"ОТКРЫТЬ РЕПОЗИТОРИЙ ↗","ENTER WORKSPACE ↗":"ВОЙТИ В РАБОЧУЮ СРЕДУ ↗","VERIFY ON GITHUB ↗":"ПРОВЕРИТЬ НА GITHUB ↗","FOUNDER PROFILE ↗":"ПРОФИЛЬ ОСНОВАТЕЛЯ ↗"
+});
+Object.assign(tj,{
+"OPEN WORKSPACE ↗":"КУШОДАНИ МУҲИТИ КОРӢ ↗","VIEW 19 PUBLIC REPOSITORIES ↗":"ДИДАНИ 19 РЕПОЗИТОРИИ КУШОДА ↗","OPEN SOURCE REPOSITORY ↗":"КУШОДАНИ РЕПОЗИТОР ↗","ENTER WORKSPACE ↗":"ВОРОИД ШУДАН БА МУҲИТИ КОРӢ ↗","VERIFY ON GITHUB ↗":"САНҶИДАН ДАР GITHUB ↗","FOUNDER PROFILE ↗":"ПРОФИЛИ АСОСГУЗОР ↗"
+});
+
 export const dictionaries = { en, ru, tj };
