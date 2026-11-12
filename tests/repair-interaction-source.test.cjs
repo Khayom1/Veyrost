@@ -9,7 +9,7 @@ const sequence = fs.readFileSync("repair-interaction.mjs", "utf8");
 test("repair action begins a guarded technician sequence instead of bypassing maintenance", () => {
   assert.match(runtime, /button\.addEventListener\("click", \(\) => this\.startProtectedRepair\(\)\)/);
   assert.match(runtime, /startProtectedRepair\(\)/);
-  assert.match(runtime, /this\.serviceCrew\.sequence\.snapshot\(\)\.phase !== "ready"/);
+  assert.match(runtime, /this\.serviceCrew\?\.sequence\?\.snapshot\?\.\(\)\.phase !== "ready"/);
 });
 
 test("maintenance lock blocks user drag while technicians handle the detached panel", () => {
@@ -28,7 +28,7 @@ test("repair sequence includes tug-of-war, cable reconnection and verification s
 test("dynamic repair cable connects the protected socket and moving panel", () => {
   assert.match(runtime, /new THREE\.Line\(/);
   assert.match(runtime, /repairCable\.geometry\.attributes\.position/);
-  assert.match(runtime, /repairConnector\.position\.copy/);
+  assert.match(runtime, /repairConnector\.position\.lerpVectors/);
 });
 
 test("technician arms animate during tug-of-war and cable connection", () => {
@@ -38,13 +38,13 @@ test("technician arms animate during tug-of-war and cable connection", () => {
 });
 
 test("verified repair restores planar and depth mounts before releasing the UI lock", () => {
-  assert.match(runtime, /snapshot\.phase === REPAIR_PHASES\.COMPLETE/);
-  assert.match(runtime, /this\.repairDetachedControls\(\)/);
+  assert.match(runtime, /phase === REPAIR_PHASES\.COMPLETE/);
+  assert.match(runtime, /this\.repairDetachedControls\(id\)/);
   assert.match(runtime, /this\.maintenanceLock = false/);
-  assert.match(runtime, /this\.serviceCrew\.depart\(\)/);
+  assert.match(runtime, /this\.serviceCrew\?\.depart\(\)/);
 });
 
 test("repair visual resources are removed with the spatial scene", () => {
   assert.match(runtime, /this\.repairVisual\?\.removeFromParent\(\)/);
-  assert.match(runtime, /this\.repairCable\?\.geometry\?\.dispose\(\)/);
+  assert.match(runtime, /this\.repairCable\?\.geometry\?\.dispose\?\.\(\)/);
 });
