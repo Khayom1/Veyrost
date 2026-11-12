@@ -98,7 +98,7 @@ test("shared script binds all three language buttons and keeps selectors valid",
 
 test("navigation menu and settings entry are visible and available on every page", () => {
   for (const page of ["index.html","projects.html","studio.html","company.html","research.html","contact.html"]) {
-    const html = readFileSync(new URL("../" + page, import.meta.url), "utf8");
+    const html = fs.readFileSync(page, "utf8");
     assert.match(html, /id="menu-toggle"/);
     assert.match(html, /id="mobile-nav"/);
     assert.match(html, /href="studio.html#workspace-settings"/);
@@ -106,7 +106,8 @@ test("navigation menu and settings entry are visible and available on every page
   }
   assert.match(css, /\\.menu-toggle\\{display:inline-flex/);
   assert.match(css, /\\.mobile-nav\\.open\\{display:grid/);
-  assert.match(studio, /id="workspace-settings"/);
+  const studioHtml = fs.readFileSync("studio.html", "utf8");
+  assert.match(studioHtml, /id="workspace-settings"/);
 });
 test("shared initialization uses querySelectorAll for every multi-element control list", () => {
   for (const selector of [
