@@ -230,7 +230,7 @@ function syncDetachedMenuWires(detached){
   }
   // Keep the severed cable at the button's authored home position, never derive it
   // from the detached button's current position or its transform.
-  if(!menuHomePosition)captureMenuHomePosition();
+  if(!menuHomePosition)return;
   const x=menuHomePosition.left-window.scrollX;
   const y=menuHomePosition.top-window.scrollY;
   if(!detachedMenuWires){
@@ -240,7 +240,9 @@ function syncDetachedMenuWires(detached){
     detachedMenuWires.innerHTML='<svg viewBox="0 0 92 74" focusable="false"><path class="wire-sleeve" d="M9 13h25v48H9z"/><path class="wire-core" d="M34 23h20l7-6 7 7-7 7H47l-5 5H34M34 38h13l8-6 7 7-8 7H45l-4 5h-7M34 53h18l7-5 7 7-7 7H47l-5 4h-8"/><path class="wire-spark" d="M69 10l-4 7 7-1-4 8M77 37l-5 5 7 1-5 5"/></svg>';
     document.body.append(detachedMenuWires);
   }
-  detachedMenuWires.style.left=(x+menuHomePosition.width/2-46)+"px";
+  // The wall-side cable stub is anchored to the exact original MENU footprint.
+  // Only the button moves; this exposed wiring stays behind at its fixed home point.
+  detachedMenuWires.style.left=(x-9)+"px";
   detachedMenuWires.style.top=(y+menuHomePosition.height/2-37)+"px";
 }
 function updateMenuRepairNotice(){
@@ -446,6 +448,8 @@ document.addEventListener("click",event=>{
   }
 },true);
 restorePositions();
+// Capture the authored MENU location before the user can drag it away.
+captureMenuHomePosition();
 updateMenuRepairNotice();
 
 // AURA camera controller: single normal arrow cursor; gestures control real site elements.
