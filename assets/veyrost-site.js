@@ -160,7 +160,7 @@ function menuIsDetached(){
   if(!menu)return false;
   const raw=(menu.style.translate||"").trim();
   if(!raw||raw==="none")return false;
-  const parts=raw.split(/\\s+/);
+  const parts=raw.split(/\s+/);
   const x=Number.parseFloat(parts[0])||0;
   const y=Number.parseFloat(parts[1])||0;
   return Math.abs(x)>2||Math.abs(y)>2;
@@ -183,7 +183,7 @@ menuRepairButton.addEventListener("click",()=>{
 });
 
 function offset(el){
-  const a=(el.style.translate||"0px 0px").split(/\\s+/);
+  const a=(el.style.translate||"0px 0px").split(/\s+/);
   return {x:Number.parseFloat(a[0])||0,y:Number.parseFloat(a[1])||0};
 }
 function startDrag(x,y,source){
@@ -204,6 +204,7 @@ function finishDrag(){
   if(!drag)return;
   const moved=drag.moved;drag=null;
   if(moved)savePositions();
+  updateMenuRepairNotice();
 }
 function setEditMode(value){
   editMode=Boolean(value);
