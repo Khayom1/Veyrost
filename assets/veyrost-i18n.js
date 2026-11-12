@@ -370,4 +370,22 @@ Object.assign(tj,{
 "OPEN WORKSPACE ↗":"КУШОДАНИ МУҲИТИ КОРӢ ↗","VIEW 19 PUBLIC REPOSITORIES ↗":"ДИДАНИ 19 РЕПОЗИТОРИИ КУШОДА ↗","OPEN SOURCE REPOSITORY ↗":"КУШОДАНИ РЕПОЗИТОР ↗","ENTER WORKSPACE ↗":"ВОРОИД ШУДАН БА МУҲИТИ КОРӢ ↗","VERIFY ON GITHUB ↗":"САНҶИДАН ДАР GITHUB ↗","FOUNDER PROFILE ↗":"ПРОФИЛИ АСОСГУЗОР ↗"
 });
 
+
+Object.assign(ru,{
+"VEYROST is an independent technology and engineering ecosystem. Explore its public projects, products, research and configurable workspace.":"VEYROST — независимая технологическая и инженерная экосистема. Изучите публичные проекты, продукты, исследования и настраиваемую рабочую среду.",
+"Explore 19 public GitHub repositories and one private project record from the Khayom1 account.":"Изучите 19 публичных репозиториев GitHub и одну запись о закрытом проекте аккаунта Khayom1.",
+"About VEYROST, an independent technology initiative from Tajikistan, with engineering workstreams, operating principles and development standards.":"О VEYROST — независимой технологической инициативе из Таджикистана, её инженерных направлениях, принципах работы и стандартах разработки.",
+"Contact VEYROST for collaboration, technical discussion and project questions.":"Свяжитесь с VEYROST для сотрудничества, технических обсуждений и вопросов о проектах.",
+"VEYROST research areas grounded in public projects: AI security, computer vision, network diagnostics, software quality, product taxonomy and hardware prototyping.":"Исследовательские направления VEYROST, основанные на публичных проектах: безопасность ИИ, компьютерное зрение, диагностика сетей, качество ПО, товарная таксономия и прототипирование оборудования.",
+"Configurable VEYROST workspace with movable engineering categories, local layout persistence and AURA hand interaction.":"Настраиваемая рабочая среда VEYROST с перемещаемыми инженерными категориями, локальным сохранением макета и управлением жестами AURA."
+});
+Object.assign(tj,{
+"VEYROST is an independent technology and engineering ecosystem. Explore its public projects, products, research and configurable workspace.":"VEYROST экосистемаи мустақили технологӣ ва муҳандисӣ мебошад. Лоиҳаҳо, маҳсулот, таҳқиқот ва муҳити кории танзимшавандаи онро омӯзед.",
+"Explore 19 public GitHub repositories and one private project record from the Khayom1 account.":"19 репозитории кушодаи GitHub ва як сабти лоиҳаи хусусии ҳисоби Khayom1-ро омӯзед.",
+"About VEYROST, an independent technology initiative from Tajikistan, with engineering workstreams, operating principles and development standards.":"Дар бораи VEYROST — ташаббуси мустақили технологии Тоҷикистон, самтҳои муҳандисӣ, принсипҳои кор ва стандартҳои таҳия.",
+"Contact VEYROST for collaboration, technical discussion and project questions.":"Барои ҳамкорӣ, муҳокимаи техникӣ ва саволҳо дар бораи лоиҳаҳо бо VEYROST тамос гиред.",
+"VEYROST research areas grounded in public projects: AI security, computer vision, network diagnostics, software quality, product taxonomy and hardware prototyping.":"Самтҳои таҳқиқотии VEYROST бар асоси лоиҳаҳои кушода: амнияти ЗС, биниши компютерӣ, ташхиси шабака, сифати нармафзор, таксономияи маҳсулот ва намунасозии таҷҳизот.",
+"Configurable VEYROST workspace with movable engineering categories, local layout persistence and AURA hand interaction.":"Муҳити кории танзимшавандаи VEYROST бо гурӯҳҳои муҳандисии ҷойивазшаванда, нигоҳдории маҳаллии тарҳ ва идоракунии дастии AURA."
+});
+
 export const dictionaries = { en, ru, tj };
