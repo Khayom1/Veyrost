@@ -266,3 +266,21 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
  .veyrost-repair-layer .veyrost-tech-person.is-working svg,
  .veyrost-repair-layer .veyrost-tech-person.is-working .robot-arm-right{animation:none!important}
 }
+
+
+/* Vehicle-deployed crew: compact paired robots physically escort the detached MENU control. */
+.veyrost-repair-layer .veyrost-tech-person{width:58px!important;min-width:58px!important;height:68px!important;gap:1px!important;opacity:0;transition:left 760ms cubic-bezier(.2,.75,.25,1),top 760ms cubic-bezier(.2,.75,.25,1),opacity 260ms ease!important}
+.veyrost-repair-layer .veyrost-tech-person svg{width:58px!important;height:58px!important;overflow:visible!important}
+.veyrost-repair-layer .veyrost-tech-person span{font-size:5px!important;padding:2px 4px!important}
+.veyrost-repair-layer .veyrost-tech-person.is-walking svg{animation:veyrost-tech-walk .22s ease-in-out infinite alternate!important}
+.veyrost-repair-layer .veyrost-tech-person.is-carrying svg{animation:veyrost-tech-carry .34s ease-in-out infinite alternate!important}
+.veyrost-repair-layer .veyrost-tech-person.is-carrying .robot-arm-left,
+.veyrost-repair-layer .veyrost-tech-person.is-carrying .robot-arm-right{stroke:#8ff4e4!important;stroke-width:9!important}
+.veyrost-repair-layer .veyrost-carried-menu{z-index:2147483645!important;box-sizing:border-box!important;filter:drop-shadow(0 5px 12px #000b)!important}
+.veyrost-repair-layer .veyrost-tech-vehicle{transition:left 1580ms cubic-bezier(.2,.75,.2,1)!important}
+.veyrost-repair-layer .veyrost-tech-vehicle.is-driving-away{transition:left 1250ms cubic-bezier(.4,0,.8,.4)!important}
+@keyframes veyrost-tech-carry{from{transform:translateY(0)}to{transform:translateY(-2px)}}
+@media(max-width:760px){
+ .veyrost-repair-layer .veyrost-tech-person{width:54px!important;min-width:54px!important;height:64px!important}
+ .veyrost-repair-layer .veyrost-tech-person svg{width:54px!important;height:54px!important}
+}
