@@ -221,7 +221,7 @@ let menuHomePosition=null;
 function captureMenuHomePosition(){
   if(!menu)return;
   const rect=menu.getBoundingClientRect();
-  menuHomePosition={left:rect.left+window.scrollX,top:rect.top+window.scrollY};
+  menuHomePosition={left:rect.left+window.scrollX,top:rect.top+window.scrollY,width:rect.width,height:rect.height};
 }
 function syncDetachedMenuWires(detached){
   if(!menu)return;
@@ -240,8 +240,8 @@ function syncDetachedMenuWires(detached){
     detachedMenuWires.innerHTML='<svg viewBox="0 0 92 74" focusable="false"><path class="wire-sleeve" d="M9 13h25v48H9z"/><path class="wire-core" d="M34 23h20l7-6 7 7-7 7H47l-5 5H34M34 38h13l8-6 7 7-8 7H45l-4 5h-7M34 53h18l7-5 7 7-7 7H47l-5 4h-8"/><path class="wire-spark" d="M69 10l-4 7 7-1-4 8M77 37l-5 5 7 1-5 5"/></svg>';
     document.body.append(detachedMenuWires);
   }
-  detachedMenuWires.style.left=(x-38)+"px";
-  detachedMenuWires.style.top=(y-20)+"px";
+  detachedMenuWires.style.left=(x+menuHomePosition.width/2-46)+"px";
+  detachedMenuWires.style.top=(y+menuHomePosition.height/2-37)+"px";
 }
 function updateMenuRepairNotice(){
   if(!menu)return;
