@@ -284,3 +284,17 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
  .veyrost-repair-layer .veyrost-tech-person{width:54px!important;min-width:54px!important;height:64px!important}
  .veyrost-repair-layer .veyrost-tech-person svg{width:54px!important;height:54px!important}
 }
+
+
+/* On-location repair: tool movement, sparks, and a clear boarding phase before departure. */
+.veyrost-repair-layer .veyrost-menu-repair-fx{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;opacity:0;transform:scale(.7);animation:veyrost-repair-tool-arrive .28s ease-out forwards}
+.veyrost-repair-layer .veyrost-menu-repair-fx svg{width:78px;height:58px;filter:drop-shadow(0 0 8px #6fe6d0aa);animation:veyrost-repair-tool-work .32s ease-in-out infinite alternate}
+.veyrost-repair-layer .veyrost-menu-repair-fx span{font:700 7px/1 monospace;letter-spacing:.16em;color:#a9fff0;text-shadow:0 0 8px #52e6d2}
+.veyrost-repair-layer .veyrost-menu-repair-fx.is-complete{animation:veyrost-repair-tool-done .35s ease-out forwards}
+.veyrost-repair-layer .veyrost-menu-repair-fx.is-complete svg{animation:none;filter:drop-shadow(0 0 13px #8ff4e4)}
+.veyrost-repair-layer .veyrost-tech-person.is-boarding{transform:scale(.55);transform-origin:bottom center;filter:brightness(1.6) drop-shadow(0 0 8px #7de6ed);transition:opacity 380ms ease,transform 380ms ease!important}
+.veyrost-repair-layer .veyrost-carried-menu.is-being-repaired{filter:drop-shadow(0 0 10px #8ff4e4aa);animation:veyrost-menu-repair-pulse .65s ease-in-out infinite alternate}
+@keyframes veyrost-repair-tool-arrive{to{opacity:1;transform:scale(1)}}
+@keyframes veyrost-repair-tool-work{from{transform:rotate(-12deg) translateY(1px)}to{transform:rotate(12deg) translateY(-2px)}}
+@keyframes veyrost-repair-tool-done{to{opacity:0;transform:scale(1.25)}}
+@keyframes veyrost-menu-repair-pulse{from{filter:drop-shadow(0 0 3px #8ff4e466)}to{filter:drop-shadow(0 0 13px #8ff4e4)}}
