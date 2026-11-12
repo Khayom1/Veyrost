@@ -1,99 +1,86 @@
 "use strict";
-
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
+const root = path.join(__dirname, "..");
+const html = fs.readFileSync(path.join(root, "index_advanced.html"), "utf8");
+const backend = fs.readFileSync(path.join(root, "assets", "veyrost-backend.js"), "utf8");
+const proxy = fs.readFileSync(path.join(root, "supabase", "functions", "veyrost-proxy", "proxy-core.ts"), "utf8");
+const auth = fs.readFileSync(path.join(root, "supabase", "functions", "veyrost-auth", "auth-core.ts"), "utf8");
+const config = fs.readFileSync(path.join(root, "supabase", "config.toml"), "utf8");
 
-const source = fs.readFileSync(path.join(__dirname, "..", "index_advanced.html"), "utf8");
-
-test("provider credentials have empty source defaults", () => {
-  assert.match(source, /deepKey:\s*""/);
-  assert.match(source, /siliconKey:\s*""/);
-  assert.doesNotMatch(source, /(?:deepKey|siliconKey):\s*["'][^"']{12,}["']/);
+test("browser config contains no provider or integration secret values", () => {
+  assert.doesNotMatch(html, /CFG\.(?:deepKey|siliconKey|ghToken|gKey|gcx)/);
+  for (const id of ["sDeep", "sSilicon", "sGh", "sGKey", "sGcx"]) assert.doesNotMatch(html, new RegExp('id="' + id + '"'));
 });
-
-test("settings persistence explicitly blanks every primary secret", () => {
-  assert.match(source, /const safeConfig = \{\s*\.\.\.CFG,\s*deepKey:\s*"",\s*siliconKey:\s*"",\s*ghToken:\s*"",\s*gKey:\s*""\s*\}/);
-  assert.match(source, /localStorage\.setItem\("veyrost_cfg", JSON\.stringify\(safeConfig\)\)/);
-  assert.doesNotMatch(source, /localStorage\.setItem\("veyrost_cfg",\s*JSON\.stringify\(CFG\)\)/);
+test("legacy browser credentials are removed during startup migration", () => {
+  assert.match(html, /for \(const secretField of \["deepKey","siliconKey","ghToken","gKey","gcx"\]\) delete m\[secretField\]/);
+  assert.match(html, /delete provider\.apiKey/);
+  assert.match(html, /integration\.config = Security\.redactAny\(integration\.config\)/);
+  assert.match(html, /delete safeConfig\[secretField\]/);
 });
-
-test("legacy config secrets are scrubbed during startup", () => {
-  assert.match(source, /One-time migration: scrub credentials previously stored in browser localStorage\.\s*saveCfg\(\);/);
+test("provider and shared HTTP traffic is sent only through the authenticated proxy client", () => {
+  assert.match(html, /window\.VeyrostBackend\.fetch\(url/);
+  assert.match(html, /window\.VeyrostBackend\.fetch\(\s*providerCfg\.baseURL/);
+  assert.doesNotMatch(html, /await fetch\(\s*providerCfg\.baseURL/);
+  assert.doesNotMatch(html, /providerCfg\.apiKey/);
 });
-
-test("legacy provider API keys are removed before provider initialization", () => {
-  const seedStart = source.indexOf("memoryState=loadLocal();");
-  const purge = source.indexOf("delete provider.apiKey", seedStart);
-  const initialize = source.indexOf("Providers.init()", seedStart);
-  assert.ok(seedStart >= 0 && purge > seedStart && initialize > purge,
-    "legacy credentials must be purged after load and before provider initialization");
+test("browser proxy client keeps user tokens in memory and never persists them", () => {
+  assert.match(backend, /let session = null/);
+  assert.match(backend, /fetch\(PROXY_URL/);
+  assert.match(backend, /Authorization: "Bearer " \+ session\.accessToken/);
+  assert.match(backend, /apikey: publishableKey/);
+  assert.doesNotMatch(backend, /localStorage|sessionStorage/);
+  assert.match(backend, /action: "refresh"/);
 });
-
-test("provider credentials are excluded from persisted workspace snapshots", () => {
-  assert.match(source, /function compactState\(state\)\s*\{[\s\S]*?delete x\.apiKey;[\s\S]*?return x;/);
-  assert.match(source, /API key \(kept in memory for this session only; re-enter after reload\)/);
+test("Supabase gateway enforces JWT on proxy and allows only auth bootstrap without JWT", () => {
+  assert.match(config, /\[functions\.veyrost-proxy\]\s*verify_jwt = true/);
+  assert.match(config, /\[functions\.veyrost-auth\]\s*verify_jwt = false/);
+  assert.match(proxy, /claims\.role !== "authenticated"/);
+  assert.match(proxy, /typeof claims\.sub !== "string"/);
 });
-
-test("SiliconFlow uses one consistent config key", () => {
-  assert.doesNotMatch(source, /CFG\.silKey/);
-  assert.match(source, /m\.siliconKey = normStr\(m\.siliconKey, DEFAULTS\.siliconKey\)/);
-  assert.match(source, /key: \(\) => CFG\.siliconKey/);
-  assert.match(source, /CFG\.siliconKey =[\s\S]{0,160}sSilicon/);
-  assert.match(source, /id="sSilicon"/);
-  assert.match(source, /text\(CFG\.siliconKey\)/);
+test("provider and integration credentials are injected only from Edge Function secrets", () => {
+  for (const name of ["DEEPSEEK_API_KEY", "SILICONFLOW_API_KEY", "GITHUB_TOKEN", "GOOGLE_API_KEY", "GOOGLE_CX"]) {
+    assert.ok(proxy.includes('env.get("' + name + '")'), "missing server secret " + name);
+  }
+  assert.match(auth, /SUPABASE_PUBLISHABLE_KEYS/);
+  assert.match(auth, /SUPABASE_ANON_KEY/);
 });
-
-test("secret redaction covers camelCase provider and credential property names", () => {
-  assert.match(source, /api[_-]?key|apikey/);
-  assert.match(source, /ghToken\|githubToken\|deepKey\|siliconKey\|gKey\|googleApiKey/);
-  assert.match(source, /Utils\.safeText\(CFG\.siliconKey\)\.trim\(\)/);
+test("proxy allowlists upstream hosts and restricts GitHub routes", () => {
+  for (const host of ["api.deepseek.com", "api.siliconflow.com", "api.github.com", "www.googleapis.com", "s.jina.ai", "r.jina.ai"]) {
+    assert.ok(proxy.includes('host === "' + host + '"'), "missing allowlisted host " + host);
+  }
+  assert.match(proxy, /function githubRoute/);
+  assert.match(proxy, /actions\/secrets/);
+  assert.match(proxy, /redirect:"manual"/);
 });
-
-test("custom provider URLs must be HTTPS and public", () => {
-  assert.match(source, /provider\.baseURL must use HTTPS/);
-  assert.match(source, /provider\.baseURL must target a public host/);
-  assert.match(source, /invalid_provider_url_https_public_host_required/);
+test("proxy rejects private targets and Jina Reader nested private URLs", () => {
+  assert.match(proxy, /function blockedHost/);
+  assert.match(proxy, /function validHttps/);
+  assert.match(proxy, /jina_target_not_allowed/);
+  assert.match(proxy, /169/);
 });
-
-test("Supabase endpoint rejects non-public or non-HTTPS URLs", () => {
-  assert.match(source, /Supabase URL must use HTTPS and a public hostname/);
+test("proxy applies request size, user rate and origin limits", () => {
+  assert.match(proxy, /MAX_BODY_BYTES = 1_000_000/);
+  assert.match(proxy, /maxRequestsPerMinute \?\? 90/);
+  assert.match(proxy, /origin_not_allowed/);
+  assert.match(proxy, /rate_limit_exceeded/);
 });
-
-test("provider chat requests send credentials in Authorization headers", () => {
-  assert.match(source, /Authorization.*providerCfg\.apiKey/);
-  assert.match(source, /Cache-Control.*no-store/);
+test("Google API key is not embedded in the browser URL", () => {
+  assert.match(html, /https:\/\/www\.googleapis\.com\/customsearch\/v1\?q=/);
+  assert.doesNotMatch(html, /customsearch\/v1\?key=/);
 });
-
-test("web fetch validates URL before forwarding it to the reader service", () => {
-  const registryStart = source.indexOf("const TOOL_REGISTRY");
-  const start = source.indexOf("web_fetch: {", registryStart);
-  assert.ok(start >= 0);
-  const section = source.slice(start, start + 1500);
-  assert.ok(section.indexOf("Utils.isValidHttpUrl(u)") >= 0);
-  assert.ok(section.indexOf("https://r.jina.ai/") > section.indexOf("Utils.isValidHttpUrl(u)"));
+test("Gmail and Drive remain unavailable until a real OAuth integration exists", () => {
+  assert.match(html, /Gmail requires OAuth 2\.0/);
+  assert.match(html, /Drive requires OAuth 2\.0/);
 });
-
-test("URL validator rejects localhost, private and metadata destinations", () => {
-  const match = source.match(/isValidHttpUrl\(u\)\s*\{([\s\S]*?)\n\},\n\nvalidateArgs/);
-  assert.ok(match, "URL validator body must be found");
-  const validator = new Function("Utils", "LIMITS", "return function(u) { " + match[1] + " }")(
-    { safeText: value => String(value ?? "") },
-    { maxWebUrlChars: 4096 }
-  );
-  assert.equal(validator("https://example.com/path"), true);
-  assert.equal(validator("http://localhost/"), false);
-  assert.equal(validator("http://127.0.0.1/"), false);
-  assert.equal(validator("http://10.0.0.5/"), false);
-  assert.equal(validator("http://192.168.1.1/"), false);
-  assert.equal(validator("http://169.254.169.254/latest/meta-data/"), false);
-  assert.equal(validator("http://metadata.google.internal/"), false);
-  assert.equal(validator("file:///etc/passwd"), false);
-  assert.equal(validator("https://user:pass@example.com/"), false);
-});
-
-test("Gmail and Drive are explicitly unavailable without OAuth", () => {
-  assert.match(source, /Gmail requires OAuth 2\.0/);
-  assert.match(source, /Drive requires OAuth 2\.0/);
+test("deployment guide documents secrets without embedding their values", () => {
+  const guide = fs.readFileSync(path.join(root, "supabase", "DEPLOYMENT.md"), "utf8");
+  assert.match(guide, /DEEPSEEK_API_KEY/);
+  assert.match(guide, /SILICONFLOW_API_KEY/);
+  assert.match(guide, /GITHUB_TOKEN/);
+  assert.match(guide, /GOOGLE_API_KEY/);
+  assert.match(guide, /supabase secrets set/);
+  assert.doesNotMatch(guide, /sk-[A-Za-z0-9_-]{12,}/);
 });
