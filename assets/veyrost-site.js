@@ -190,41 +190,48 @@ menuRepairButton.addEventListener("click",()=>{
   menuRepairNotice.classList.add("is-repairing");
   const rect=menu.getBoundingClientRect();
   const delta=offset(menu);
-  const targetX=rect.left-delta.x+rect.width/2;
-  const targetY=rect.top-delta.y+rect.height/2;
+  const homeX=rect.left-delta.x+rect.width/2-36;
+  const homeY=rect.top-delta.y+rect.height/2-54;
   const robot=document.createElement("div");
   robot.className="veyrost-repair-robot";
   robot.setAttribute("aria-hidden","true");
-  robot.innerHTML='<svg viewBox="0 0 72 84" xmlns="http://www.w3.org/2000/svg"><path class="robot-antenna" d="M36 8V3" stroke="#9DEBFF" stroke-width="3" stroke-linecap="round"/><circle cx="36" cy="3" r="3" fill="#9DEBFF"/><rect x="13" y="12" width="46" height="36" rx="12" fill="#B9B4FF" stroke="#F0EEFF" stroke-width="2"/><rect x="19" y="20" width="34" height="20" rx="7" fill="#111827"/><circle cx="28" cy="30" r="3.5" fill="#6FE6D0"/><circle cx="44" cy="30" r="3.5" fill="#6FE6D0"/><path d="M29 37Q36 41 43 37" fill="none" stroke="#6FE6D0" stroke-width="2" stroke-linecap="round"/><path d="M13 25H7V39H13M59 25H65V39H59" fill="none" stroke="#9DEBFF" stroke-width="3" stroke-linecap="round"/><rect x="23" y="50" width="26" height="19" rx="6" fill="#8D88D8"/><path class="robot-arm robot-arm-left" d="M23 54L12 65L19 70" fill="none" stroke="#B9B4FF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path class="robot-arm robot-arm-right" d="M49 54L60 65L53 70" fill="none" stroke="#B9B4FF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path class="robot-leg robot-leg-left" d="M29 69L25 80" stroke="#9DEBFF" stroke-width="5" stroke-linecap="round"/><path class="robot-leg robot-leg-right" d="M43 69L47 80" stroke="#9DEBFF" stroke-width="5" stroke-linecap="round"/></svg><span>REPAIRING</span>';
+  robot.innerHTML='<svg viewBox="0 0 72 84" xmlns="http://www.w3.org/2000/svg"><path d="M36 8V3" stroke="#9DEBFF" stroke-width="3" stroke-linecap="round"/><circle cx="36" cy="3" r="3" fill="#9DEBFF"/><rect x="13" y="12" width="46" height="36" rx="12" fill="#B9B4FF" stroke="#F0EEFF" stroke-width="2"/><rect x="19" y="20" width="34" height="20" rx="7" fill="#111827"/><circle cx="28" cy="30" r="3.5" fill="#6FE6D0"/><circle cx="44" cy="30" r="3.5" fill="#6FE6D0"/><path d="M29 37Q36 41 43 37" fill="none" stroke="#6FE6D0" stroke-width="2" stroke-linecap="round"/><path d="M13 25H7V39H13M59 25H65V39H59" fill="none" stroke="#9DEBFF" stroke-width="3" stroke-linecap="round"/><rect x="23" y="50" width="26" height="19" rx="6" fill="#8D88D8"/><path class="robot-arm robot-arm-left" d="M23 54L12 65L19 70" fill="none" stroke="#B9B4FF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path class="robot-arm robot-arm-right" d="M49 54L60 65L53 70" fill="none" stroke="#B9B4FF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M29 69L25 80M43 69L47 80" stroke="#9DEBFF" stroke-width="5" stroke-linecap="round"/></svg><span>VEYROST • REPAIR UNIT</span>';
   document.body.append(robot);
-  const startX=Math.max(12,Math.min(window.innerWidth-84,window.innerWidth-92));
-  const startY=Math.max(80,window.innerHeight-180);
-  robot.style.left="0px";robot.style.top="0px";
-  robot.style.transform="translate3d("+startX+"px,"+startY+"px,0)";
+  const startX=Math.max(8,Math.min(window.innerWidth-80,window.innerWidth-92));
+  const startY=Math.max(90,window.innerHeight-190);
   const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const travel=reduced?30:720;
-  requestAnimationFrame(()=>{
-    robot.style.transform="translate3d("+(targetX-36)+"px,"+(targetY-54)+"px,0)";
-  });
+  const approach=reduced?700:1250;
+  const repair=reduced?700:1250;
+  const finish=reduced?500:850;
+  robot.style.transform="translate3d("+startX+"px,"+startY+"px,0)";
+  robot.style.transitionDuration=(reduced?"0ms":"1250ms");
+  robot.style.opacity="1";
+  robot.style.visibility="visible";
+  robot.style.display="flex";
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    robot.style.transform="translate3d("+(rect.left+rect.width/2-36)+"px,"+(rect.top+rect.height/2-54)+"px,0)";
+  }));
   window.setTimeout(()=>{
     robot.classList.add("is-working");
-    menu.style.transition="translate "+(reduced?"120ms":"850ms")+" cubic-bezier(.2,.8,.2,1)";
+    menu.style.transition="translate "+(reduced?"350ms":"1250ms")+" cubic-bezier(.2,.8,.2,1)";
     menu.style.translate="0px 0px";
+    robot.style.transitionDuration=(reduced?"350ms":"1250ms");
+    robot.style.transform="translate3d("+homeX+"px,"+homeY+"px,0)";
     robot.classList.add("is-lifting");
-  },travel);
+  },approach);
   window.setTimeout(()=>{
     menu.style.transition="";
     menu.dataset.detached="false";
     updateMenuRepairNotice();
     robot.classList.add("is-leaving");
-  },travel+(reduced?140:900));
+  },approach+repair);
   window.setTimeout(()=>{
     robot.remove();
     menuRepairing=false;
     menuRepairButton.disabled=false;
     menuRepairNotice.classList.remove("is-repairing");
     toast((translations[language]||translations.en).menuRestored);
-  },travel+(reduced?220:1450));
+  },approach+repair+finish);
 });
 
 function offset(el){
