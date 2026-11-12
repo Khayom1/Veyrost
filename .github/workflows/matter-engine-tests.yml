@@ -3,7 +3,8 @@ name: Matter Engine checks
 on:
   push:
     branches:
-      - feat/veyrost-matter-engine-foundation
+      - main
+      - feat/**
   pull_request:
     branches:
       - main
@@ -27,5 +28,13 @@ jobs:
         run: |
           node -e 'const fs=require("node:fs"); const html=fs.readFileSync("matter-lab.html","utf8"); const match=html.match(/<script>\s*([\s\S]*?)<\/script>/i); if(!match) throw new Error("Inline lab script not found"); fs.writeFileSync("/tmp/matter-lab-inline.js",match[1]);'
           node --check /tmp/matter-lab-inline.js
-      - name: Run physics regression tests
-        run: node --test tests/matter-engine.test.cjs
+      - name: Run project regression tests
+        run: node --test tests/*.test.cjs tests/*.test.mjs
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install generator test dependency
+        run: python -m pip install requests
+      - name: Run generator safety tests
+        run: python -m unittest discover -s tests -p "test_*.py"
