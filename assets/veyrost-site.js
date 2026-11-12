@@ -50,7 +50,7 @@ function translateDocument(){
       node.nodeValue=leading+translated+trailing;
     }else node.nodeValue=source;
   }
-  $("[placeholder],[title],[aria-label],[data-label]").forEach(el=>{
+  $$("[placeholder],[title],[aria-label],[data-label]").forEach(el=>{
     if(!originalAttrs.has(el))originalAttrs.set(el,{});
     const saved=originalAttrs.get(el);
     ["placeholder","title","aria-label","data-label"].forEach(name=>{
@@ -65,7 +65,7 @@ function translateDocument(){
       if(name==="aria-label")el.setAttribute(name,value);
     });
   });
-  $("[data-lang]").forEach(el=>el.classList.toggle("active",el.dataset.lang===language));
+  $$("[data-lang]").forEach(el=>el.classList.toggle("active",el.dataset.lang===language));
   const pageTitle=document.querySelector("title");
   if(pageTitle){
     if(!pageTitle.dataset.i18nSource)pageTitle.dataset.i18nSource=pageTitle.textContent;
@@ -94,7 +94,7 @@ function applyLanguage(){
   const aura=$("#aura-toggle");
   if(aura){const state=aura.getAttribute("aria-pressed")==="true";aura.textContent=state?(translations[language]||translations.en).auraOn:(translations[language]||translations.en).auraOff;}
 }
-$$("[data-lang]").forEach(button=>button.addEventListener("click",()=>{
+$$$("[data-lang]").forEach(button=>button.addEventListener("click",()=>{
   const next=button.dataset.lang||"en";
   if(!dictionaries[next])return;
   language=next;
