@@ -360,6 +360,7 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
 @keyframes veyrost-cable-upper{from{translate:0 0}to{translate:-1.2px -1px}}
 @keyframes veyrost-cable-lower{from{translate:0 0}to{translate:1px 1.4px}}
 @keyframes veyrost-cable-side{from{translate:0 0}to{translate:1.5px -.6px}}
+.veyrost-detached-wires svg path:nth-of-type(n+11){filter:drop-shadow(0 0 .5px rgba(235,170,105,.55))}
 @media(prefers-reduced-motion:reduce){
  .veyrost-detached-wires svg path:nth-of-type(7),
  .veyrost-detached-wires svg path:nth-of-type(8),
