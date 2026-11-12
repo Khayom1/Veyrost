@@ -61,7 +61,7 @@ const checks = [
   ["3D-06","3D spatial environment","Mobile pixel-ratio cap and responsive layout","spatial-world.mjs",/setPixelRatio\(Math\.min[\s\S]*width < 680 \? 1\.2 : 1\.5/],
   ["3D-07","3D spatial environment","Independent panel depth layers in perspective scene","spatial-world.mjs",/userData\.depth = \[[-0-9., ]+\][\s\S]*position\.set\(position\.x, position\.y, panel\.group\.userData\.depth/],
   ["3D-08","3D spatial environment","Depth-aware panel tilt and floating animation","spatial-world.mjs",/group\.rotation\.set\([\s\S]*group\.rotation\.y \+=/],
-  ["3D-09","3D spatial environment","Spatial engine is mounted from a reachable public website route","spatial-page.mjs",/new SpatialWorldController[\\s\\S]*\.start\(\)/],
+  ["3D-09","3D spatial environment","Spatial engine is mounted from a reachable public website route","spatial-page.mjs",/new SpatialWorldController[\s\S]*\.start\(\)/],
   ["DPH-01","Depth-axis collision physics","Dedicated Z-axis physics world and body registry","spatial-depth-physics.mjs",/export class DepthPhysicsWorld[\s\S]*this\.bodies = new Map\(\)/],
   ["DPH-02","Depth-axis collision physics","Projected X/Y overlap gates depth collision","spatial-depth-physics.mjs",/function overlap2D[\s\S]*a\.width \+ b\.width[\s\S]*a\.height \+ b\.height/],
   ["DPH-03","Depth-axis collision physics","Mass-weighted positional correction","spatial-depth-physics.mjs",/1 \/ a\.mass[\s\S]*correction \* invA[\s\S]*correction \* invB/],
