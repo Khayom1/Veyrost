@@ -46,11 +46,10 @@ These are source-level capabilities. They do not mean the 3D engine is currently
 
 ## Still not implemented from the Service Crew concept
 
-- Rigged realistic technicians.
-- Service-vehicle arrival/departure and physical ladder handling.
+- Photorealistic scanned or production-grade rigged technician assets (current models are procedural low-poly geometry).
 - Tug-of-war with a held detached component.
-- Technician-controlled maintenance lock and repair sequence.
-- Cable reconnection animation.
+- Technician-controlled maintenance lock and protected-component repair sequence.
+- Hand-animated cable reconnection and post-repair interface restoration.
 - Localized character dialogue and emotion state machine.
 - Spatially positioned voices and synchronized mechanical sounds.
 
