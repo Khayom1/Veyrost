@@ -79,7 +79,7 @@ export function createProxyHandler(options:HandlerOptions) {
     if(new TextEncoder().encode(raw).byteLength>MAX_BODY_BYTES)return json({error:"request_too_large"},413,ch);
     let input:Record<string,unknown>;try{input=JSON.parse(raw);}catch{return json({error:"invalid_json"},400,ch);}
     if(!input||typeof input!=="object"||Array.isArray(input))return json({error:"invalid_payload"},400,ch);
-    if(input.action==="health")return json({ok:true,authenticated:true},200,ch);
+    if(input.action==="health")return json({ok:true,authenticated:true,configured:{deepseek:!!options.env.get("DEEPSEEK_API_KEY"),siliconflow:!!options.env.get("SILICONFLOW_API_KEY"),github:!!options.env.get("GITHUB_TOKEN"),google:!!options.env.get("GOOGLE_API_KEY")&&!!options.env.get("GOOGLE_CX")}},200,ch);
     const target=typeof input.target==="string"?validHttps(input.target):null;
     if(!target)return json({error:"target_not_allowed"},400,ch);
     const method=typeof input.method==="string"?input.method.toUpperCase():"GET";
