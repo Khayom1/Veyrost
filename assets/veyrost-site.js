@@ -263,16 +263,19 @@ menuRepairButton.addEventListener("click",async()=>{
   // The service vehicle enters from the right on the same horizontal level as the detached MENU.
   const vehicleX=clamp(rect.right+14,8,Math.max(8,vw-vehicleWidth-8));
   const startVehicleX=vw+vehicleWidth+24;
-  const doorAX=vehicleX+54,doorBX=vehicleX+132;
-  const robotStartY=lineY+18;
-  const robotExitY=clamp(lineY+vehicleHeight-18,4,Math.max(4,vh-robotHeight-4));
+  // Door anchors are measured from the parked vehicle's cabin, not the viewport edges.
+  const robotSize=vw<=760?58:82;
+  const doorAX=vehicleX+38,doorBX=vehicleX+124;
+  const cabinY=lineY+7;
+  const robotStartY=cabinY;
+  const robotExitY=lineY+vehicleHeight-robotSize+8;
   const robotAX=clamp(rect.left-robotWidth-8,4,Math.max(4,vw-robotWidth-4));
   const robotBX=clamp(rect.right+8,4,Math.max(4,vw-robotWidth-4));
   const robotAY=clamp(rect.top+rect.height/2-robotHeight/2,4,Math.max(4,vh-robotHeight-4));
   const robotBY=robotAY;
   vehicle.style.left=startVehicleX+"px";vehicle.style.top=lineY+"px";
   for(const [el,x] of [[techA,doorAX],[techB,doorBX]]){
-    Object.assign(el.style,{position:"fixed",left:x+"px",top:robotStartY+"px",right:"auto",bottom:"auto",width:"82px",height:"auto",margin:"0",transform:"none",translate:"none",opacity:"0",zIndex:"2147483647",pointerEvents:"none"});
+    Object.assign(el.style,{position:"fixed",left:x+"px",top:robotStartY+"px",right:"auto",bottom:"auto",width:robotSize+"px",height:"auto",margin:"0",transform:"none",translate:"none",opacity:"0",zIndex:"2147483647",pointerEvents:"none"});
   }
   const move=(el,x,y)=>{el.style.left=x+"px";el.style.top=y+"px";};
   try{
@@ -285,8 +288,8 @@ menuRepairButton.addEventListener("click",async()=>{
     await wait(220);
     // Step out from the vehicle's near-side door before walking to the detached control.
     techA.classList.add("is-walking");techB.classList.add("is-walking");
-    move(techA,clamp(doorAX-8,4,vw-robotWidth-4),robotExitY);
-    move(techB,clamp(doorBX-8,4,vw-robotWidth-4),robotExitY);
+    move(techA,doorAX-8,robotExitY);
+    move(techB,doorBX-8,robotExitY);
     await wait(620);
     move(techA,robotAX,robotAY);move(techB,robotBX,robotBY);
     await wait(780);
@@ -317,13 +320,14 @@ menuRepairButton.addEventListener("click",async()=>{
     await wait(260);
     techA.classList.remove("is-working");techB.classList.remove("is-working");
     techA.classList.add("is-walking");techB.classList.add("is-walking");
-    move(techA,doorAX,robotExitY);move(techB,doorBX,robotExitY);
-    await wait(680);
-    // Board the service vehicle: each technician disappears behind its side panel before departure.
+    // Return to the exact cabin anchors. The robots move fully inside the vehicle body.
+    move(techA,doorAX,robotStartY);move(techB,doorBX,robotStartY);
+    await wait(720);
+    // Only after reaching the cabin do they board and disappear inside.
     techA.classList.add("is-boarding");techB.classList.add("is-boarding");
-    await wait(340);
+    await wait(460);
     techA.style.opacity="0";techB.style.opacity="0";
-    await wait(420);
+    await wait(520);
     vehicle.classList.add("is-driving-away");vehicle.style.left=startVehicleX+"px";
     await wait(1250);
     toast((translations[language]||translations.en).menuRestored);
