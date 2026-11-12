@@ -64,7 +64,7 @@ const checks = [
   ["3D-09","3D spatial environment","Spatial engine is mounted from a reachable public website route","spatial-page.mjs",/new SpatialWorldController[\s\S]*\.start\(\)/],
   ["DPH-01","Depth-axis collision physics","Dedicated Z-axis physics world and body registry","spatial-depth-physics.mjs",/export class DepthPhysicsWorld[\s\S]*this\.bodies = new Map\(\)/],
   ["DPH-02","Depth-axis collision physics","Projected X/Y overlap gates depth collision","spatial-depth-physics.mjs",/function overlap2D[\s\S]*a\.width \+ b\.width[\s\S]*a\.height \+ b\.height/],
-  ["DPH-03","Depth-axis collision physics","Mass-weighted positional correction","spatial-depth-physics.mjs",/1 \/ a\.mass[\s\S]*correction \* invA[\s\S]*correction \* invB/],
+  ["DPH-03","Depth-axis collision physics","Mass-weighted positional correction","spatial-depth-physics.mjs",/1 \/ a\.mass[\s\S]*correction \* inverseA[\s\S]*correction \* inverseB/],
   ["DPH-04","Depth-axis collision physics","Restitution-based depth impulse response","spatial-depth-physics.mjs",/1 \+ this\.restitution[\s\S]*velocityZ/],
   ["DPH-05","Depth-axis collision physics","Matter X/Y synchronization and depth-render integration","spatial-world.mjs",/depthBody\.x = planar\.x \+ planar\.width \/ 2[\s\S]*this\.depthPhysics\.step\(delta\)[\s\S]*panel\.group\.position\.z = depthBody\.z/],
   ["DPH-06","Depth-axis collision physics","Layout reset restores initial depth and clears Z velocity","spatial-world.mjs",/this\.physics\.reset\(\)[\s\S]*this\.depthPhysics\?\.reset\(\)/],
