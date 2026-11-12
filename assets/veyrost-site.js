@@ -176,6 +176,8 @@ function applyLanguage(){
   const t=dictionaries[language]||dictionaries.en;
   const edit=$("#layout-toggle");
   if(edit)edit.textContent=edit.getAttribute("aria-pressed")==="true"?(translations[language]||translations.en).done:(translations[language]||translations.en).move;
+  const hint=$("#edit-hint");
+  if(hint)hint.textContent=(translations[language]||translations.en).editHint;
 }
 $$("[data-lang]").forEach(button=>button.addEventListener("click",()=>{
   const next=button.dataset.lang||"en";
