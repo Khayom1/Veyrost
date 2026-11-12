@@ -279,7 +279,12 @@ menuRepairButton.addEventListener("click",async()=>{
   vehicle.innerHTML='<svg viewBox="0 0 220 100" aria-hidden="true"><path d="M16 58h126l24-29h26l15 29h7v20H16z" fill="#17263a" stroke="#7de6ed" stroke-width="2"/><path d="M145 57l22-24h22l12 24z" fill="#233d54" stroke="#9defff" stroke-width="2"/><path d="M20 64h186" stroke="#a9b8d2" stroke-width="3"/><rect x="28" y="38" width="76" height="22" rx="5" fill="#26354c" stroke="#9b91ff" stroke-width="2"/><path d="M39 49h53M39 55h33" stroke="#8de8ed" stroke-width="2"/><circle cx="52" cy="80" r="13" fill="#080d17" stroke="#9da9c1" stroke-width="4"/><circle cx="52" cy="80" r="4" fill="#70e7df"/><circle cx="176" cy="80" r="13" fill="#080d17" stroke="#9da9c1" stroke-width="4"/><circle cx="176" cy="80" r="4" fill="#70e7df"/><path d="M4 65h12M207 65h10" stroke="#6fe6d0" stroke-width="4" stroke-linecap="round"/></svg><span>VEYROST SERVICE UNIT</span>';
   const makeTechnician=(number,accent)=>{
     const el=document.createElement("div");el.className="veyrost-tech-person";
-    el.innerHTML='<svg viewBox="0 0 100 116" aria-hidden="true"><defs><linearGradient id="robot-metal-'+number+'" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e0e8ef"/><stop offset=".42" stop-color="#778797"/><stop offset="1" stop-color="#273441"/></linearGradient><linearGradient id="robot-dark-'+number+'" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#263746"/><stop offset="1" stop-color="#0b121a"/></linearGradient></defs><path d="M50 2v9M50 8l-7-5m7 5l7-5" stroke="'+accent+'" stroke-width="2.4" stroke-linecap="round"/><circle cx="50" cy="3" r="2.4" fill="'+accent+'"/><path d="M32 25L35 15L43 11H57L65 15L68 25L63 32H37Z" fill="url(#robot-metal-'+number+')" stroke="#dce7ef" stroke-width="1.8"/><path d="M35 24L41 19H59L65 24L62 30H38Z" fill="url(#robot-dark-'+number+')" stroke="'+accent+'" stroke-width="1.7"/><rect x="41" y="22" width="7" height="4" rx="1.5" fill="'+accent+'"/><rect x="52" y="22" width="7" height="4" rx="1.5" fill="'+accent+'"/><path d="M50 31v5m-4-1h8" stroke="#dce7ef" stroke-width="2" stroke-linecap="round"/><path d="M38 37L31 42L33 62L41 69H59L67 62L69 42L62 37Z" fill="url(#robot-dark-'+number+')" stroke="#aebdca" stroke-width="1.8"/><path d="M39 40L50 36L61 40L59 48H41Z" fill="url(#robot-metal-'+number+')" stroke="'+accent+'" stroke-width="1.7"/><path d="M43 51H57L61 62L50 67L39 62Z" fill="#111d28" stroke="'+accent+'" stroke-width="1.5"/><path d="M46 53v8m8-8v8M50 39v7" stroke="'+accent+'" stroke-width="2" stroke-linecap="round"/><circle cx="50" cy="57" r="2.5" fill="'+accent+'"/><path d="M32 42L24 47L19 62L24 65L32 55M68 42L76 47L81 62L76 65L68 55" fill="none" stroke="url(#robot-metal-'+number+')" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="22" cy="64" r="5" fill="#172532" stroke="'+accent+'" stroke-width="1.7"/><circle cx="78" cy="64" r="5" fill="#172532" stroke="'+accent+'" stroke-width="1.7"/><path d="M22 69l-4 8 5 5 8-9m47-4l4 8-5 5-8-9" fill="none" stroke="#aebdca" stroke-width="4" stroke-linecap="round"/><path d="M42 68L38 75L40 88H47L50 77L53 88H60L62 75L58 68Z" fill="url(#robot-metal-'+number+')" stroke="#dce7ef" stroke-width="1.7"/><path d="M40 76H47L45 84H40ZM53 76H60L60 84H55Z" fill="#101a24" stroke="'+accent+'" stroke-width="1.2"/><path d="M42 89L38 101L43 105L49 91M58 89L62 101L57 105L51 91" fill="none" stroke="url(#robot-metal-'+number+')" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M37 105h9m8 0h9" stroke="'+accent+'" stroke-width="2.5" stroke-linecap="round"/><path d="M34 45l-4 10m36-10l4 10" stroke="'+accent+'" stroke-width="1.3" opacity=".9"/><circle cx="50" cy="73" r="2" fill="'+accent+'"/></svg><span>UNIT '+number+'</span>';
+    el.innerHTML='<svg viewBox="0 0 100 116" aria-hidden="true"><defs><linearGradient id="robot-metal-\'+number+\'" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#edf4f8"/><stop offset=".38" stop-color="#91a1af"/><stop offset=".72" stop-color="#536473"/><stop offset="1" stop-color="#263441"/></linearGradient><linearGradient id="robot-dark-\'+number+\'" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#263947"/><stop offset="1" stop-color="#0a121a"/></linearGradient><linearGradient id="robot-glass-\'+number+\'" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#18384a"/><stop offset="1" stop-color="#07131e"/></linearGradient></defs>
+<path d="M50 2v9m-7-6 7 5 7-5" fill="none" stroke="\'+accent+\'" stroke-width="2.4" stroke-linecap="round"/><circle cx="50" cy="3" r="2.5" fill="\'+accent+\'"/>
+<path d="M32 24l4-10 8-4h12l8 4 4 10-5 9H37z" fill="url(#robot-metal-\'+number+\')" stroke="#e3edf4" stroke-width="1.8"/><path d="M35 23l6-5h18l6 5-3 7H38z" fill="url(#robot-glass-\'+number+\')" stroke="\'+accent+\'" stroke-width="1.7"/><rect x="41" y="22" width="7" height="4" rx="1.5" fill="\'+accent+\'"/><rect x="52" y="22" width="7" height="4" rx="1.5" fill="\'+accent+\'"/><path d="M50 31v5m-4-1h8" stroke="#dce7ef" stroke-width="2" stroke-linecap="round"/><path d="M38 37l-7 5 2 21 8 7h18l8-7 2-21-7-5z" fill="url(#robot-dark-\'+number+\')" stroke="#aebdca" stroke-width="1.8"/><path d="M39 40l11-4 11 4-2 9H41z" fill="url(#robot-metal-\'+number+\')" stroke="\'+accent+\'" stroke-width="1.7"/><path d="M42 52h16l3 10-11 6-11-6z" fill="#101b25" stroke="\'+accent+\'" stroke-width="1.5"/><path d="M46 53v8m8-8v8m-4-20v7" stroke="\'+accent+\'" stroke-width="2" stroke-linecap="round"/><circle cx="50" cy="58" r="2.5" fill="\'+accent+\'"/><path d="M38 73l-4 8 5 5 11-7 11 7 5-5-4-8" fill="none" stroke="url(#robot-metal-\'+number+\')" stroke-width="5" stroke-linejoin="round"/><path d="M40 78h20" stroke="\'+accent+\'" stroke-width="1.4"/>
+<g class="robot-arm robot-arm-left"><path d="M33 44L23 53" stroke="url(#robot-metal-\'+number+\')" stroke-width="7" stroke-linecap="round"/><circle cx="23" cy="53" r="4.2" fill="#263746" stroke="\'+accent+\'" stroke-width="1.6"/><path d="M23 53L19 67" stroke="url(#robot-metal-\'+number+\')" stroke-width="6" stroke-linecap="round"/><circle cx="19" cy="67" r="3.2" fill="#172532" stroke="#dce7ef" stroke-width="1.2"/><g class="robot-hand robot-hand-left"><path d="M19 67l-2 8-5 3m7-3 3 5m-8-2 5 1" fill="none" stroke="#e0e9ef" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="19" cy="67" r="2.2" fill="\'+accent+\'"/></g></g>
+<g class="robot-arm robot-arm-right"><path d="M67 44L77 53" stroke="url(#robot-metal-\'+number+\')" stroke-width="7" stroke-linecap="round"/><circle cx="77" cy="53" r="4.2" fill="#263746" stroke="\'+accent+\'" stroke-width="1.6"/><path d="M77 53L81 67" stroke="url(#robot-metal-\'+number+\')" stroke-width="6" stroke-linecap="round"/><circle cx="81" cy="67" r="3.2" fill="#172532" stroke="#dce7ef" stroke-width="1.2"/><g class="robot-hand robot-hand-right"><path d="M81 67l2 8 5 3m-7-3-3 5m8-2-5 1" fill="none" stroke="#e0e9ef" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="81" cy="67" r="2.2" fill="\'+accent+\'"/></g><g class="robot-welder"><path d="M82 76l4 5-2 7" fill="none" stroke="#dce7ef" stroke-width="2.2" stroke-linecap="round"/><path d="M82 86l5 2-2 4-5-2z" fill="#263746" stroke="\'+accent+\'" stroke-width="1.2"/><path class="welder-beam" d="M85 92l4 5m-4-3 6 1m-6 1 1 6" stroke="\'+accent+\'" stroke-width="1.5" stroke-linecap="round"/></g></g>
+<path d="M42 88l-4 13 5 4 7-13 7 13 5-4-4-13" fill="none" stroke="url(#robot-metal-\'+number+\')" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M37 105h10m6 0h10" stroke="\'+accent+\'" stroke-width="2.5" stroke-linecap="round"/><circle cx="50" cy="75" r="2" fill="\'+accent+\'"/></svg><span>UNIT \'+number+\'</span>';
     return el;
   };
   const techA=makeTechnician("01","#6FE6D0"),techB=makeTechnician("02","#A98CFF");
@@ -324,31 +329,67 @@ menuRepairButton.addEventListener("click",async()=>{
     move(techA,robotAX,robotAY);move(techB,robotBX,robotBY);
     await wait(780);
     techA.classList.remove("is-walking");techB.classList.remove("is-walking");
-    // Robot A physically carries MENU to its original mount; robot B independently reconnects the seven leads at the wall opening.
+    // Robot B starts the individual seven-cable reconnection while Robot A grips and transports MENU.
     menu.style.visibility="hidden";
-    techA.classList.add("is-carrying");
-    techB.classList.add("is-wiring");
     const homeX=(menuHomePosition?.left??(targetX+window.scrollX))-window.scrollX;
     const homeY=(menuHomePosition?.top??(targetY+window.scrollY))-window.scrollY;
-    const wireRobotX=clamp(homeX+rect.width+12,4,vw-robotWidth-4);
-    const wireRobotY=clamp(homeY+rect.height/2-robotHeight/2,4,vh-robotHeight-4);
+    techB.classList.add("is-wiring");
+    const wireRobotX=clamp(homeX+rect.width+14,4,vw-robotWidth-4);
+    const wireRobotY=clamp(homeY+rect.height/2-robotHeight+14,4,vh-robotHeight-4);
     move(techB,wireRobotX,wireRobotY);
-    await wait(180);
-    carried.style.left=targetX+"px";carried.style.top=targetY+"px";
-    move(techA,clamp(targetX-robotWidth+8,4,vw-robotWidth-4),clamp(targetY+rect.height/2-robotHeight/2,4,vh-robotHeight-4));
-    await wait(1580);
+
+    // Bring the carrier directly behind MENU. Both articulated grippers reach around its edges.
+    const carryX=clamp(rect.left+rect.width/2-robotWidth/2,4,vw-robotWidth-4);
+    const carryY=clamp(rect.top-robotHeight+35,4,vh-robotHeight-4);
+    techA.classList.add("is-grabbing");
+    move(techA,carryX,carryY);
+    await wait(720);
+    carried.style.transition="left 260ms ease,top 260ms cubic-bezier(.2,.8,.2,1),transform 260ms ease";
+    carried.classList.add("is-lifting");
+    carried.style.top=(rect.top-12)+"px";
+    await wait(320);
+    techA.classList.remove("is-grabbing");
+    techA.classList.add("is-carrying");
+    carried.style.transition="left 1850ms cubic-bezier(.22,.72,.25,1),top 1850ms cubic-bezier(.22,.72,.25,1),transform 260ms ease";
+    const destinationX=homeX+menuHomePosition.width/2-rect.width/2;
+    const destinationY=homeY+menuHomePosition.height/2-rect.height/2;
+    carried.style.left=destinationX+"px";
+    carried.style.top=destinationY+"px";
+    move(techA,clamp(destinationX+rect.width/2-robotWidth/2,4,vw-robotWidth-4),clamp(destinationY-robotHeight+35,4,vh-robotHeight-4));
+
+    const wireSequence=(async()=>{
+      const letters=["a","b","c","d","e","f","g"];
+      for(let i=0;i<letters.length;i++){
+        const lead=detachedMenuWires?.querySelector(".wire-"+letters[i]);
+        lead?.classList.add("is-connecting");
+        techB.classList.toggle("is-wire-reach",i%2===0);
+        await wait(300);
+        lead?.classList.remove("is-connecting");
+        lead?.classList.add("is-connected");
+        await wait(90);
+      }
+      techB.classList.remove("is-wire-reach");
+      techB.classList.add("is-working");
+      detachedMenuWires?.classList.add("is-reconnecting");
+    })();
+
+    await wait(1900);
     techA.classList.remove("is-carrying");
+    techA.classList.add("is-setting-down");
+    carried.classList.remove("is-lifting");
+    carried.style.transition="top 360ms cubic-bezier(.2,.8,.2,1),transform 360ms ease";
+    carried.style.top=destinationY+"px";
+    await wait(400);
+    techA.classList.remove("is-setting-down");
     techA.classList.add("is-working");
+    await wireSequence;
     const repairFx=document.createElement("div");repairFx.className="veyrost-menu-repair-fx";
     repairFx.innerHTML='<svg viewBox="0 0 120 90" aria-hidden="true"><path d="M19 22l10 10-8 8-10-10a14 14 0 0018 18l28 28 9-9-28-28a14 14 0 00-19-17zM91 8l-8 8 7 7-18 18 7 7 18-18 7 7 8-8-21-21z" fill="none" stroke="#8ff4e4" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M60 4v12M44 11l7 8M76 11l-7 8M60 66v15M47 70l-7 8M73 70l7 8" stroke="#d7fbff" stroke-width="3" stroke-linecap="round"/></svg><span>7 CABLES • RECONNECTED</span>';
     Object.assign(repairFx.style,{position:"fixed",left:(homeX+rect.width/2-60)+"px",top:(homeY+rect.height/2-45)+"px",width:"120px",height:"90px",zIndex:"2147483647",pointerEvents:"none"});
     overlay.append(repairFx);
-    if(detachedMenuWires)detachedMenuWires.classList.add("is-reconnecting");
-    await wait(1900);
+    await wait(900);
     repairFx.classList.add("is-complete");
     await wait(500);
-    techB.classList.remove("is-wiring");
-    techB.classList.add("is-working");
     // Reveal the real MENU only after the repair sequence is complete.
     menu.style.transition="none";menu.style.translate="0px 0px";menu.style.visibility="";
     detachedMenuState=false;menu.dataset.detached="false";updateMenuRepairNotice();
