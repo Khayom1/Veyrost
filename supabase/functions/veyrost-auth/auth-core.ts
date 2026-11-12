@@ -7,7 +7,7 @@ function publicKey(env:Env):string{
   return env.get("SUPABASE_ANON_KEY")||"";
 }
 function cors(origin:string|null,env:Env):Record<string,string>{
-  const list=(env.get("VEYROST_ALLOWED_ORIGINS")||"").split(",").map(x=>x.trim()).filter(Boolean);
+  const list=(env.get("VEYROST_ALLOWED_ORIGINS")||"https://veyrost.is-a.dev,https://khayom1.github.io").split(",").map(x=>x.trim()).filter(Boolean);
   return {"access-control-allow-origin":!origin?"*":(!list.length?"*":(list.includes(origin)?origin:"null")),"access-control-allow-headers":"apikey, content-type","access-control-allow-methods":"POST, OPTIONS","access-control-max-age":"600","vary":"Origin"};
 }
 export function createAuthHandler(options:Options){
