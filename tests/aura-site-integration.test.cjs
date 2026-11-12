@@ -104,8 +104,8 @@ test("navigation menu and settings entry are visible and available on every page
     assert.match(html, /href="studio.html#workspace-settings"/);
     assert.ok(html.includes("veyrost-corporate.css?v=20261112-6"));
   }
-  assert.match(css, /\.menu-toggle\\{display:inline-flex/);
-  assert.match(css, /\.mobile-nav\.open\\{display:grid/);
+  assert.ok(css.includes(".menu-toggle{display:inline-flex"));
+  assert.ok(css.includes(".mobile-nav.open{display:grid"));
   const studioHtml = fs.readFileSync("studio.html", "utf8");
   assert.match(studioHtml, /id="workspace-settings"/);
 });
