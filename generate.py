@@ -221,6 +221,14 @@ def publish_generated_files(paths, repo_path, message):
         relative_paths.append(relative.as_posix())
     if not relative_paths:
         raise ValueError("No generated files were supplied for publishing.")
+    existing_staged = subprocess.run(
+        ["git", "-C", str(root), "diff", "--cached", "--quiet"],
+        check=False, capture_output=True, text=True
+    )
+    if existing_staged.returncode == 1:
+        raise RuntimeError("Refusing to publish while unrelated changes are already staged.")
+    if existing_staged.returncode != 0:
+        raise subprocess.CalledProcessError(existing_staged.returncode, existing_staged.args)
     subprocess.run(
         ["git", "-C", str(root), "add", "--", *relative_paths],
         check=True, capture_output=True, text=True
