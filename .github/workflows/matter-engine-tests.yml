@@ -34,6 +34,12 @@ jobs:
           node --check /tmp/index-advanced-inline.js
       - name: Run project regression tests
         run: node --test tests/*.test.cjs tests/*.test.mjs
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Test Supabase Edge Functions
+        run: deno test supabase/functions/veyrost-proxy/index_test.ts supabase/functions/veyrost-auth/index_test.ts
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
