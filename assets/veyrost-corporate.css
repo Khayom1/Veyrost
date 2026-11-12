@@ -335,3 +335,18 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
  .veyrost-repair-layer .veyrost-tech-person{width:58px!important;min-width:58px!important}
  .veyrost-repair-layer .veyrost-tech-person svg{width:58px!important;height:68px!important}
 }
+
+/* Exposed severed wiring left behind when the physical Menu switch is detached. */
+.veyrost-detached-wires{
+ position:fixed;width:92px;height:74px;z-index:10040;pointer-events:none;
+ opacity:1;filter:drop-shadow(0 2px 5px #000b);
+ animation:veyrost-wire-reveal .32s ease-out both;
+}
+.veyrost-detached-wires svg{display:block;width:100%;height:100%;overflow:visible}
+.veyrost-detached-wires .wire-sleeve{fill:#172638;stroke:#8295ad;stroke-width:2}
+.veyrost-detached-wires .wire-core{fill:none;stroke:#e8b75f;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
+.veyrost-detached-wires .wire-core:nth-child(2){stroke:#69d9d1}
+.veyrost-detached-wires .wire-spark{fill:none;stroke:#b9f7ff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.8;animation:veyrost-wire-spark .9s ease-in-out infinite alternate}
+@keyframes veyrost-wire-reveal{from{opacity:0;transform:translateY(5px) scale(.88)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes veyrost-wire-spark{from{opacity:.25}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.veyrost-detached-wires,.veyrost-detached-wires .wire-spark{animation:none}}
