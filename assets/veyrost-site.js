@@ -148,7 +148,7 @@ let physicsWorld=null,physicsFrame=0;
 function clearButtonPhysics(){
   if(physicsFrame)cancelAnimationFrame(physicsFrame);
   physicsFrame=0;
-  physicalBodies.forEach(({el})=>{el.style.scale="";el.style.transformOrigin="";});
+  physicalBodies.forEach((body,el)=>{el.style.scale="";el.style.transformOrigin="";});
   physicalBodies.clear();physicsWorld=null;
 }
 function renderButtonPhysics(){
