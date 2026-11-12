@@ -212,10 +212,3 @@ html.veyrost-layout-editing button:not(#layout-toggle):not(#aura-toggle):not(.me
 html.veyrost-layout-editing button:not(#layout-toggle):not(#aura-toggle):not(.menu-repair-button):active{cursor:grabbing!important}
 
 
-/* Integrated test controls live in the site header, beside the real interface controls. */
-.veyrost-button-lab{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap;padding:7px clamp(12px,3vw,28px);border-top:1px solid rgba(130,160,210,.12);background:rgba(8,12,22,.72)}
-.button-lab-title{margin-right:auto;color:#91a9d0;font:700 9px/1 system-ui;letter-spacing:.16em}
-.veyrost-button-lab button{min-height:32px;padding:7px 11px;border:1px solid rgba(150,170,220,.24);border-radius:9px;background:#141b2b;color:#dfe8ff;font:700 9px/1.2 system-ui;letter-spacing:.04em;touch-action:manipulation}
-.veyrost-button-lab button.test-pulse{background:#285c64;border-color:#7de4cf}
-html.veyrost-layout-editing .veyrost-button-lab button{touch-action:none!important;cursor:grab!important;will-change:translate,scale}
-@media(max-width:560px){.veyrost-button-lab{justify-content:center;gap:6px;padding:7px 8px}.button-lab-title{width:100%;text-align:center;margin:0 0 2px}.veyrost-button-lab button{flex:1;min-width:0;padding:7px 5px;font-size:8px}}
