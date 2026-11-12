@@ -87,3 +87,10 @@ These checks harden the source lifecycle. They do not replace browser interactio
 ## Phase 4 — service crew 3D scene
 
 The spatial route now mounts a procedural 3D maintenance vehicle and two articulated technicians with helmets, safety vests and tool gear. The vehicle enters and parks; a roof-mounted metal ladder unfolds; the lead technician climbs while the support technician remains at ground level. The sequence uses a deterministic, bounded state machine and pauses with the spatial simulation. A guarded departure action folds the ladder before the crew and vehicle leave. Tug-of-war, protected-control locking during maintenance, cable repair, dialogue and sound remain later-phase work. The character assets are procedural low-poly models, not scanned or photorealistic rigged characters.
+
+
+## Phase 5 — interaction and repair
+
+The repair action now starts a technician-led transaction rather than instantly snapping a protected panel into place. The transaction locks user manipulation, animates both technicians in a tug-of-war, aligns the detached panel, moves a connector along a live 3D cable, verifies the connection, and only then restores the planar Matter body, depth body and protected-control lifecycle. Multiple detached protected controls are processed sequentially. The crew departs after the final repair. The sequence pauses with the spatial simulation and is cancelled safely by layout reset.
+
+This remains a deterministic scripted interaction layered over the existing hybrid 2.5D physics; it is not a full rope/soft-body solver or physically simulated two-human grasp system.
