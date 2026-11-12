@@ -369,4 +369,5 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
 /* The original header plane must always sit above the wall aperture and its cables. */
 .site-header{position:sticky!important;z-index:1000!important;isolation:isolate!important}
 #menu-toggle{position:relative!important;z-index:10060!important}
-.veyrost-detached-wires{z-index:1!important}
+.site-header .veyrost-detached-wires{position:fixed!important;z-index:1!important;pointer-events:none!important}
+.site-header #menu-toggle{position:relative!important;z-index:10060!important}
