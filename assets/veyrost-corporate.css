@@ -206,3 +206,7 @@ html.veyrost-menu-detached.veyrost-layout-editing #menu-toggle[data-veyrost-layo
  .veyrost-repair-layer .veyrost-repair-robot{width:76px!important;min-width:76px!important}
  .veyrost-repair-layer .veyrost-repair-robot svg{width:76px!important;height:88px!important}
 }
+
+/* VEYROST physical button bodies: collision-ready controls in layout edit mode. */
+html.veyrost-layout-editing button:not(#layout-toggle):not(#aura-toggle):not(.menu-repair-button){touch-action:none!important;will-change:translate,scale;transform-origin:center;transition:scale 70ms linear;cursor:grab!important}
+html.veyrost-layout-editing button:not(#layout-toggle):not(#aura-toggle):not(.menu-repair-button):active{cursor:grabbing!important}
