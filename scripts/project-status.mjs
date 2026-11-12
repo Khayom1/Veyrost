@@ -84,6 +84,10 @@ const checks = [
   ["PRO-03","Protected control lifecycle","Detached control reveals fixed 3D mount socket","spatial-world.mjs",/_buildProtectedSocket[\s\S]*socket\.visible = true/],
   ["PRO-04","Protected control lifecycle","Repair restores mount, original depth and hides socket","spatial-world.mjs",/control\.beginRepair\(\)[\s\S]*this\.physics\.repair\(id\)[\s\S]*depthBody\.z = depthBody\.initialZ[\s\S]*control\.completeRepair\(\)[\s\S]*socket\.visible = false/],
   ["PRO-05","Protected control lifecycle","Repair action is localized in EN/RU/TJ","spatial-world.mjs",/repair: "REPAIR MOUNT"[\s\S]*repair: "ВОССТАНОВИТЬ КРЕПЛЕНИЕ"[\s\S]*repair: "ПАЙВАСТКУНИРО БАРҚАРОР КУН"/],
+  ["PRO-06","Protected control lifecycle","Protected component IDs are non-empty and canonicalized","protected-control.mjs",/normalizeControlId[\s\S]*Protected control ID must be non-empty/],
+  ["PRO-07","Protected control lifecycle","Lifecycle snapshots are immutable","protected-control.mjs",/Object\.freeze\(\{[\s\S]*id: this\.id[\s\S]*revision: this\.revision/],
+  ["PRO-08","Protected control lifecycle","Protected detachment synchronizes state machine and Matter physics","spatial-world.mjs",/const synchronized = result\.reason[\s\S]*this\.physics\.tryDetach\(id\)/],
+  ["PRO-09","Protected control lifecycle","Failed repairs roll back to detached state","protected-control.mjs",/cancelRepair\(\)[\s\S]*PROTECTED_CONTROL_STATES\.REPAIRING[\s\S]*PROTECTED_CONTROL_STATES\.DETACHED/],
 
 
   ["CREW-01","Technician service sequence","Rigged realistic technician character models",null,null],
