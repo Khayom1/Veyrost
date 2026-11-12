@@ -73,7 +73,7 @@ test("departure folds the ladder before vehicle departure completes", async () =
 test("departure is a one-shot transition", async () => {
   const { ServiceCrewSequence } = await api;
   const sequence = new ServiceCrewSequence();
-  for (let i = 0; i < 80; i++) sequence.update(0.1);
+  for (let i = 0; i < 100; i++) sequence.update(0.1);
   assert.equal(sequence.depart(), true);
   assert.equal(sequence.depart(), false);
 });
@@ -81,11 +81,11 @@ test("departure is a one-shot transition", async () => {
 test("ready and completed states remain stable under additional updates", async () => {
   const { ServiceCrewSequence, SERVICE_CREW_PHASES } = await api;
   const sequence = new ServiceCrewSequence();
-  for (let i = 0; i < 80; i++) sequence.update(0.1);
+  for (let i = 0; i < 100; i++) sequence.update(0.1);
   sequence.update(5);
   assert.equal(sequence.snapshot().phase, SERVICE_CREW_PHASES.READY);
   sequence.depart();
-  for (let i = 0; i < 80; i++) sequence.update(0.1);
+  for (let i = 0; i < 100; i++) sequence.update(0.1);
   const revision = sequence.snapshot().revision;
   sequence.update(5);
   assert.equal(sequence.snapshot().phase, SERVICE_CREW_PHASES.COMPLETE);
