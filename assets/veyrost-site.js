@@ -163,11 +163,12 @@ function renderButtonPhysics(){
   physicsFrame=requestAnimationFrame(renderButtonPhysics);
 }
 function ensurePhysicsTestButtons(){
-  let panel=$("#veyrost-physics-test-panel");
+  $("#veyrost-physics-test-panel")?.remove();
+  let panel=$("#veyrost-header-button-lab");
   if(!panel){
     const header=$(".site-header"),inner=header?.querySelector(".header-inner");
     if(!header||!inner)return;
-    panel=document.createElement("div");panel.id="veyrost-physics-test-panel";panel.className="veyrost-button-lab";
+    panel=document.createElement("div");panel.id="veyrost-header-button-lab";panel.className="veyrost-button-lab";
     panel.innerHTML='<span class="button-lab-title">BUTTON LAB</span><button type="button" data-physics-test="light" data-test-action="state">STATE: OFF</button><button type="button" data-physics-test="standard" data-test-action="count">COUNT: 0</button><button type="button" data-physics-test="heavy" data-test-action="ping">PING</button><button type="button" data-physics-test="spring" data-test-action="reset">RESET</button>';
     inner.insertAdjacentElement("afterend",panel);
     panel.addEventListener("click",event=>{
