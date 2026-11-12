@@ -42,7 +42,15 @@ export function createAuthHandler(options:Options){
       const upstream=await fetchImpl(base+endpoint,{method:"POST",headers:{"apikey":key,"content-type":"application/json"},body:JSON.stringify(body),signal:AbortSignal.timeout(20_000),redirect:"manual"});
       let data:Record<string,unknown>={};try{data=await upstream.json();}catch{}
       if(!upstream.ok){const message=typeof data.msg==="string"?data.msg:(typeof data.message==="string"?data.message:"authentication_failed");return json({error:message.slice(0,180)},upstream.status,ch);}
-      return json({ok:true,access_token:typeof data.access_token==="string"?data.access_token:null,refresh_token:typeof data.refresh_token==="string"?data.refresh_token:null,expires_in:typeof data.expires_in==="number"?data.expires_in:null,token_type:typeof data.token_type==="string"?data.token_type:null,user:data.user||null,needs_email_confirmation:!data.access_token,publishable_key:key},200,ch);
+      const rawUser = data.user && typeof data.user === "object" ? data.user as Record<string,unknown> : {};
+      const safeUser = {
+        id: typeof rawUser.id === "string" ? rawUser.id : null,
+        email: typeof rawUser.email === "string" ? rawUser.email : null,
+        role: typeof rawUser.role === "string" ? rawUser.role : null,
+        created_at: typeof rawUser.created_at === "string" ? rawUser.created_at : null,
+        email_confirmed_at: typeof rawUser.email_confirmed_at === "string" ? rawUser.email_confirmed_at : null
+      };
+      return json({ok:true,access_token:typeof data.access_token==="string"?data.access_token:null,refresh_token:typeof data.refresh_token==="string"?data.refresh_token:null,expires_in:typeof data.expires_in==="number"?data.expires_in:null,token_type:typeof data.token_type==="string"?data.token_type:null,user:rawUser.id?safeUser:null,needs_email_confirmation:!data.access_token,publishable_key:key},200,ch);
     }catch{return json({error:"auth_upstream_unavailable"},502,ch);}
   };
 }
