@@ -18,6 +18,7 @@ test("service vehicle has a detailed body, cab, glass, wheels and warning beacon
   assert.match(visual, /new THREE\.CylinderGeometry\(0\.27, 0\.27, 0\.16, 16\)/);
   assert.match(visual, /vehicle\.userData\.wheels/);
   assert.match(visual, /vehicle\.userData\.beacon/);
+  assert.match(visual, /vehicle\.userData\.beacon\.emissiveIntensity/);
 });
 
 test("two articulated technicians include safety helmets, vests and tool gear", () => {
@@ -38,6 +39,7 @@ test("technician climbing animation drives body position and articulated limbs",
   assert.match(visual, /const climbing = phase === SERVICE_CREW_PHASES\.CLIMBING/);
   assert.match(visual, /this\.leadTechnician\.position\.set\(/);
   assert.match(visual, /leadLimbs\.leftLeg\.rotation\.x/);
+  assert.match(visual, /phase === SERVICE_CREW_PHASES\.FOLDING \? 1 - state\.progress : 0/);
 });
 
 test("service crew exposes controlled ladder folding and vehicle departure", () => {
