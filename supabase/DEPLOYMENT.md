@@ -14,9 +14,9 @@ Set these in Supabase Dashboard → Edge Functions → Secrets, or with the Supa
 - GITHUB_TOKEN — use a fine-grained token restricted to only the repositories and permissions Veyrost needs.
 - GOOGLE_API_KEY
 - GOOGLE_CX
-- VEYROST_ALLOWED_ORIGINS=https://veyrost.is-a.dev,https://khayom1.github.io
+- Optional override: VEYROST_ALLOWED_ORIGINS=https://veyrost.is-a.dev,https://khayom1.github.io (the same allowlist is the code default).
 
-Supabase supplies SUPABASE_URL and the project's publishable/legacy anon key environment. The auth function reads SUPABASE_PUBLISHABLE_KEYS (default) or SUPABASE_ANON_KEY. If neither exists in the project environment, add VEYROST_SUPABASE_PUBLISHABLE_KEY with the project's publishable key (not a secret/service-role key).
+Supabase supplies SUPABASE_URL and SUPABASE_PUBLISHABLE_KEYS automatically; the auth function reads the default publishable key and falls back to SUPABASE_ANON_KEY for legacy projects. The publishable key is intentionally embedded in the browser client because Supabase classifies it as safe for browser use. It is not a provider secret or service-role key.
 
 ## CLI deployment
 
@@ -32,6 +32,6 @@ veyrost-proxy validates the user role and subject again inside the handler. Its 
 
 ## Browser behavior
 
-The browser stores no provider API key, GitHub token, Google key, Supabase secret/service-role key, or auth password. The login form asks for the project's publishable key; Supabase documents this key as safe for browser use. It is held only in page memory and is not persisted. A Supabase user access/refresh token also exists only in page memory for the current tab. Reloading the page signs the user out and requires sign-in again.
+The browser stores no provider API key, GitHub token, Google key, Supabase secret/service-role key, or auth password. The Supabase publishable key is public by design and is embedded in the client; the user access/refresh token exists only in page memory for the current tab. Reloading the page signs the user out and requires sign-in again.
 
 Custom provider hosts are disabled until an explicit server-side route and secret are reviewed and added to the proxy allowlist. Gmail and Google Drive remain unavailable until OAuth consent and scopes are implemented; they are not routed through a fake API-key path.
