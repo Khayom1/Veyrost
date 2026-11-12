@@ -46,11 +46,8 @@ These are source-level capabilities. They do not mean the 3D engine is currently
 
 ## Still not implemented from the Service Crew concept
 
-- Rigged realistic technicians.
-- Service-vehicle arrival/departure and physical ladder handling.
-- Tug-of-war with a held detached component.
-- Technician-controlled maintenance lock and repair sequence.
-- Cable reconnection animation.
+- Photorealistic scanned or production-grade rigged technician assets (current models are procedural low-poly geometry).
+- A general physical rope/soft-body solver and independent two-human grasp simulation (the current tug-of-war is deterministic and scripted).
 - Localized character dialogue and emotion state machine.
 - Spatially positioned voices and synchronized mechanical sounds.
 
@@ -66,3 +63,32 @@ node scripts/project-status.mjs
 ```
 
 The CI suite validates module syntax and deterministic source-level behavior. It does not replace physical-device, lighting, cross-browser or sustained-performance testing.
+
+## Phase 1 — engine stabilization
+
+The code-level stabilization pass covers saved-layout coordinate validation, pause-safe simulation, bounded procedural motion, viewport-resize recentering with bounds clamping, and interaction cancellation on lost pointer capture, window blur, or hidden-page transitions. Automated regression and CI checks are required before the phase is marked complete. Physical Android camera/gesture acceptance remains a separate device-level gate and must not be inferred from CI.
+
+## Phase 2 — Matter 2.5D solver hardening
+
+The planar Matter solver now advances in bounded substeps (up to 120 Hz) to reduce high-speed X/Y tunnelling, and its drag ownership is exclusive and cleaned up on repair/removal/reset. Empty body identifiers are rejected. The depth solver now validates tuning parameters, canonicalizes IDs, bounds velocity before integration, uses bounded substeps, resolves projected Z contacts iteratively, and reports unique contact pairs rather than counting repeated solver passes.
+
+The 2.5D contract remains explicit: Matter resolves planar X/Y motion and this depth solver resolves Z separation only where projected X/Y bounds overlap. This is not a general 6-DoF engine. CI and regression tests validate deterministic engine behavior; they do not certify GPU performance or device-specific browser rendering.
+
+
+## Phase 3 — protected component integrity
+
+Protected controls now validate and canonicalize identifiers, reject duplicate registry keys, and expose immutable snapshots. The lifecycle supports an explicit repair rollback path. Spatial detachment is coordinated with the Matter solver: the first pull must remain anchored, and the second pull must produce a matching detached state in both systems. A mismatch triggers a safe reset instead of leaving the visual, lifecycle and physics states divergent. Repair requires both planar and depth bodies and only completes after the planar mount has been restored; failed repair transitions return to the detached state.
+
+These checks harden the source lifecycle. They do not replace browser interaction testing or Android camera/gesture acceptance.
+
+
+## Phase 4 — service crew 3D scene
+
+The spatial route now mounts a procedural 3D maintenance vehicle and two articulated technicians with helmets, safety vests and tool gear. The vehicle enters and parks; a roof-mounted metal ladder unfolds; the lead technician climbs while the support technician remains at ground level. The sequence uses a deterministic, bounded state machine and pauses with the spatial simulation. A guarded departure action folds the ladder before the crew and vehicle leave. Technician-led tug-of-war, maintenance locking, cable reconnection and protected mount restoration are now part of Phase 5. Dialogue and spatial sound remain future work. The character assets are procedural low-poly models, not scanned or photorealistic rigged characters.
+
+
+## Phase 5 — interaction and repair
+
+The repair action now starts a technician-led transaction rather than instantly snapping a protected panel into place. The transaction locks user manipulation, animates both technicians in a tug-of-war, aligns the detached panel, moves a connector along a live 3D cable, verifies the connection, and only then restores the planar Matter body, depth body and protected-control lifecycle. Multiple detached protected controls are processed sequentially. The crew departs after the final repair. The sequence pauses with the spatial simulation and is cancelled safely by layout reset.
+
+This remains a deterministic scripted interaction layered over the existing hybrid 2.5D physics; it is not a full rope/soft-body solver or physically simulated two-human grasp system.

@@ -2,7 +2,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
-
 const runtime = fs.readFileSync("spatial-world.mjs", "utf8");
 const lifecycle = fs.readFileSync("protected-control.mjs", "utf8");
 
@@ -11,25 +10,26 @@ test("protected navigation panels start anchored", () => {
   assert.match(runtime, /anchored: isProtected/);
 });
 
-test("first and second pulls are routed through the protected lifecycle and physics mount", () => {
-  assert.match(runtime, /lifecycle\?\.pull\(\)/);
+test("protected release synchronizes lifecycle and Matter solver before detachment", () => {
+  assert.match(runtime, /const result = lifecycle\.pull\(\)/);
+  assert.match(runtime, /const isValidAttempt = result\.reason === "first-pull-resisted"/);
+  assert.match(runtime, /const synchronized = result\.reason === "first-pull-resisted"/);
+  assert.match(runtime, /protected-integrity-reset/);
   assert.match(runtime, /this\.physics\.tryDetach\(id\)/);
-  assert.match(lifecycle, /first-pull-resisted/);
-  assert.match(lifecycle, /mount-released/);
 });
 
 test("detached controls reveal a fixed mount socket and repair action", () => {
   assert.match(runtime, /_buildProtectedSocket/);
   assert.match(runtime, /socket\.visible = true/);
   assert.match(runtime, /spatial-repair-control/);
-  assert.match(runtime, /repairDetachedControls\(\)/);
+  assert.ok(runtime.includes("repairDetachedControls(targetId = null)"));
 });
 
-test("repair lifecycle restores original body position and hides socket", () => {
-  assert.match(runtime, /control\.beginRepair\(\)/);
-  assert.match(runtime, /this\.physics\.repair\(id\)/);
-  assert.match(runtime, /control\.completeRepair\(\)/);
-  assert.match(runtime, /socket\.visible = false/);
+test("repair requires both physics bodies and recovers failed transitions", () => {
+  assert.match(runtime, /if \(!body \|\| !depthBody \|\| !control\.beginRepair\(\)\) continue/);
+  assert.match(runtime, /if \(!planarRestored\) \{\s*control\.cancelRepair\(\)/);
+  assert.match(runtime, /if \(!control\.completeRepair\(\)\) \{\s*control\.cancelRepair\(\)/);
+  assert.match(runtime, /depthBody\.z = depthBody\.initialZ/);
 });
 
 test("reset restores all protected controls and removes repair affordance", () => {
@@ -37,7 +37,9 @@ test("reset restores all protected controls and removes repair affordance", () =
   assert.match(runtime, /this\.repairButton\.style\.display = "none"/);
 });
 
-test("protected repair restores the original depth layer and socket alignment", () => {
-  assert.match(runtime, /depthBody\.z = depthBody\.initialZ/);
-  assert.match(runtime, /socket\.position\.set\(center\.x, center\.y, \(\[-0\.22, 0\.18, -0\.12, 0\.24, -0\.18, 0\.12\]\[panelIndex\] \?\? 0\) - 0\.08\)/);
+test("lifecycle rejects invalid IDs and supports safe repair rollback", () => {
+  assert.match(lifecycle, /function normalizeControlId/);
+  assert.match(lifecycle, /Protected control ID must be non-empty/);
+  assert.match(lifecycle, /cancelRepair\(\)/);
+  assert.match(lifecycle, /Protected control IDs must be iterable/);
 });

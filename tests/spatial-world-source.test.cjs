@@ -40,10 +40,23 @@ test("3D renderer caps pixel ratio for mobile performance", () => {
   assert.match(source, /width < 680 \? 1\.2 : 1\.5/);
 });
 
+test("pause freezes physics and procedural animation without stopping rendering", () => {
+  assert.match(source, /this\.animationTime = 0/);
+  assert.match(source, /if \(!this\.paused\) this\.animationTime \+= frameDelta/);
+  assert.match(source, /if \(!this\.paused\) \{[\s\S]*this\.physics\.step\(delta\)[\s\S]*this\.depthPhysics\.step\(delta\)[\s\S]*this\.core\.rotation\.y/);
+  assert.match(source, /this\.renderer\.render\(this\.scene, this\.camera\)/);
+});
+
 test("render loop and GPU resources are disposed", () => {
   assert.match(source, /setAnimationLoop\(null\)/);
   assert.match(source, /renderer\?\.dispose/);
   assert.match(source, /geometry\?\.dispose/);
+});
+
+test("procedural panel rotations are assigned as bounded offsets, not accumulated", () => {
+  assert.match(source, /panel\.group\.rotation\.x = Math\.sin\(elapsed \* 0\.31 \+ index\) \* 0\.00008/);
+  assert.match(source, /panel\.group\.rotation\.y = Math\.cos\(elapsed \* 0\.27 \+ index \* 0\.7\) \* 0\.00007/);
+  assert.doesNotMatch(source, /panel\.group\.rotation\.[xy] \+=/);
 });
 
 test("selected panels expose depth slider and accessible step buttons", () => {
@@ -75,4 +88,20 @@ test("custom depth is serialized and restored with legacy layout compatibility",
 test("depth HUD stays clear of repair action and AURA pinches bypass its canvas raycast", () => {
   assert.match(source, /repairButton\?\.style\.display === "block"[\s\S]*max\(132px, env\(safe-area-inset-bottom\)\)/);
   assert.match(source, /elementFromPoint[\s\S]*spatial-depth-control[\s\S]*spatial-repair-control/);
+});
+
+test("responsive resize preserves panel centers, clamps bounds, and ends active drags", () => {
+  assert.match(source, /if \(this\.activeDrag\) this\.physics\.endDrag\(0, 0\)/);
+  assert.match(source, /\(\(body\.x \+ oldWidth \/ 2\) \/ Math\.max\(1, previousWidth\)\) \* width/);
+  assert.match(source, /\(\(body\.y \+ oldHeight \/ 2\) \/ Math\.max\(1, previousHeight\)\) \* height/);
+  assert.match(source, /body\.x = Math\.max\(0, Math\.min\(width - body\.width/);
+  assert.match(source, /body\.y = Math\.max\(0, Math\.min\(height - body\.height/);
+});
+
+test("lost pointer capture, window blur, and hidden-page transitions cancel interactions", () => {
+  assert.match(source, /addEventListener\("lostpointercapture", this\._pointerCancel\)/);
+  assert.match(source, /addEventListener\("blur", this\._windowBlur/);
+  assert.match(source, /addEventListener\("visibilitychange", this\._visibilityChange\)/);
+  assert.match(source, /removeEventListener\("lostpointercapture", this\._pointerCancel\)/);
+  assert.match(source, /removeEventListener\("visibilitychange", this\._visibilityChange\)/);
 });

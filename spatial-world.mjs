@@ -2,6 +2,8 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.m
 import "./matter-engine.js";
 import { DepthPhysicsWorld } from "./spatial-depth-physics.mjs";
 import { createProtectedControlRegistry, PROTECTED_CONTROL_STATES } from "./protected-control.mjs";
+import { ServiceCrew3D } from "./service-crew.mjs";
+import { RepairInteractionSequence, REPAIR_PHASES } from "./repair-interaction.mjs";
 import {
   computeSpatialLayout,
   screenToWorld,
@@ -16,6 +18,7 @@ const COPY = {
     reset: "RESET LAYOUT",
     exit: "AURA OFF",
     repair: "REPAIR MOUNT",
+    repairing: "MAINTENANCE IN PROGRESS",
     depth: "PANEL DEPTH",
     depthHint: "Wheel or adjust to move the selected panel in depth.",
     status: "3D SPATIAL MODE ACTIVE",
@@ -34,6 +37,7 @@ const COPY = {
     reset: "СБРОСИТЬ РАСКЛАДКУ",
     exit: "ВЫКЛЮЧИТЬ AURA",
     repair: "ВОССТАНОВИТЬ КРЕПЛЕНИЕ",
+    repairing: "ИДЁТ ОБСЛУЖИВАНИЕ",
     depth: "ГЛУБИНА ПАНЕЛИ",
     depthHint: "Колесо мыши или ползунок меняют глубину выбранной панели.",
     status: "АКТИВЕН 3D-РЕЖИМ",
@@ -52,6 +56,7 @@ const COPY = {
     reset: "БАРҚАРОРИ ЧИДАШ",
     exit: "AURA-РО ХОМӮШ КУН",
     repair: "ПАЙВАСТКУНИРО БАРҚАРОР КУН",
+    repairing: "ТАЪМИР ДАВОМ ДОРАД",
     depth: "ЧУҚУРИИ ПАНЕЛ",
     depthHint: "Бо чархи муш ё лағжонак чуқурии панели интихобшударо тағйир деҳ.",
     status: "ҲОЛАТИ ФАЗОИИ 3D ФАЪОЛ АСТ",
@@ -135,6 +140,15 @@ export class SpatialWorldController {
     this.protectedControls = createProtectedControlRegistry(this.protectedIds);
     this.protectedSockets = new Map();
     this.repairButton = null;
+    this.repairSequence = new RepairInteractionSequence();
+    this.maintenanceLock = false;
+    this.repairTargetId = null;
+    this.repairVisual = null;
+    this.repairCable = null;
+    this.repairConnector = null;
+    this.repairCableMaterial = null;
+    this._repairStart = new THREE.Vector3();
+    this._repairEnd = new THREE.Vector3();
     this.depthControl = null;
     this.depthRange = null;
     this.depthValue = null;
@@ -145,6 +159,7 @@ export class SpatialWorldController {
     this.activeDrag = null;
     this.pointer = { x: 0, y: 0 };
     this.lastFrame = 0;
+    this.animationTime = 0;
     this.units = SPATIAL_UNITS_PER_PIXEL;
     this.storageKey = "veyrost:spatial-layout:v1";
     this.hasCustomLayout = false;
@@ -156,6 +171,8 @@ export class SpatialWorldController {
     this._pointerUp = this._pointerUp.bind(this);
     this._pointerCancel = this._pointerCancel.bind(this);
     this._wheel = this._wheel.bind(this);
+    this._visibilityChange = this._visibilityChange.bind(this);
+    this._windowBlur = this._windowBlur.bind(this);
   }
 
   start() {
@@ -205,6 +222,8 @@ export class SpatialWorldController {
 
     this._buildEnvironment();
     this._buildPanels();
+    this.serviceCrew = new ServiceCrew3D(THREE, this.scene, { onState: name => this._emitStatus(name) });
+    this._buildRepairVisual();
     this._buildProtectedRepairControl();
     this._buildDepthControl();
     this._restoreLayout();
@@ -464,6 +483,33 @@ export class SpatialWorldController {
     this.protectedSockets.set(definition.id, socket);
   }
 
+  _buildRepairVisual() {
+    this.repairVisual = new THREE.Group();
+    this.repairVisual.name = "VEYROST-Repair-Cable";
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.BufferAttribute(new Float32Array(13 * 3), 3));
+    this.repairCableMaterial = new THREE.LineBasicMaterial({
+      color: 0xffb45e,
+      transparent: true,
+      opacity: 0.96
+    });
+    this.repairCable = new THREE.Line(geometry, this.repairCableMaterial);
+    this.repairVisual.add(this.repairCable);
+    this.repairConnector = new THREE.Mesh(
+      new THREE.SphereGeometry(0.075, 10, 8),
+      new THREE.MeshStandardMaterial({
+        color: 0xffc06e,
+        emissive: 0x9b4a0c,
+        emissiveIntensity: 0.8,
+        metalness: 0.55,
+        roughness: 0.28
+      })
+    );
+    this.repairVisual.add(this.repairConnector);
+    this.repairVisual.visible = false;
+    this.scene.add(this.repairVisual);
+  }
+
   _buildProtectedRepairControl() {
     const button = this.document.createElement("button");
     button.type = "button";
@@ -487,7 +533,7 @@ export class SpatialWorldController {
       cursor: "pointer",
       touchAction: "manipulation"
     });
-    button.addEventListener("click", () => this.repairDetachedControls());
+    button.addEventListener("click", () => this.startProtectedRepair());
     this.mount.appendChild(button);
     this.repairButton = button;
   }
@@ -632,34 +678,200 @@ export class SpatialWorldController {
     if (this.depthPlus) this.depthPlus.disabled = !available;
   }
 
-  repairDetachedControls() {
-    let repaired = 0;
-    for (const [id, control] of this.protectedControls) {
-      if (!control.beginRepair()) continue;
+  startProtectedRepair() {
+    if (!this.running || this.paused || this.maintenanceLock) return false;
+    const crewPhase = this.serviceCrew?.sequence?.snapshot?.().phase;
+    if (crewPhase === "complete") {
+      this.serviceCrew.recall();
+      this._emitStatus("repair-awaiting-technicians");
+      return false;
+    }
+    if (crewPhase !== "ready") {
+      this._emitStatus("repair-awaiting-technicians");
+      return false;
+    }
+    const next = [...this.protectedControls.entries()].find(([, control]) =>
+      control.snapshot().state === PROTECTED_CONTROL_STATES.DETACHED
+    );
+    if (!next || !this.repairSequence.begin(next[0])) return false;
+    this.maintenanceLock = true;
+    this._prepareRepairTarget(next[0]);
+    if (this.repairButton) {
+      this.repairButton.disabled = true;
+      this.repairButton.textContent = COPY[this.language]?.repairing ?? COPY.en.repairing;
+      this.repairButton.setAttribute("aria-live", "polite");
+    }
+    this._emitStatus("maintenance-lock-engaged");
+    return true;
+  }
+
+  _prepareRepairTarget(id) {
+    this.repairTargetId = id;
+    const body = this.physics?.get(id);
+    const depthBody = this.depthPhysics?.get(id);
+    if (body) {
+      body.anchored = true;
+      body.vx = 0;
+      body.vy = 0;
+      body.dragging = false;
+    }
+    if (depthBody) {
+      depthBody.anchored = true;
+      depthBody.velocityZ = 0;
+    }
+    if (this.repairVisual) this.repairVisual.visible = true;
+    if (this.repairConnector) this.repairConnector.visible = true;
+    this._emitStatus("repair-target-secured");
+  }
+
+  _updateRepairVisual(snapshot) {
+    const id = this.repairTargetId;
+    const panel = id ? this.panelGroups.get(id) : null;
+    const socket = id ? this.protectedSockets.get(id) : null;
+    if (!panel || !socket || !this.repairCable) return;
+    this._repairStart.copy(socket.position);
+    this._repairStart.x -= 0.46;
+    this._repairStart.z += 0.06;
+    this._repairEnd.copy(panel.group.position);
+    this._repairEnd.x += 0.46;
+    this._repairEnd.z += 0.12;
+
+    const phase = snapshot.phase;
+    const isConnected = phase === REPAIR_PHASES.VERIFYING ||
+      phase === REPAIR_PHASES.RESTORING || phase === REPAIR_PHASES.COMPLETE;
+    this.repairCableMaterial.color.set(isConnected ? 0x65f2c2 :
+      phase === REPAIR_PHASES.CONNECTING ? 0x69e7ff : 0xffb45e);
+    const attribute = this.repairCable.geometry.attributes.position;
+    const count = attribute.count;
+    const sag = phase === REPAIR_PHASES.TUG_OF_WAR ? 0.42 :
+      phase === REPAIR_PHASES.CONNECTING ? 0.12 : 0.22;
+    for (let i = 0; i < count; i++) {
+      const t = i / (count - 1);
+      const x = this._repairStart.x + (this._repairEnd.x - this._repairStart.x) * t;
+      const y = this._repairStart.y + (this._repairEnd.y - this._repairStart.y) * t -
+        Math.sin(Math.PI * t) * sag;
+      const z = this._repairStart.z + (this._repairEnd.z - this._repairStart.z) * t +
+        Math.sin(Math.PI * t) * 0.08;
+      attribute.setXYZ(i, x, y, z);
+    }
+    attribute.needsUpdate = true;
+    this.repairCable.geometry.computeBoundingSphere();
+
+    const connectorProgress = phase === REPAIR_PHASES.CONNECTING ? snapshot.progress :
+      isConnected ? 1 : 0.18;
+    this.repairConnector.position.lerpVectors(
+      this._repairStart, this._repairEnd, connectorProgress
+    );
+    this.repairConnector.material.color.set(isConnected ? 0x65f2c2 : 0xffc06e);
+  }
+
+  _updateRepairInteraction(delta) {
+    if (!this.maintenanceLock || !this.repairTargetId || !this.repairSequence) return;
+    const snapshot = this.repairSequence.update(delta);
+    const id = this.repairTargetId;
+    const body = this.physics?.get(id);
+    const phase = snapshot.phase;
+    if (body) {
+      let offsetX = 0, offsetY = 0;
+      if (phase === REPAIR_PHASES.TUG_OF_WAR) {
+        const pull = Math.sin(snapshot.progress * Math.PI * 4);
+        offsetX = pull * 24;
+        offsetY = Math.cos(snapshot.progress * Math.PI * 4) * 7;
+      } else if (phase === REPAIR_PHASES.ALIGNING) {
+        const blend = 1 - snapshot.progress;
+        offsetX = Math.sin(Math.PI * 2 * (1 - blend)) * 8 * blend;
+      } else if (phase === REPAIR_PHASES.CONNECTING) {
+        offsetX = Math.sin(snapshot.progress * Math.PI) * 3;
+      }
+      body.x = body.initial.x + offsetX;
+      body.y = body.initial.y + offsetY;
+      body.vx = 0;
+      body.vy = 0;
+    }
+
+    const crew = this.serviceCrew;
+    if (crew?.leadTechnician && crew?.supportTechnician) {
+      const lead = crew.leadTechnician.userData.limbs;
+      const support = crew.supportTechnician.userData.limbs;
+      const tug = phase === REPAIR_PHASES.TUG_OF_WAR ? Math.sin(snapshot.progress * Math.PI * 4) : 0;
+      const connect = phase === REPAIR_PHASES.CONNECTING ? snapshot.progress : 0;
+      lead.leftArm.rotation.z = -0.65 - tug * 0.48 - connect * 0.25;
+      lead.rightArm.rotation.z = 0.65 + tug * 0.48 + connect * 0.25;
+      support.leftArm.rotation.z = -0.68 + tug * 0.42;
+      support.rightArm.rotation.z = 0.68 - tug * 0.42;
+    }
+
+    this._updateRepairVisual(snapshot);
+    if (phase === REPAIR_PHASES.COMPLETE) this._finishProtectedRepair();
+  }
+
+  _finishProtectedRepair() {
+    const id = this.repairTargetId;
+    const repaired = id ? this.repairDetachedControls(id) : 0;
+    if (!repaired) {
       const body = this.physics?.get(id);
       const depthBody = this.depthPhysics?.get(id);
-      if (body) {
-        body.vx = 0;
-        body.vy = 0;
-        body.dragging = false;
-        this.physics.repair(id);
-        if (depthBody) {
-          depthBody.anchored = true;
-          depthBody.z = depthBody.initialZ;
-          depthBody.velocityZ = 0;
-          const depthPanel = this.panelGroups.get(id);
-          if (depthPanel) depthPanel.group.userData.depth = depthBody.z;
-        }
-        control.completeRepair();
-        const socket = this.protectedSockets.get(id);
-        if (socket) socket.visible = false;
-        const panel = this.panelGroups.get(id);
-        if (panel) {
-          panel.group.visible = true;
-          panel.group.scale.set(1, 1, 1);
-        }
-        repaired += 1;
+      if (body) body.anchored = false;
+      if (depthBody) depthBody.anchored = false;
+      this.repairSequence.fail();
+      this.maintenanceLock = false;
+      if (this.repairButton) this.repairButton.disabled = false;
+      if (this.repairVisual) this.repairVisual.visible = false;
+      this.repairTargetId = null;
+      this._emitStatus("repair-rollback");
+      return;
+    }
+
+    const next = [...this.protectedControls.entries()].find(([, control]) =>
+      control.snapshot().state === PROTECTED_CONTROL_STATES.DETACHED
+    );
+    if (next) {
+      this.repairSequence.reset();
+      this.repairSequence.begin(next[0]);
+      this._prepareRepairTarget(next[0]);
+      return;
+    }
+
+    this.maintenanceLock = false;
+    this.repairTargetId = null;
+    if (this.repairVisual) this.repairVisual.visible = false;
+    if (this.repairButton) this.repairButton.disabled = false;
+    if (this.serviceCrew?.depart()) this._emitStatus("maintenance-complete");
+    this._emitStatus("protected-interface-restored");
+  }
+
+  repairDetachedControls(targetId = null) {
+    let repaired = 0;
+    for (const [id, control] of this.protectedControls) {
+      if (targetId && id !== targetId) continue;
+      const body = this.physics?.get(id);
+      const depthBody = this.depthPhysics?.get(id);
+      if (!body || !depthBody || !control.beginRepair()) continue;
+      body.vx = 0;
+      body.vy = 0;
+      body.dragging = false;
+      const planarRestored = this.physics.repair(id);
+      if (!planarRestored) {
+        control.cancelRepair();
+        continue;
       }
+      depthBody.anchored = true;
+      depthBody.z = depthBody.initialZ;
+      depthBody.velocityZ = 0;
+      const depthPanel = this.panelGroups.get(id);
+      if (depthPanel) depthPanel.group.userData.depth = depthBody.z;
+      if (!control.completeRepair()) {
+        control.cancelRepair();
+        continue;
+      }
+      const socket = this.protectedSockets.get(id);
+      if (socket) socket.visible = false;
+      const panel = this.panelGroups.get(id);
+      if (panel) {
+        panel.group.visible = true;
+        panel.group.scale.set(1, 1, 1);
+      }
+      repaired += 1;
     }
     if (this.repairButton && !this._hasDetachedProtectedControl()) {
       this.repairButton.style.display = "none";
@@ -734,7 +946,10 @@ export class SpatialWorldController {
     this.canvas.addEventListener("pointerdown", this._pointerDown);
     this.canvas.addEventListener("pointerup", this._pointerUp);
     this.canvas.addEventListener("pointercancel", this._pointerCancel);
+    this.canvas.addEventListener("lostpointercapture", this._pointerCancel);
     this.canvas.addEventListener("wheel", this._wheel, { passive: false });
+    this.window.addEventListener("blur", this._windowBlur, { passive: true });
+    this.document.addEventListener("visibilitychange", this._visibilityChange);
     this.canvas.addEventListener("contextmenu", event => event.preventDefault());
     if (typeof ResizeObserver !== "undefined") {
       this.resizeObserver = new ResizeObserver(this._resize);
@@ -761,29 +976,39 @@ export class SpatialWorldController {
     const layout = computeSpatialLayout(width, height);
     this.layout = layout;
     if (this.physics) {
-      const sx = width / Math.max(1, previousWidth);
-      const sy = height / Math.max(1, previousHeight);
+      // A viewport change invalidates the active pointer's screen-space origin.
+      // End the drag through the physics API before moving any bodies.
+      if (this.activeDrag) this.physics.endDrag(0, 0);
+      this.activeDrag = null;
+      this.physics.draggedId = null;
+
       for (const definition of layout.panels) {
         const body = this.physics.get(definition.id);
         if (!body) continue;
         const wasInitial = !this.hasCustomLayout && previousWidth === width && previousHeight === height;
-        if (wasInitial) {
-          body.x = definition.x;
-          body.y = definition.y;
-          body.width = definition.width;
-          body.height = definition.height;
-          body.initial.x = definition.x;
-          body.initial.y = definition.y;
-        } else {
-          body.x *= sx;
-          body.y *= sy;
-          body.width = definition.width;
-          body.height = definition.height;
-          body.x = Math.max(0, Math.min(width - body.width, body.x));
-          body.y = Math.max(0, Math.min(height - body.height, body.y));
-          body.initial.x = Math.max(0, Math.min(width - body.width, body.initial.x * sx));
-          body.initial.y = Math.max(0, Math.min(height - body.height, body.initial.y * sy));
-        }
+        const oldWidth = Math.max(1, body.width);
+        const oldHeight = Math.max(1, body.height);
+        const centerX = wasInitial
+          ? definition.centerX
+          : ((body.x + oldWidth / 2) / Math.max(1, previousWidth)) * width;
+        const centerY = wasInitial
+          ? definition.centerY
+          : ((body.y + oldHeight / 2) / Math.max(1, previousHeight)) * height;
+
+        body.width = definition.width;
+        body.height = definition.height;
+        body.x = Math.max(0, Math.min(width - body.width, centerX - body.width / 2));
+        body.y = Math.max(0, Math.min(height - body.height, centerY - body.height / 2));
+
+        const initialCenterX = wasInitial
+          ? definition.centerX
+          : ((body.initial.x + oldWidth / 2) / Math.max(1, previousWidth)) * width;
+        const initialCenterY = wasInitial
+          ? definition.centerY
+          : ((body.initial.y + oldHeight / 2) / Math.max(1, previousHeight)) * height;
+        body.initial.x = Math.max(0, Math.min(width - body.width, initialCenterX - body.width / 2));
+        body.initial.y = Math.max(0, Math.min(height - body.height, initialCenterY - body.height / 2));
+
         this._syncPanel(body, this.panelGroups.get(definition.id));
         const socket = this.protectedSockets.get(definition.id);
         if (socket) {
@@ -799,8 +1024,6 @@ export class SpatialWorldController {
         }
       }
       this.physics.setBounds(width, height);
-      this.physics.draggedId = null;
-      this.activeDrag = null;
     }
     this.viewport = { width, height };
     if (this.core) {
@@ -840,6 +1063,15 @@ export class SpatialWorldController {
     this.cancelActiveInteraction();
   }
 
+  _windowBlur() {
+    this.cancelActiveInteraction();
+    if (this.cursor3D) this.cursor3D.visible = false;
+  }
+
+  _visibilityChange() {
+    if (this.document?.visibilityState === "hidden") this._windowBlur();
+  }
+
   _pointerVector(x, y) {
     return new THREE.Vector2((x / this.window.innerWidth) * 2 - 1, -(y / this.window.innerHeight) * 2 + 1);
   }
@@ -873,7 +1105,7 @@ export class SpatialWorldController {
   }
 
   _beginPress(x, y, source) {
-    if (!this.running || this.paused || this.activeDrag) return false;
+    if (!this.running || this.paused || this.maintenanceLock || this.activeDrag) return false;
     const overlay = this.document?.elementFromPoint?.(x, y)?.closest?.(".spatial-depth-control, .spatial-repair-control");
     if (overlay) return false;
     const id = this._raycastPanel(x, y);
@@ -886,9 +1118,31 @@ export class SpatialWorldController {
     if (!body) return false;
     if (this.protectedIds.has(id) && body.anchored) {
       const lifecycle = this.protectedControls.get(id);
-      const result = lifecycle?.pull();
-      const release = this.physics.tryDetach(id);
-      if (!result?.accepted || !release.detached) {
+      if (!lifecycle) return false;
+      const result = lifecycle.pull();
+      const isValidAttempt = result.reason === "first-pull-resisted" ||
+        result.reason === "mount-released";
+      const release = isValidAttempt
+        ? this.physics.tryDetach(id)
+        : { detached: false, reason: "invalid-lifecycle-transition" };
+      const synchronized = result.reason === "first-pull-resisted"
+        ? !release.detached && body.anchored
+        : result.reason === "mount-released" && release.detached && body.detached && !body.anchored;
+      if (!synchronized) {
+        this.physics.repair(id);
+        lifecycle.reset();
+        const depthBody = this.depthPhysics?.get(id);
+        if (depthBody) {
+          depthBody.anchored = true;
+          depthBody.z = depthBody.initialZ;
+          depthBody.velocityZ = 0;
+        }
+        const socket = this.protectedSockets.get(id);
+        if (socket) socket.visible = false;
+        this._emitStatus("protected-integrity-reset");
+        return false;
+      }
+      if (!result.accepted) {
         const panel = this.panelGroups.get(id);
         if (panel) {
           panel.group.position.x += 0.035;
@@ -1018,46 +1272,58 @@ export class SpatialWorldController {
 
   _animate() {
     if (!this.running || !this.renderer) return;
-    const delta = Math.min(this.clock.getDelta(), 1 / 30);
-    const elapsed = this.clock.elapsedTime;
-    this.physics.step(delta);
-    if (this.depthPhysics) {
-      for (const [id, depthBody] of this.depthPhysics.bodies) {
-        const planar = this.physics.get(id);
-        if (!planar) continue;
-        depthBody.x = planar.x + planar.width / 2;
-        depthBody.y = planar.y + planar.height / 2;
-        depthBody.width = planar.width;
-        depthBody.height = planar.height;
-      }
-      this.depthPhysics.step(delta);
-      for (const depthBody of this.depthPhysics.bodies.values()) {
-        const boundedZ = Math.max(-1.25, Math.min(1.25, depthBody.z));
-        if (boundedZ !== depthBody.z) {
-          depthBody.z = boundedZ;
-          depthBody.velocityZ = 0;
+    const frameDelta = Math.min(this.clock.getDelta(), 1 / 30);
+    if (!this.paused) this.animationTime += frameDelta;
+    const delta = this.paused ? 0 : frameDelta;
+    const elapsed = this.animationTime;
+
+    // Pause freezes simulation and procedural motion, but keeps rendering alive
+    // so the HUD and the user's explicit resume interaction remain responsive.
+    if (!this.paused) {
+      this.physics.step(delta);
+      this.serviceCrew?.update(delta);
+      this._updateRepairInteraction(delta);
+      if (this.depthPhysics) {
+        for (const [id, depthBody] of this.depthPhysics.bodies) {
+          const planar = this.physics.get(id);
+          if (!planar) continue;
+          depthBody.x = planar.x + planar.width / 2;
+          depthBody.y = planar.y + planar.height / 2;
+          depthBody.width = planar.width;
+          depthBody.height = planar.height;
+        }
+        this.depthPhysics.step(delta);
+        for (const depthBody of this.depthPhysics.bodies.values()) {
+          const boundedZ = Math.max(-1.25, Math.min(1.25, depthBody.z));
+          if (boundedZ !== depthBody.z) {
+            depthBody.z = boundedZ;
+            depthBody.velocityZ = 0;
+          }
         }
       }
+
+      for (const [id, panel] of this.panelGroups) {
+        const body = this.physics.get(id);
+        this._syncPanel(body, panel);
+        const index = this.layout.panels.findIndex(item => item.id === id);
+        panel.group.rotation.z = Math.sin(elapsed * 0.42 + index * 1.1) * 0.012;
+        const depthBody = this.depthPhysics?.get(id);
+        if (depthBody) panel.group.position.z = depthBody.z + Math.sin(elapsed * 0.8 + index) * 0.035;
+        // Assign bounded procedural offsets; incremental rotation accumulates
+        // forever and eventually destroys the intended panel orientation.
+        panel.group.rotation.x = Math.sin(elapsed * 0.31 + index) * 0.00008;
+        panel.group.rotation.y = Math.cos(elapsed * 0.27 + index * 0.7) * 0.00007;
+      }
+      if (this.selectedId || this.hoveredId) this._refreshDepthControl();
+
+      this.core.rotation.y = elapsed * 0.24;
+      this.core.rotation.x = Math.sin(elapsed * 0.19) * 0.18;
+      this.rings.forEach((ring, index) => {
+        ring.rotation.z = elapsed * (index % 2 ? -0.18 : 0.13) * (index + 1);
+      });
+      this.stars.rotation.z = Math.sin(elapsed * 0.025) * 0.025;
     }
 
-    for (const [id, panel] of this.panelGroups) {
-      const body = this.physics.get(id);
-      this._syncPanel(body, panel);
-      const index = this.layout.panels.findIndex(item => item.id === id);
-      panel.group.rotation.z = Math.sin(elapsed * 0.42 + index * 1.1) * 0.012;
-      const depthBody = this.depthPhysics?.get(id);
-      if (depthBody) panel.group.position.z = depthBody.z + Math.sin(elapsed * 0.8 + index) * 0.035;
-      panel.group.rotation.x += Math.sin(elapsed * 0.31 + index) * 0.00008;
-      panel.group.rotation.y += Math.cos(elapsed * 0.27 + index * 0.7) * 0.00007;
-    }
-    if (this.selectedId || this.hoveredId) this._refreshDepthControl();
-
-    this.core.rotation.y = elapsed * 0.24;
-    this.core.rotation.x = Math.sin(elapsed * 0.19) * 0.18;
-    this.rings.forEach((ring, index) => {
-      ring.rotation.z = elapsed * (index % 2 ? -0.18 : 0.13) * (index + 1);
-    });
-    this.stars.rotation.z = Math.sin(elapsed * 0.025) * 0.025;
     this.renderer.render(this.scene, this.camera);
   }
 
@@ -1072,7 +1338,7 @@ export class SpatialWorldController {
     setText("spatial-help", copy.help);
     setText("spatial-reset", copy.reset);
     setText("spatial-exit", copy.exit);
-    if (this.repairButton) this.repairButton.textContent = copy.repair;
+    if (this.repairButton) this.repairButton.textContent = this.maintenanceLock ? copy.repairing : copy.repair;
     if (this.depthControl) {
       const title = this.depthControl.querySelector("div > span");
       const hint = this.depthControl.querySelector("div + div + div");
@@ -1143,6 +1409,11 @@ export class SpatialWorldController {
     if (!this.physics) return;
     try { this.window.localStorage?.removeItem(this.storageKey); } catch (_) {}
     this.hasCustomLayout = false;
+    this.repairSequence?.reset();
+    this.maintenanceLock = false;
+    this.repairTargetId = null;
+    if (this.repairVisual) this.repairVisual.visible = false;
+    if (this.repairButton) this.repairButton.disabled = false;
     this.physics.reset();
     this.depthPhysics?.reset();
     for (const [id, depthBody] of this.depthPhysics?.bodies ?? []) {
@@ -1159,6 +1430,10 @@ export class SpatialWorldController {
     this._resize();
   }
 
+  departServiceCrew() {
+    return this.serviceCrew?.depart() ?? false;
+  }
+
   destroy() {
     if (this.destroyed) return;
     this.destroyed = true;
@@ -1171,8 +1446,11 @@ export class SpatialWorldController {
       this.canvas.removeEventListener("pointerdown", this._pointerDown);
       this.canvas.removeEventListener("pointerup", this._pointerUp);
       this.canvas.removeEventListener("pointercancel", this._pointerCancel);
+      this.canvas.removeEventListener("lostpointercapture", this._pointerCancel);
       this.canvas.removeEventListener("wheel", this._wheel);
     }
+    this.window.removeEventListener("blur", this._windowBlur);
+    this.document.removeEventListener("visibilitychange", this._visibilityChange);
     if (this.scene) {
       this.scene.traverse(object => {
         object.geometry?.dispose?.();
@@ -1195,6 +1473,18 @@ export class SpatialWorldController {
     this.depthControl = null;
     this.depthRange = null;
     this.depthValue = null;
+    this.serviceCrew?.dispose();
+    this.serviceCrew = null;
+    this.repairVisual?.removeFromParent();
+    this.repairCable?.geometry?.dispose?.();
+    this.repairCableMaterial?.dispose?.();
+    this.repairConnector?.geometry?.dispose?.();
+    this.repairConnector?.material?.dispose?.();
+    this.repairVisual = null;
+    this.repairCable = null;
+    this.repairConnector = null;
+    this.maintenanceLock = false;
+    this.repairTargetId = null;
     this.protectedSockets.clear();
     this.panelGroups.clear();
     this.panelMeshes = [];

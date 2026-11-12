@@ -57,3 +57,44 @@ test("reset restores initial depth and clears velocity", async () => {
   assert.equal(body.z, 0.35);
   assert.equal(body.velocityZ, 0);
 });
+
+test("depth solver clamps invalid tuning options to finite defaults", async () => {
+  const DepthPhysicsWorld = await loadDepthWorld();
+  const world = new DepthPhysicsWorld({ restitution: NaN, friction: Infinity, maxSpeed: NaN });
+  assert.equal(Number.isFinite(world.restitution), true);
+  assert.equal(Number.isFinite(world.friction), true);
+  assert.equal(Number.isFinite(world.maxSpeed), true);
+  assert.equal(world.restitution, 0.42);
+  assert.equal(world.friction, 0.08);
+  assert.equal(world.maxSpeed, 4);
+});
+
+test("depth velocity is bounded before integration and thin panels do not tunnel", async () => {
+  const DepthPhysicsWorld = await loadDepthWorld();
+  const world = new DepthPhysicsWorld({ restitution: 0, friction: 0, maxSpeed: 4 });
+  const a = world.add({ id: "fast-a", x: 0, y: 0, z: -0.105, width: 2, height: 2, depth: 0.18, velocityZ: 4 });
+  const b = world.add({ id: "fast-b", x: 0, y: 0, z: 0.105, width: 2, height: 2, depth: 0.18, velocityZ: -4 });
+  assert.equal(world.step(1 / 20), 1);
+  assert.ok(Math.abs(a.z - b.z) >= 0.179);
+  assert.ok(Math.abs(a.velocityZ) <= 4);
+  assert.ok(Math.abs(b.velocityZ) <= 4);
+});
+
+test("collision totals count unique body pairs across solver iterations", async () => {
+  const DepthPhysicsWorld = await loadDepthWorld();
+  const world = new DepthPhysicsWorld({ restitution: 0 });
+  const a = world.add({ id: "a", x: 0, y: 0, z: 0, width: 2, height: 2, depth: 0.4 });
+  const b = world.add({ id: "b", x: 0, y: 0, z: 0.1, width: 2, height: 2, depth: 0.4 });
+  assert.equal(world.step(1 / 60), 1);
+  assert.equal(a.collisions, 1);
+  assert.equal(b.collisions, 1);
+});
+
+test("depth world rejects blank identifiers and canonicalizes numeric identifiers", async () => {
+  const DepthPhysicsWorld = await loadDepthWorld();
+  const world = new DepthPhysicsWorld();
+  assert.throws(() => world.add({ id: " ", x: 0, y: 0, width: 1, height: 1 }), /unique and non-empty/);
+  const body = world.add({ id: 7, x: 0, y: 0, width: 1, height: 1 });
+  assert.equal(body.id, "7");
+  assert.equal(world.get(7), body);
+});
