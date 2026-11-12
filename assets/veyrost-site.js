@@ -99,7 +99,6 @@ function translateDocument(){
 }
 function applyLanguage(){
   translateDocument();
-  if(typeof ensurePhysicsTestButtons==="function")ensurePhysicsTestButtons();
   const t=dictionaries[language]||dictionaries.en;
   const edit=$("#layout-toggle");
   if(edit)edit.textContent=edit.getAttribute("aria-pressed")==="true"?(translations[language]||translations.en).done:(translations[language]||translations.en).move;
@@ -162,37 +161,16 @@ function renderButtonPhysics(){
   }
   physicsFrame=requestAnimationFrame(renderButtonPhysics);
 }
-function ensurePhysicsTestButtons(){
-  $("#veyrost-physics-test-panel")?.remove();
-  let panel=$("#veyrost-header-button-lab");
-  if(!panel){
-    const header=$(".site-header"),inner=header?.querySelector(".header-inner");
-    if(!header||!inner)return;
-    panel=document.createElement("div");panel.id="veyrost-header-button-lab";panel.className="veyrost-button-lab";
-    panel.innerHTML='<span class="button-lab-title">BUTTON LAB</span><button type="button" data-physics-test="light" data-test-action="state">STATE: OFF</button><button type="button" data-physics-test="standard" data-test-action="count">COUNT: 0</button><button type="button" data-physics-test="heavy" data-test-action="ping">PING</button><button type="button" data-physics-test="spring" data-test-action="reset">RESET</button>';
-    inner.insertAdjacentElement("afterend",panel);
-    panel.addEventListener("click",event=>{
-      const button=event.target.closest("[data-test-action]");if(!button||editMode)return;
-      const t=translations[language]||translations.en;
-      if(button.dataset.testAction==="state"){const on=button.dataset.state!=="on";button.dataset.state=on?"on":"off";button.textContent=on?t.testActive:t.testState;}
-      if(button.dataset.testAction==="count"){const n=(Number(button.dataset.count)||0)+1;button.dataset.count=String(n);button.textContent=t.testCount.replace("0",String(n));}
-      if(button.dataset.testAction==="ping"){button.classList.add("test-pulse");setTimeout(()=>button.classList.remove("test-pulse"),450);button.textContent=t.testPinged;setTimeout(()=>{if(button.isConnected)button.textContent=t.testPing},1100);}
-      if(button.dataset.testAction==="reset"){panel.querySelectorAll("[data-test-action]").forEach(b=>{b.dataset.state="off";b.dataset.count="0";b.textContent=b.dataset.testAction==="state"?t.testState:b.dataset.testAction==="count"?t.testCount:b.dataset.testAction==="ping"?t.testPing:t.testReset;});}
-    });
-  }
-  const t=translations[language]||translations.en;
-  panel.querySelector(".button-lab-title").textContent=t.testTitle;
-  panel.querySelectorAll("[data-test-action]").forEach(b=>{const k=b.dataset.testAction;b.textContent=k==="state"?(b.dataset.state==="on"?t.testActive:t.testState):k==="count"?t.testCount.replace("0",b.dataset.count||"0"):k==="ping"?t.testPing:t.testReset;});
-}
 function initButtonPhysics(){
   clearButtonPhysics();
-  ensurePhysicsTestButtons();
   if(!window.VEYROST_MATTER?.MatterWorld)return;
   physicsWorld=new window.VEYROST_MATTER.MatterWorld(window.innerWidth,window.innerHeight,{gravity:0,positionCorrection:.9});
-  const buttons=$("button:not(#layout-toggle):not(#aura-toggle):not(.menu-repair-button):not([disabled])");
-  buttons.forEach((el,index)=>{
+  const catalogs=movable().filter(el=>!el.matches("#layout-toggle,#aura-toggle,#menu-toggle,.menu-repair-button,[disabled]"));
+  catalogs.forEach((el,index)=>{
     const rect=el.getBoundingClientRect(),base=offset(el);
-    const body=physicsWorld.add({id:el.id||el.dataset.layoutId||("ui-button-"+index),x:rect.left,y:rect.top,width:rect.width,height:rect.height,mass:el.dataset.physicsTest==="light"?.6:el.dataset.physicsTest==="heavy"?2.4:el.dataset.physicsTest==="spring"?.8:el.id==="menu-toggle"?2.4:1,elasticity:el.dataset.physicsTest==="spring"?.82:.24,friction:.42,maxCompression:.16,material:"soft-rubber"});
+    const area=rect.width*rect.height;
+    const mass=Math.max(.8,Math.min(4,area/18000));
+    const body=physicsWorld.add({id:el.id||el.dataset.layoutId||("catalog-body-"+index),x:rect.left,y:rect.top,width:rect.width,height:rect.height,mass,elasticity:.16,friction:.48,maxCompression:.08,material:"soft-rubber"});
     body.__origin={x:rect.left,y:rect.top};body.__base=base;
     physicalBodies.set(el,body);el.style.transformOrigin="center";
   });
