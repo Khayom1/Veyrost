@@ -356,9 +356,10 @@ menuRepairButton.addEventListener("click",async()=>{
     // Bring the carrier directly behind MENU. Both articulated grippers reach around its edges.
     const carryX=clamp(rect.left+rect.width/2-robotWidth/2,4,vw-robotWidth-4);
     const carryY=clamp(rect.top-robotHeight+35,4,vh-robotHeight-4);
-    techA.classList.add("is-grabbing");
     move(techA,carryX,carryY);
     await wait(720);
+    techA.classList.add("is-grabbing");
+    await wait(260);
     carried.style.transition="left 260ms ease,top 260ms cubic-bezier(.2,.8,.2,1),transform 260ms ease";
     carried.classList.add("is-lifting");
     carried.style.top=(rect.top-12)+"px";
@@ -377,11 +378,12 @@ menuRepairButton.addEventListener("click",async()=>{
       for(let i=0;i<letters.length;i++){
         const lead=detachedMenuWires?.querySelector(".wire-"+letters[i]);
         lead?.classList.add("is-connecting");
-        techB.classList.toggle("is-wire-reach",i%2===0);
-        await wait(300);
+        techB.classList.add("is-wire-reach");
+        await wait(270);
+        techB.classList.remove("is-wire-reach");
         lead?.classList.remove("is-connecting");
         lead?.classList.add("is-connected");
-        await wait(90);
+        await wait(120);
       }
       techB.classList.remove("is-wire-reach");
       techB.classList.add("is-working");
