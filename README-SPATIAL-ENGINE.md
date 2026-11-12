@@ -66,3 +66,7 @@ node scripts/project-status.mjs
 ```
 
 The CI suite validates module syntax and deterministic source-level behavior. It does not replace physical-device, lighting, cross-browser or sustained-performance testing.
+
+## Phase 1 — engine stabilization
+
+The code-level stabilization pass covers saved-layout coordinate validation, pause-safe simulation, bounded procedural motion, viewport-resize recentering with bounds clamping, and interaction cancellation on lost pointer capture, window blur, or hidden-page transitions. Automated regression and CI checks are required before the phase is marked complete. Physical Android camera/gesture acceptance remains a separate device-level gate and must not be inferred from CI.
