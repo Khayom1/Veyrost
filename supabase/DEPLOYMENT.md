@@ -23,7 +23,7 @@ Supabase supplies SUPABASE_URL and SUPABASE_PUBLISHABLE_KEYS automatically; the 
 1. Restore the paused Supabase project in the Supabase Dashboard.
 2. Install the current Supabase CLI and authenticate: supabase login.
 3. Link the project: supabase link --project-ref bgfcpnlxztziigrsyuqp.
-4. Add the secrets above in the dashboard or supabase secrets set (supply values locally; do not put them in shell history or source control).
+4. Add the secrets above in Dashboard → Edge Functions → Secrets, or create a local gitignored .env file and run supabase secrets set --env-file .env. Never commit that file or paste secret values into chat.
 5. Deploy auth without gateway JWT validation: supabase functions deploy veyrost-auth --no-verify-jwt.
 6. Deploy the proxy with JWT validation enabled: supabase functions deploy veyrost-proxy.
 7. Confirm both functions are deployed and test sign-up/sign-in, proxy health, DeepSeek, SiliconFlow, GitHub, Google Search and Jina Reader.
