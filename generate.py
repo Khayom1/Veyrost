@@ -205,10 +205,6 @@ def publish_generated_files(paths, repo_path, message):
     root = Path(repo_path).expanduser().resolve()
     if not root.is_dir():
         raise RuntimeError(f"Repository directory does not exist: {root}")
-    subprocess.run(
-        ["git", "-C", str(root), "rev-parse", "--is-inside-work-tree"],
-        check=True, capture_output=True, text=True
-    )
     relative_paths = []
     for candidate in paths:
         target = (root / candidate).resolve()
@@ -221,6 +217,10 @@ def publish_generated_files(paths, repo_path, message):
         relative_paths.append(relative.as_posix())
     if not relative_paths:
         raise ValueError("No generated files were supplied for publishing.")
+    subprocess.run(
+        ["git", "-C", str(root), "rev-parse", "--is-inside-work-tree"],
+        check=True, capture_output=True, text=True
+    )
     existing_staged = subprocess.run(
         ["git", "-C", str(root), "diff", "--cached", "--quiet"],
         check=False, capture_output=True, text=True
