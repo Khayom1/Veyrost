@@ -216,6 +216,7 @@ if(video&&cursor&&auraButton){
       const active=state==="active"||state==="paused";
       document.documentElement.classList.toggle("aura-active",active);
       auraButton.classList.toggle("active",active);
+      auraButton.setAttribute("aria-pressed",String(active));
       auraButton.textContent=active?(translations[language]||translations.en).auraOn:(translations[language]||translations.en).auraOff;
       auraButton.disabled=state==="starting"||state==="loading";
       if(status){
