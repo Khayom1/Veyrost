@@ -174,11 +174,11 @@ function finishDrag(){
   if(moved)savePositions();
 }
 function setEditMode(value){
-  editMode=Boolean(value)&&Boolean(controller?.active);
+  editMode=Boolean(value);
   document.documentElement.classList.toggle("veyrost-layout-editing",editMode);
-  editButton?.classList.toggle("visible",Boolean(controller?.active));
+  editButton?.classList.add("visible");
   if(editButton){
-    editButton.hidden=!controller?.active;
+    editButton.hidden=false;
     editButton.textContent=editMode?(translations[language]||translations.en).done:(translations[language]||translations.en).move;
     editButton.setAttribute("aria-pressed",String(editMode));
   }
@@ -224,8 +224,6 @@ if(video&&cursor&&auraButton){
         status.dataset.message=message||state.toUpperCase();
         status.textContent=(dictionaries[language]||{})[status.dataset.message]||status.dataset.message;
       }
-      if(!active)setEditMode(false);
-      else if(editButton)editButton.hidden=false;
     },
     onGesture:(name,detail={})=>{
       if(name==="pinch-start"&&Number.isFinite(detail.x)&&Number.isFinite(detail.y))startDrag(detail.x,detail.y,"hand");
@@ -236,13 +234,12 @@ if(video&&cursor&&auraButton){
     onCursorMove:({x,y})=>moveDrag(x,y,"hand")
   });
   auraButton.addEventListener("click",async()=>{
-    if(controller.active){await controller.stop();setEditMode(false);return}
+    if(controller.active){if(drag?.source==="hand")finishDrag();await controller.stop();return}
     try{await controller.start()}catch(error){toast(error?.message||"AURA could not start.");}
   });
   window.addEventListener("pagehide",()=>{setEditMode(false);void controller.stop({notify:false})});
 }
-editButton?.classList.remove("visible");
-if(editButton)editButton.hidden=true;
+if(editButton){editButton.hidden=false;editButton.classList.add("visible");}
 
 // Project directory search/filter.
 const projectGrid=$("#project-grid");
