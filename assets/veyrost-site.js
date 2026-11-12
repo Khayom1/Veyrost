@@ -463,6 +463,9 @@ const captureInitialMenuHome=()=>{if(!menuIsDetached())captureMenuHomePosition()
 requestAnimationFrame(()=>requestAnimationFrame(captureInitialMenuHome));
 if(document.fonts?.ready)document.fonts.ready.then(captureInitialMenuHome).catch(()=>{});
 window.addEventListener("resize",()=>{if(!menuIsDetached())captureMenuHomePosition();},{passive:true});
+// MENU lives in a sticky header: refresh its true home coordinates after page scrolling,
+// so a first locked tap followed by scrolling cannot leave the wall opening off-screen.
+window.addEventListener("scroll",()=>{if(!menuIsDetached())captureMenuHomePosition();},{passive:true});
 updateMenuRepairNotice();
 
 // AURA camera controller: single normal arrow cursor; gestures control real site elements.
