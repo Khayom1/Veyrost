@@ -456,3 +456,27 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
  .veyrost-repair-layer .veyrost-tech-person{width:58px!important;min-width:58px!important}
  .veyrost-repair-layer .veyrost-tech-person svg{width:58px!important;height:67px!important}
 }
+
+/* Cable technician stands shoulder-close to the aperture; the right tool arm reaches into the cable fan. */
+.veyrost-repair-layer .veyrost-tech-person.is-wiring{z-index:2147483647!important}
+.veyrost-repair-layer .veyrost-tech-person.is-wiring .robot-arm-right{
+ transform:rotate(42deg) translate(2px,3px)!important;
+ transform-origin:69px 47px!important;
+}
+.veyrost-repair-layer .veyrost-tech-person.is-wiring .robot-arm-left{
+ transform:rotate(-12deg) translate(0,1px)!important;
+ transform-origin:31px 47px!important;
+}
+.veyrost-repair-layer .veyrost-tech-person.is-wire-reach .robot-arm-right{
+ transition:transform .22s cubic-bezier(.2,.8,.2,1)!important;
+}
+.veyrost-repair-layer .veyrost-tech-person.wire-reach-0 .robot-arm-right{transform:rotate(78deg) translate(3px,1px)!important}
+.veyrost-repair-layer .veyrost-tech-person.wire-reach-1 .robot-arm-right{transform:rotate(54deg) translate(2px,0)!important}
+.veyrost-repair-layer .veyrost-tech-person.wire-reach-2 .robot-arm-right{transform:rotate(28deg) translate(1px,1px)!important}
+.veyrost-repair-layer .veyrost-tech-person.wire-reach-3 .robot-arm-right{transform:rotate(4deg) translate(0,2px)!important}
+.veyrost-repair-layer .veyrost-tech-person.wire-reach-4 .robot-arm-right{transform:rotate(-24deg) translate(1px,3px)!important}
+.veyrost-repair-layer .veyrost-tech-person.wire-reach-5 .robot-arm-right{transform:rotate(-48deg) translate(2px,3px)!important}
+.veyrost-repair-layer .veyrost-tech-person.wire-reach-6 .robot-arm-right{transform:rotate(-72deg) translate(3px,2px)!important}
+.veyrost-repair-layer .veyrost-tech-person.is-wire-reach .robot-welder{opacity:1!important}
+.veyrost-repair-layer .veyrost-tech-person.is-wire-reach .robot-welder .welder-beam{opacity:1!important;animation:veyrost-welder-spark .13s steps(2,end) infinite!important}
+.veyrost-detached-wires .wire.is-connecting{filter:drop-shadow(0 0 6px rgba(137,255,235,.95))!important}
