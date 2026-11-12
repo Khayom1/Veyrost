@@ -47,9 +47,7 @@ These are source-level capabilities. They do not mean the 3D engine is currently
 ## Still not implemented from the Service Crew concept
 
 - Photorealistic scanned or production-grade rigged technician assets (current models are procedural low-poly geometry).
-- Tug-of-war with a held detached component.
-- Technician-controlled maintenance lock and protected-component repair sequence.
-- Hand-animated cable reconnection and post-repair interface restoration.
+- A general physical rope/soft-body solver and independent two-human grasp simulation (the current tug-of-war is deterministic and scripted).
 - Localized character dialogue and emotion state machine.
 - Spatially positioned voices and synchronized mechanical sounds.
 
