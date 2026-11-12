@@ -95,3 +95,9 @@ test("native select option labels are included in localization traversal", () =>
   const page = fs.readFileSync("projects.html", "utf8");
   assert.match(page, /<option>Core platform<\/option>/);
 });
+
+test("localized repository search resolves locale data inside its renderer", () => {
+  const site = fs.readFileSync("assets/veyrost-site.js", "utf8");
+  assert.match(site, /const localeDictionary=dictionaries\[language\]\|\|\{\}/);
+  assert.match(site, /localeDictionary\[p\.description\]/);
+});
