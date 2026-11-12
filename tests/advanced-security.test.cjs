@@ -31,8 +31,11 @@ test("browser proxy client keeps user tokens in memory and never persists them",
   assert.match(backend, /fetch\(PROXY_URL/);
   assert.match(backend, /"Authorization": "Bearer " \+ session\.accessToken/);
   assert.match(backend, /"apikey": publishableKey/);
+  assert.match(backend, /sb_publishable_[A-Za-z0-9_-]+/);
   assert.doesNotMatch(backend, /localStorage|sessionStorage/);
   assert.match(backend, /action: "refresh"/);
+  assert.match(html, /id="sAuthPassword" type="password"/);
+  assert.doesNotMatch(html, /sSupabasePublicKey/);
 });
 test("Supabase gateway enforces JWT on proxy and allows only auth bootstrap without JWT", () => {
   assert.match(config, /\[functions\.veyrost-proxy\]\s*verify_jwt = true/);
@@ -46,6 +49,8 @@ test("provider and integration credentials are injected only from Edge Function 
   }
   assert.match(auth, /SUPABASE_PUBLISHABLE_KEYS/);
   assert.match(auth, /SUPABASE_ANON_KEY/);
+  assert.match(auth, /req\.headers\.get\("apikey"\)!==key/);
+  assert.match(html, /\(\?:key\|authorization/);
 });
 test("proxy allowlists upstream hosts and restricts GitHub routes", () => {
   for (const host of ["api.deepseek.com", "api.siliconflow.com", "api.github.com", "www.googleapis.com", "s.jina.ai", "r.jina.ai"]) {
