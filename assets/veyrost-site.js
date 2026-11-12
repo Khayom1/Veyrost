@@ -44,9 +44,9 @@ let language="en";
 try{language=localStorage.getItem("veyrost-language")||"en"}catch(_){}
 if(!dictionaries[language])language="en";
 const translations={
- en:{move:"MOVE ITEMS",done:"FINISH EDIT",auraOn:"AURA ON",auraOff:"AURA OFF",editHint:"Layout editing is active. Drag cards or categories to rearrange them.",saved:"Workspace arrangement saved.",menuRisk:"MENU DETACHED · SYSTEM RISK",repairMenu:"REPAIR MENU",menuRestored:"Menu button restored to its original position."},
- ru:{move:"ПЕРЕМЕСТИТЬ БЛОКИ",done:"ЗАВЕРШИТЬ РЕДАКТИРОВАНИЕ",auraOn:"AURA ВКЛ",auraOff:"AURA ВЫКЛ",editHint:"Режим редактирования активен. Перетаскивайте карточки и категории.",saved:"Расположение сохранено.",menuRisk:"КНОПКА МЕНЮ СМЕЩЕНА · РИСК СИСТЕМЫ",repairMenu:"ВОССТАНОВИТЬ МЕНЮ",menuRestored:"Кнопка меню возвращена на исходное место."},
- tj:{move:"ҶОЙИВАЗКУНИИ ҚИСМҲО",done:"АНҶОМИ ТАҲРИР",auraOn:"AURA ФАЪОЛ",auraOff:"AURA ХОМӮШ",editHint:"Реҷаи таҳрир фаъол аст. Кортҳо ва гурӯҳҳоро ҷойиваз кунед.",saved:"Тарҳ нигоҳ дошта шуд.",menuRisk:"ТУГМАИ МЕНЮ ҶОЙИ ХУДРО ТАРК КАРД · ХАТАРИ СИСТЕМАВӢ",repairMenu:"МЕНЮРО ДУРУСТ КУН",menuRestored:"Тугмаи меню ба ҷойи аслиаш баргашт."}
+ en:{move:"MOVE ITEMS",done:"FINISH EDIT",auraOn:"AURA ON",auraOff:"AURA OFF",testTitle:"BUTTON LAB",testState:"STATE: OFF",testCount:"COUNT: 0",testPing:"PING",testReset:"RESET",testActive:"STATE: ON",testPinged:"SIGNAL SENT",editHint:"Layout editing is active. Drag cards or categories to rearrange them.",saved:"Workspace arrangement saved.",menuRisk:"MENU DETACHED · SYSTEM RISK",repairMenu:"REPAIR MENU",menuRestored:"Menu button restored to its original position."},
+ ru:{move:"ПЕРЕМЕСТИТЬ БЛОКИ",done:"ЗАВЕРШИТЬ РЕДАКТИРОВАНИЕ",auraOn:"AURA ВКЛ",auraOff:"AURA ВЫКЛ",testTitle:"ТЕСТ КНОПОК",testState:"СОСТОЯНИЕ: ВЫКЛ",testCount:"СЧЁТ: 0",testPing:"СИГНАЛ",testReset:"СБРОС",testActive:"СОСТОЯНИЕ: ВКЛ",testPinged:"СИГНАЛ ОТПРАВЛЕН",editHint:"Режим редактирования активен. Перетаскивайте карточки и категории.",saved:"Расположение сохранено.",menuRisk:"КНОПКА МЕНЮ СМЕЩЕНА · РИСК СИСТЕМЫ",repairMenu:"ВОССТАНОВИТЬ МЕНЮ",menuRestored:"Кнопка меню возвращена на исходное место."},
+ tj:{move:"ҶОЙИВАЗКУНИИ ҚИСМҲО",done:"АНҶОМИ ТАҲРИР",auraOn:"AURA ФАЪОЛ",auraOff:"AURA ХОМӮШ",testTitle:"САНҶИШИ ТУГМАҲО",testState:"ҲОЛАТ: ХОМӮШ",testCount:"ШУМОР: 0",testPing:"СИГНАЛ",testReset:"АЗ НАВ",testActive:"ҲОЛАТ: ФАЪОЛ",testPinged:"СИГНАЛ ФИРИСТОДА ШУД",editHint:"Реҷаи таҳрир фаъол аст. Кортҳо ва гурӯҳҳоро ҷойиваз кунед.",saved:"Тарҳ нигоҳ дошта шуд.",menuRisk:"ТУГМАИ МЕНЮ ҶОЙИ ХУДРО ТАРК КАРД · ХАТАРИ СИСТЕМАВӢ",repairMenu:"МЕНЮРО ДУРУСТ КУН",menuRestored:"Тугмаи меню ба ҷойи аслиаш баргашт."}
 };
 const originalText=new WeakMap();
 const originalAttrs=new WeakMap();
@@ -99,6 +99,7 @@ function translateDocument(){
 }
 function applyLanguage(){
   translateDocument();
+  if(typeof ensurePhysicsTestButtons==="function")ensurePhysicsTestButtons();
   const t=dictionaries[language]||dictionaries.en;
   const edit=$("#layout-toggle");
   if(edit)edit.textContent=edit.getAttribute("aria-pressed")==="true"?(translations[language]||translations.en).done:(translations[language]||translations.en).move;
@@ -164,14 +165,23 @@ function renderButtonPhysics(){
 function ensurePhysicsTestButtons(){
   let panel=$("#veyrost-physics-test-panel");
   if(!panel){
-    panel=document.createElement("div");
-    panel.id="veyrost-physics-test-panel";
-    panel.className="veyrost-physics-test-panel";
-    panel.setAttribute("aria-label","Physics test controls");
-    panel.innerHTML='<span class="physics-test-label">PHYSICS TEST</span><button type="button" data-physics-test="light">LIGHT · 0.6</button><button type="button" data-physics-test="standard">STANDARD · 1.0</button><button type="button" data-physics-test="heavy">HEAVY · 2.4</button><button type="button" data-physics-test="spring">SPRING · 0.8</button>';
-    document.body.append(panel);
+    const header=$(".site-header"),inner=header?.querySelector(".header-inner");
+    if(!header||!inner)return;
+    panel=document.createElement("div");panel.id="veyrost-physics-test-panel";panel.className="veyrost-button-lab";
+    panel.innerHTML='<span class="button-lab-title">BUTTON LAB</span><button type="button" data-physics-test="light" data-test-action="state">STATE: OFF</button><button type="button" data-physics-test="standard" data-test-action="count">COUNT: 0</button><button type="button" data-physics-test="heavy" data-test-action="ping">PING</button><button type="button" data-physics-test="spring" data-test-action="reset">RESET</button>';
+    inner.insertAdjacentElement("afterend",panel);
+    panel.addEventListener("click",event=>{
+      const button=event.target.closest("[data-test-action]");if(!button||editMode)return;
+      const t=translations[language]||translations.en;
+      if(button.dataset.testAction==="state"){const on=button.dataset.state!=="on";button.dataset.state=on?"on":"off";button.textContent=on?t.testActive:t.testState;}
+      if(button.dataset.testAction==="count"){const n=(Number(button.dataset.count)||0)+1;button.dataset.count=String(n);button.textContent=t.testCount.replace("0",String(n));}
+      if(button.dataset.testAction==="ping"){button.classList.add("test-pulse");setTimeout(()=>button.classList.remove("test-pulse"),450);button.textContent=t.testPinged;setTimeout(()=>{if(button.isConnected)button.textContent=t.testPing},1100);}
+      if(button.dataset.testAction==="reset"){panel.querySelectorAll("[data-test-action]").forEach(b=>{b.dataset.state="off";b.dataset.count="0";b.textContent=b.dataset.testAction==="state"?t.testState:b.dataset.testAction==="count"?t.testCount:b.dataset.testAction==="ping"?t.testPing:t.testReset;});}
+    });
   }
-  panel.hidden=!editMode;
+  const t=translations[language]||translations.en;
+  panel.querySelector(".button-lab-title").textContent=t.testTitle;
+  panel.querySelectorAll("[data-test-action]").forEach(b=>{const k=b.dataset.testAction;b.textContent=k==="state"?(b.dataset.state==="on"?t.testActive:t.testState):k==="count"?t.testCount.replace("0",b.dataset.count||"0"):k==="ping"?t.testPing:t.testReset;});
 }
 function initButtonPhysics(){
   clearButtonPhysics();
@@ -323,7 +333,7 @@ function setEditMode(value){
     editButton.setAttribute("aria-pressed",String(editMode));
   }
   if(editHint)editHint.hidden=!editMode;
-  const physicsPanel=$("#veyrost-physics-test-panel");if(physicsPanel)physicsPanel.hidden=!editMode;
+  
   if(editMode)initButtonPhysics();
   else {finishDrag();clearButtonPhysics();}
 }
