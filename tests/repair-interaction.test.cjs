@@ -23,9 +23,12 @@ test("sequence follows lock, tug-of-war, alignment, cable connection, verificati
   const { RepairInteractionSequence } = await api;
   const sequence = new RepairInteractionSequence();
   sequence.begin("home");
-  const expected = ["tug-of-war", "aligning", "connecting", "verifying", "restoring", "complete"];
-  for (const phase of expected) {
-    for (let i = 0; i < 10; i++) sequence.update(0.1);
+  const expected = [
+    ["tug-of-war", 3], ["aligning", 10], ["connecting", 5],
+    ["verifying", 9], ["restoring", 4], ["complete", 5]
+  ];
+  for (const [phase, frames] of expected) {
+    for (let i = 0; i < frames; i++) sequence.update(0.25);
     assert.equal(sequence.snapshot().phase, phase);
   }
 });
