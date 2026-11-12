@@ -210,3 +210,11 @@ html.veyrost-menu-detached.veyrost-layout-editing #menu-toggle[data-veyrost-layo
 /* VEYROST physical button bodies: collision-ready controls in layout edit mode. */
 html.veyrost-layout-editing button:not(#layout-toggle):not(#aura-toggle):not(.menu-repair-button){touch-action:none!important;will-change:translate,scale;transform-origin:center;transition:scale 70ms linear;cursor:grab!important}
 html.veyrost-layout-editing button:not(#layout-toggle):not(#aura-toggle):not(.menu-repair-button):active{cursor:grabbing!important}
+
+
+/* Temporary physical-button test rig, visible only in MOVE ITEMS mode. */
+.veyrost-physics-test-panel{position:fixed;z-index:9998;left:50%;bottom:18px;transform:translateX(-50%);display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;max-width:calc(100vw - 24px);padding:10px 12px;border:1px solid rgba(120,190,255,.35);border-radius:16px;background:rgba(8,16,30,.92);backdrop-filter:blur(14px);box-shadow:0 12px 36px rgba(0,0,0,.35)}
+.veyrost-physics-test-panel[hidden]{display:none}
+.veyrost-physics-test-panel .physics-test-label{width:100%;text-align:center;color:#9fcfff;font:700 10px/1.2 system-ui;letter-spacing:.18em}
+.veyrost-physics-test-panel button{min-height:38px;padding:8px 12px;border:1px solid rgba(130,190,255,.42);border-radius:10px;background:linear-gradient(145deg,#1b3657,#10243d);color:#f3f8ff;font:700 10px/1.2 system-ui;letter-spacing:.04em;touch-action:none;cursor:grab}
+html.veyrost-layout-editing .veyrost-physics-test-panel button{will-change:translate,scale}
