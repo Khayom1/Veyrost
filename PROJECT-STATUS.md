@@ -26,8 +26,8 @@ The checklist uses binary source evidence. It does not measure visual quality, u
 | Validation and release | 4 | 6 | 66.67% |
 | **Total** | **80** | **98** | **81.63%** |
 
-- Implemented source criteria: **80 / 98**
-- Pending criteria: **18 / 98**
+- Implemented source criteria: **84 / 98**
+- Pending criteria: **14 / 98**
 - Failed source criteria: **0**
 - Any later source edit must be validated again before merge.
 
@@ -58,6 +58,17 @@ The checklist uses binary source evidence. It does not measure visual quality, u
 - The two-stage release now verifies that the lifecycle and Matter physics agree before allowing detachment. A mismatch restores the protected mount rather than leaving inconsistent state.
 - Repair requires both planar and depth bodies and completes only after the planar mount is restored.
 - Four additional source-evidence checks cover these integrity guarantees.
+
+## Phase 4 — service crew 3D
+
+- Added a procedural 3D service vehicle with cab, windows, wheels and an amber warning beacon.
+- Added two articulated technicians with helmets, safety vests, tool belts and differentiated uniforms.
+- Added a roof-mounted metal ladder with rails and rungs, unfolding and folding animation.
+- Added a bounded service sequence: vehicle arrival, parking, ladder deployment, technician climb and ready state.
+- Added a guarded departure transition; the ladder folds and the technicians return to ground level before the vehicle exits.
+- Crew animation updates only while the spatial simulation is active and is cleaned up with the scene.
+
+The models are procedural low-poly geometry, not scanned or photorealistic rigged characters. Tug-of-war, maintenance lock, cable reconnection and post-repair UI restoration remain pending for later work.
 
 ## Critical integration boundary
 
