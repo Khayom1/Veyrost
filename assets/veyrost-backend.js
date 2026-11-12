@@ -43,7 +43,7 @@
     }
   }
   function isAuthenticated() {
-    return !!(session && session.accessToken && session.expiresAt > Date.now());
+    return !!(session && session.accessToken && (session.expiresAt > Date.now() || session.refreshToken));
   }
   function accessToken() {
     return session && session.accessToken ? session.accessToken : "";
