@@ -40,9 +40,9 @@ let language="en";
 try{language=localStorage.getItem("veyrost-language")||"en"}catch(_){}
 if(!dictionaries[language])language="en";
 const translations={
- en:{move:"MOVE ITEMS",done:"FINISH EDIT",auraOn:"AURA ON",auraOff:"AURA OFF",editHint:"Layout editing is active. Drag cards or categories to rearrange them.",saved:"Workspace arrangement saved."},
- ru:{move:"ПЕРЕМЕСТИТЬ БЛОКИ",done:"ЗАВЕРШИТЬ РЕДАКТИРОВАНИЕ",auraOn:"AURA ВКЛ",auraOff:"AURA ВЫКЛ",editHint:"Режим редактирования активен. Перетаскивайте карточки и категории.",saved:"Расположение сохранено."},
- tj:{move:"ҶОЙИВАЗКУНИИ ҚИСМҲО",done:"АНҶОМИ ТАҲРИР",auraOn:"AURA ФАЪОЛ",auraOff:"AURA ХОМӮШ",editHint:"Реҷаи таҳрир фаъол аст. Кортҳо ва гурӯҳҳоро ҷойиваз кунед.",saved:"Тарҳ нигоҳ дошта шуд."}
+ en:{move:"MOVE ITEMS",done:"FINISH EDIT",auraOn:"AURA ON",auraOff:"AURA OFF",editHint:"Layout editing is active. Drag cards or categories to rearrange them.",saved:"Workspace arrangement saved.",menuRisk:"MENU DETACHED · SYSTEM RISK",repairMenu:"REPAIR MENU",menuRestored:"Menu button restored to its original position."},
+ ru:{move:"ПЕРЕМЕСТИТЬ БЛОКИ",done:"ЗАВЕРШИТЬ РЕДАКТИРОВАНИЕ",auraOn:"AURA ВКЛ",auraOff:"AURA ВЫКЛ",editHint:"Режим редактирования активен. Перетаскивайте карточки и категории.",saved:"Расположение сохранено.",menuRisk:"КНОПКА МЕНЮ СМЕЩЕНА · РИСК СИСТЕМЫ",repairMenu:"ВОССТАНОВИТЬ МЕНЮ",menuRestored:"Кнопка меню возвращена на исходное место."},
+ tj:{move:"ҶОЙИВАЗКУНИИ ҚИСМҲО",done:"АНҶОМИ ТАҲРИР",auraOn:"AURA ФАЪОЛ",auraOff:"AURA ХОМӮШ",editHint:"Реҷаи таҳрир фаъол аст. Кортҳо ва гурӯҳҳоро ҷойиваз кунед.",saved:"Тарҳ нигоҳ дошта шуд.",menuRisk:"ТУГМАИ МЕНЮ ҶОЙИ ХУДРО ТАРК КАРД · ХАТАРИ СИСТЕМАВӢ",repairMenu:"МЕНЮРО ДУРУСТ КУН",menuRestored:"Тугмаи меню ба ҷойи аслиаш баргашт."}
 };
 const originalText=new WeakMap();
 const originalAttrs=new WeakMap();
@@ -141,7 +141,47 @@ let editMode=false,drag=null;
 const editButton=$("#layout-toggle");
 const editHint=$("#edit-hint");
 const cursor=$("#aura-pointer");
+
 const twoStepArmed=new WeakSet();
+const menuRepairNotice=document.createElement("aside");
+menuRepairNotice.id="menu-repair-notice";
+menuRepairNotice.className="menu-repair-notice";
+menuRepairNotice.hidden=true;
+menuRepairNotice.setAttribute("role","alert");
+menuRepairNotice.setAttribute("aria-live","assertive");
+const menuRepairText=document.createElement("span");
+menuRepairText.className="menu-repair-message";
+const menuRepairButton=document.createElement("button");
+menuRepairButton.type="button";
+menuRepairButton.className="menu-repair-button";
+menuRepairNotice.append(menuRepairText,menuRepairButton);
+document.body.append(menuRepairNotice);
+function menuIsDetached(){
+  if(!menu)return false;
+  const raw=(menu.style.translate||"").trim();
+  if(!raw||raw==="none")return false;
+  const parts=raw.split(/\\s+/);
+  const x=Number.parseFloat(parts[0])||0;
+  const y=Number.parseFloat(parts[1])||0;
+  return Math.abs(x)>2||Math.abs(y)>2;
+}
+function updateMenuRepairNotice(){
+  if(!menu)return;
+  const detached=menuIsDetached();
+  menuRepairNotice.hidden=!detached;
+  const t=translations[language]||translations.en;
+  menuRepairText.textContent=t.menuRisk;
+  menuRepairButton.textContent=t.repairMenu;
+}
+menuRepairButton.addEventListener("click",()=>{
+  if(!menu)return;
+  // Repair only the primary Menu control; do not reset any other layout item.
+  menu.style.translate="0px 0px";
+  twoStepArmed.delete(menu);
+  updateMenuRepairNotice();
+  toast((translations[language]||translations.en).menuRestored);
+});
+
 function offset(el){
   const a=(el.style.translate||"0px 0px").split(/\\s+/);
   return {x:Number.parseFloat(a[0])||0,y:Number.parseFloat(a[1])||0};
