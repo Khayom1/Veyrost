@@ -2,6 +2,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.m
 import "./matter-engine.js";
 import { DepthPhysicsWorld } from "./spatial-depth-physics.mjs";
 import { createProtectedControlRegistry, PROTECTED_CONTROL_STATES } from "./protected-control.mjs";
+import { ServiceCrew3D } from "./service-crew.mjs";
 import {
   computeSpatialLayout,
   screenToWorld,
@@ -208,6 +209,7 @@ export class SpatialWorldController {
 
     this._buildEnvironment();
     this._buildPanels();
+    this.serviceCrew = new ServiceCrew3D(THREE, this.scene, { onState: name => this._emitStatus(name) });
     this._buildProtectedRepairControl();
     this._buildDepthControl();
     this._restoreLayout();
@@ -1075,6 +1077,7 @@ export class SpatialWorldController {
     // so the HUD and the user's explicit resume interaction remain responsive.
     if (!this.paused) {
       this.physics.step(delta);
+      this.serviceCrew?.update(delta);
       if (this.depthPhysics) {
         for (const [id, depthBody] of this.depthPhysics.bodies) {
           const planar = this.physics.get(id);
@@ -1217,6 +1220,10 @@ export class SpatialWorldController {
     this._resize();
   }
 
+  departServiceCrew() {
+    return this.serviceCrew?.depart() ?? false;
+  }
+
   destroy() {
     if (this.destroyed) return;
     this.destroyed = true;
@@ -1256,6 +1263,8 @@ export class SpatialWorldController {
     this.depthControl = null;
     this.depthRange = null;
     this.depthValue = null;
+    this.serviceCrew?.dispose();
+    this.serviceCrew = null;
     this.protectedSockets.clear();
     this.panelGroups.clear();
     this.panelMeshes = [];
