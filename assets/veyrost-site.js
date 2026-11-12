@@ -5,7 +5,8 @@ const $$ = (selector, root=document) => [...root.querySelectorAll(selector)];
 const toast = (message) => {
   const node=$("#site-toast");
   if(!node) return;
-  node.textContent=(typeof dictionaries!=="undefined"?(dictionaries[language]||{})[message]||message:message); node.classList.add("show");
+  node.dataset.sourceMessage=message;
+  node.textContent=(dictionaries[language]||{})[message]||message; node.classList.add("show");
   clearTimeout(window.__veyrostToastTimer);
   window.__veyrostToastTimer=setTimeout(()=>node.classList.remove("show"),2200);
 };
@@ -85,6 +86,10 @@ function applyLanguage(){
   if(edit)edit.textContent=edit.getAttribute("aria-pressed")==="true"?(translations[language]||translations.en).done:(translations[language]||translations.en).move;
   const hint=$("#edit-hint");
   if(hint)hint.textContent=(translations[language]||translations.en).editHint;
+  if(status?.dataset.message)status.textContent=(dictionaries[language]||{})[status.dataset.message]||status.dataset.message;
+  const toastNode=$("#site-toast");
+  if(toastNode?.classList.contains("show")&&toastNode.dataset.sourceMessage)toastNode.textContent=(dictionaries[language]||{})[toastNode.dataset.sourceMessage]||toastNode.dataset.sourceMessage;
+  window.dispatchEvent(new Event("veyrost:languagechange"));
   const aura=$("#aura-toggle");
   if(aura){const state=aura.getAttribute("aria-pressed")==="true";aura.textContent=state?(translations[language]||translations.en).auraOn:(translations[language]||translations.en).auraOff;}
 }
@@ -215,7 +220,8 @@ if(video&&cursor&&auraButton){
       auraButton.disabled=state==="starting"||state==="loading";
       if(status){
         status.style.display=state==="off"?"none":"block";
-        status.textContent=(dictionaries[language]||{})[message]||message||state.toUpperCase();
+        status.dataset.message=message||state.toUpperCase();
+        status.textContent=(dictionaries[language]||{})[status.dataset.message]||status.dataset.message;
       }
       if(!active)setEditMode(false);
       else if(editButton)editButton.hidden=false;
@@ -257,11 +263,14 @@ if(projectGrid&&Array.isArray(window.VEYROST_PROJECTS)){
       </article>`).join(""):'<div class="empty-state">No projects match this search. Try another term or category.</div>';
     const publicMatches=list.filter(p=>p.visibility!=="private").length;
     const privateMatches=list.length-publicMatches;
-    if(count)count.textContent=`${publicMatches} PUBLIC + ${privateMatches} PRIVATE`;
+    const locale=dictionaries[language]||{};
+    if(count)count.textContent=language==="en"?`${publicMatches} PUBLIC + ${privateMatches} PRIVATE`:`${publicMatches} ${locale.PUBLIC||"PUBLIC"} + ${privateMatches} ${locale.PRIVATE||"PRIVATE"}`;
     registerMovable();restorePositions();
   };
   function escapeHTML(value){return String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]))}
-  input?.addEventListener("input",render);filter?.addEventListener("change",render);render();
+  input?.addEventListener("input",render);filter?.addEventListener("change",render);
+  window.addEventListener("veyrost:languagechange",render);
+  render();
 }
 
 // Settings switches are deliberately local preferences, not fake cloud controls.
