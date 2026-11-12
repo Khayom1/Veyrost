@@ -291,16 +291,12 @@ display:flex;justify-content:space-between;align-items:center;color:#eee}
 <h3>⚙ Танзимот</h3>
 <label>Номи соҳиб</label>
 <input id="sOwner" placeholder="Номи шумо">
-<label>DeepSeek API Key (танҳо барои ин сессия)</label>
-<input id="sDeep" type="password" placeholder="sk-...">
-<label>SiliconFlow API Key (танҳо барои ин сессия)</label>
-<input id="sSilicon" type="password" placeholder="sk-...">
-<label>GitHub Token (танҳо барои ин сессия)</label>
-<input id="sGh" type="password" placeholder="ghp_...">
-<label>Google API Key (барои Drive/Gmail)</label>
-<input id="sGKey" type="password" placeholder="AIza...">
-<label>Google CX (Custom Search Engine ID)</label>
-<input id="sGcx" placeholder="xxxxxxxxxxxx:yyyy">
+<h3 style="margin-top:18px;font-size:14px">Supabase account · Backend access</h3>
+<div class="hint">Воридшавӣ ба proxy-и серверӣ. API key-ҳои провайдерҳо дар Supabase Edge Function Secrets нигоҳ дошта мешаванд.</div>
+<label>Email</label><input id="sAuthEmail" type="email" autocomplete="username" placeholder="you@example.com">
+<label>Password</label><input id="sAuthPassword" type="password" autocomplete="current-password" placeholder="Ҳадди ақал 8 аломат">
+<div class="row"><button id="sAuthSignIn" type="button">Ворид шудан</button><button id="sAuthSignUp" type="button">Сохтани ҳисоб</button><button id="sAuthSignOut" type="button">Баромадан</button></div>
+<div class="hint" id="sAuthStatus" role="status">Ҳолат: ворид нашудаед.</div>
 <label>System Prompt</label>
 <textarea id="sSys"></textarea>
 
@@ -359,6 +355,7 @@ display:flex;justify-content:space-between;align-items:center;color:#eee}
 <div id="debugBody"></div>
 </div>
 
+<script src="assets/veyrost-backend.js"></script>
 <script>
 
 "use strict";
@@ -367,13 +364,8 @@ display:flex;justify-content:space-between;align-items:center;color:#eee}
 // ───────────────────────────── CONFIG ─────────────────────────────
 const DEFAULTS = {
 owner: "Соҳиб",
-deepKey: "",
-siliconKey: "",
 siliconModel: "tencent/Hy4-preview",
 expertMode: true,
-ghToken: "",
-gKey: "",
-gcx: "",
 sys: "",
 model: "deepseek-chat",
 temperature: 0.7,
@@ -438,13 +430,9 @@ if (!saved || typeof saved !== "object" || Array.isArray(saved)) saved = {};
 
 const m = { ...DEFAULTS, ...saved };
 m.owner = normStr(m.owner, DEFAULTS.owner).trim() || DEFAULTS.owner;
-m.deepKey = normStr(m.deepKey, DEFAULTS.deepKey);
-m.siliconKey = normStr(m.siliconKey, DEFAULTS.siliconKey);
 m.siliconModel = normStr(m.siliconModel, DEFAULTS.siliconModel).trim() || DEFAULTS.siliconModel;
 m.expertMode = normBool(m.expertMode, DEFAULTS.expertMode);
-m.ghToken = normStr(m.ghToken, DEFAULTS.ghToken);
-m.gKey = normStr(m.gKey, DEFAULTS.gKey).trim();
-m.gcx = normStr(m.gcx, DEFAULTS.gcx).trim();
+for (const secretField of ["deepKey","siliconKey","ghToken","gKey","gcx"]) delete m[secretField];
 m.sys = normStr(m.sys, DEFAULTS.sys);
 if (!ALLOWED_MODELS.includes(m.model)) m.model = DEFAULTS.model;
 m.temperature = clampNum(m.temperature, 0, 2, DEFAULTS.temperature);
@@ -457,7 +445,8 @@ return m;
 
 function saveCfg() {
 try {
-const safeConfig = { ...CFG, deepKey: "", siliconKey: "", ghToken: "", gKey: "" };
+const safeConfig = { ...CFG };
+for (const secretField of ["deepKey","siliconKey","ghToken","gKey","gcx"]) delete safeConfig[secretField];
 localStorage.setItem("veyrost_cfg", JSON.stringify(safeConfig));
 }
 catch (e) { Debug.add("error", { at: "saveCfg", msg: String(e.message || e) }); }
@@ -517,13 +506,11 @@ const PROVIDERS = {
 deepseek: {
 name: "DeepSeek",
 baseURL: "https://api.deepseek.com/chat/completions",
-key: () => CFG.deepKey,
 model: () => CFG.model || "deepseek-chat"
 },
 siliconflow: {
 name: "SiliconFlow",
 baseURL: "https://api.siliconflow.com/v1/chat/completions",
-key: () => CFG.siliconKey,
 model: () => CFG.siliconModel || "tencent/Hy4-preview"
 }
 };
@@ -534,7 +521,7 @@ return {
 provider: PROVIDERS[provider] ? provider : "deepseek",
 name: p.name,
 baseURL: p.baseURL,
-apiKey: Utils.safeText(p.key()).trim(),
+apiKey: "",
 model: p.model()
 };
 }
@@ -813,12 +800,7 @@ return (prefix || "id") + "" + Date.now() + "" + Math.random().toString(36).slic
 redactSecrets(text) {
 let s = Utils.safeText(text);
 
-const directSecrets = [
-Utils.safeText(CFG.deepKey).trim(),
-Utils.safeText(CFG.siliconKey).trim(),
-Utils.safeText(CFG.ghToken).trim(),
-Utils.safeText(CFG.gKey).trim()
-].filter(v => v.length >= 8);
+const directSecrets = [Utils.safeText(window.VeyrostBackend?.accessToken?.() || "")].filter(v => v.length >= 8);
 
 for (const secret of directSecrets) {
 if (secret) s = s.split(secret).join('[REDACTED_SECRET]');
@@ -2072,10 +2054,6 @@ const headers = {
 "X-GitHub-Api-Version": "2022-11-28"
 };
 
-if (CFG.ghToken) {
-headers["Authorization"] = `Bearer ${CFG.ghToken}`;
-}
-
 return headers;
 }
 
@@ -2208,10 +2186,7 @@ ctrl.abort();
 }, timeout);
 
 try {
-const res = await fetch(url, {
-...options,
-signal: ctrl.signal
-});
+const res = await window.VeyrostBackend.fetch(url, { ...options, signal: ctrl.signal }, ctrl.signal);
 
 let text = "";
 try {
@@ -2654,7 +2629,7 @@ required: []
 },
 
 async execute(args, ctx) {
-if (!CFG.ghToken) {
+if (!window.VeyrostBackend.isAuthenticated()) {
 throw notConfiguredError("GitHub Token дар Settings холӣ аст.");
 }
 
@@ -3389,11 +3364,7 @@ required: ["query"]
 },
 
 async execute(args, ctx) {
-if (!CFG.gKey || !CFG.gcx) {
-throw notConfiguredError(
-"Google Search is not configured. gKey/gcx дар Settings холӣ ҳастанд."
-);
-}
+if (!window.VeyrostBackend.isAuthenticated()) throw notConfiguredError("Google Search requires a signed-in Supabase user.");
 
 const query = Utils.safeText(args.query).trim();
 
@@ -3405,7 +3376,7 @@ throw err;
 }
 
 const u =
-`https://www.googleapis.com/customsearch/v1?key=${encodeURIComponent(CFG.gKey)}&cx=${encodeURIComponent(CFG.gcx)}&q=${encodeURIComponent(query)}`;
+`https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}`;
 
 const r = await httpJson(
 u,
@@ -3510,7 +3481,7 @@ retryable: false
 };
 }
 
-if (toolName.startsWith("gh_") && !CFG.ghToken) {
+if (toolName.startsWith("gh_") && !window.VeyrostBackend.isAuthenticated()) {
 const err = notConfiguredError("GitHub Token дар Settings танзим нашудааст.");
 const msg = friendlyError(err, "GitHub дастрас нест");
 uiStep.fail(msg);
@@ -3841,9 +3812,7 @@ toolCalls.filter(Boolean)
 
 try {
 const providerCfg = getProviderConfig(provider);
-if (!providerCfg.apiKey) {
-throw notConfiguredError(`${providerCfg.name} API Key дар Settings танзим нашудааст.`);
-}
+if (!window.VeyrostBackend.isAuthenticated()) throw notConfiguredError("Аввал бо ҳисоби Supabase ворид шавед.");
 const caps = getProviderCapabilities(providerCfg.provider, providerCfg.model);
 
 const body = {
@@ -3870,13 +3839,12 @@ body.tool_choice = "auto";
 
 armIdle();
 
-const res = await fetch(
+const res = await window.VeyrostBackend.fetch(
 providerCfg.baseURL,
 {
 method: "POST",
 headers: {
 "Content-Type": "application/json",
-"Authorization": `Bearer ${providerCfg.apiKey}`,
 "Cache-Control": "no-store"
 },
 body: JSON.stringify(body),
@@ -4039,9 +4007,7 @@ provider = "deepseek"
 } = {}
 ) {
 const providerCfg = getProviderConfig(provider);
-if (!providerCfg.apiKey) {
-throw notConfiguredError(`${providerCfg.name} API Key дар Settings танзим нашудааст.`);
-}
+if (!window.VeyrostBackend.isAuthenticated()) throw notConfiguredError("Аввал бо ҳисоби Supabase ворид шавед.");
 const caps = getProviderCapabilities(providerCfg.provider, providerCfg.model);
 
 const body = {
@@ -4060,7 +4026,6 @@ providerCfg.baseURL,
 method: "POST",
 headers: {
 "Content-Type": "application/json",
-"Authorization": `Bearer ${providerCfg.apiKey}`,
 "Cache-Control": "no-store"
 },
 body: JSON.stringify(body)
@@ -4366,7 +4331,7 @@ return result;
 
 // ───────────────────────────── EXPERT COUNCIL ─────────────────────────────
 async function getExpertAdvisory(messages, signal) {
-if (!CFG.expertMode || !Utils.safeText(CFG.siliconKey).trim()) return "";
+if (!CFG.expertMode || !window.VeyrostBackend.isAuthenticated()) return "";
 
 const advisorSystem = `You are Veyrost's second expert analyst.
 Your role is advisory only. Do not call tools and do not issue executable commands.
@@ -4515,7 +4480,7 @@ throw e;
 let messages =
 Memory.buildApiMessages(chat);
 
-if (CFG.expertMode && Utils.safeText(CFG.siliconKey).trim()) {
+if (CFG.expertMode && window.VeyrostBackend.isAuthenticated()) {
 agent.commitThinking("🧠 Expert Council: экспертии дуюм дархостро мустақилона таҳлил мекунад…");
 const advisory = await getExpertAdvisory(messages, controller.signal);
 if (advisory) {
@@ -5004,7 +4969,7 @@ persist();
 // Last-resort fallback: if the primary execution provider fails before producing a useful response,
 // ask the second provider for a direct answer without tools. This never bypasses permissions or destructive actions.
 let fallbackUsed = false;
-if (Utils.safeText(CFG.siliconKey).trim() && !finalText && !partialContent.trim()) {
+if (window.VeyrostBackend.isAuthenticated() && !finalText && !partialContent.trim()) {
 try {
 const fallbackMessages = Memory.boundRuntimeMessages(messages || Memory.buildApiMessages(chat));
 const fallbackText = await AI.chatOnce(fallbackMessages, {
@@ -5832,12 +5797,12 @@ const VX = (() => {
         const saved = existing.get(provider.id);
         if (saved) {
           Object.assign(saved, provider, {
-            apiKey: provider.id === "deepseek" ? CFG.deepKey : CFG.siliconKey
+            apiKey: ""
           });
         } else {
           memoryState.providers.push({
             ...provider,
-            apiKey: provider.id === "deepseek" ? CFG.deepKey : CFG.siliconKey,
+            apiKey: "",
             createdAt: now(),
             updatedAt: now()
           });
@@ -5857,7 +5822,7 @@ const VX = (() => {
         models: Array.isArray(input.models) ? input.models.map(text).filter(Boolean).slice(0, 100) : [],
         defaultModel: text(input.defaultModel || input.models?.[0] || "").trim(),
         capabilities: Array.isArray(input.capabilities) ? input.capabilities.slice(0, 40) : ["chat"],
-        apiKey: text(input.apiKey || "").trim(),
+        apiKey: "",
         builtin: !!input.builtin,
         metadata: Security.redactAny(input.metadata || {})
       };
@@ -5872,7 +5837,7 @@ const VX = (() => {
     async health(id, signal) {
       const p = find("providers", id);
       if (!p) return { ok: false, error: "provider_not_found" };
-      if (!p.apiKey) return { ok: false, error: "api_key_missing" };
+      if (!window.VeyrostBackend.isAuthenticated()) return { ok: false, error: "supabase_auth_required" };
       if (!Utils.isValidHttpUrl(p.baseURL) || new URL(p.baseURL).protocol !== "https:") {
         return { ok: false, error: "invalid_provider_url_https_public_host_required" };
       }
@@ -5882,7 +5847,7 @@ const VX = (() => {
           p.baseURL,
           {
             method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${p.apiKey}` },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ model: p.defaultModel || p.models[0], messages: [{ role: "user", content: "Reply with OK." }], max_tokens: 4 })
           },
           signal,
@@ -6413,15 +6378,10 @@ const VX = (() => {
       emit("integration:changed", memoryState.integrations[idx]);
       return true;
     },
-    async testSupabase(url, key, signal) {
-      const base = text(url).trim().replace(/\/$/,"");
-      if (!/^https:\/\//i.test(base) || !Utils.isValidHttpUrl(base)) return { ok:false,error:"Supabase URL must use HTTPS and a public hostname" };
-      if (!text(key).trim()) return { ok:false,error:"Supabase publishable/anon key missing" };
+    async testSupabase() {
       const started=performance.now();
-      try {
-        const r=await httpJson(`${base}/rest/v1/`,{method:"GET",headers:{apikey:text(key).trim(),Authorization:`Bearer ${text(key).trim()}`}},signal,{timeout:10000});
-        return {ok:r.ok,status:r.status,latency:Math.round(performance.now()-started)};
-      } catch(e) { return {ok:false,error:clean(e?.message||e)}; }
+      try { const result=await window.VeyrostBackend.health(); return {ok:result.ok,status:result.status,latency:Math.round(performance.now()-started)}; }
+      catch(e) { return {ok:false,error:clean(e?.message||e)}; }
     }
   };
 
@@ -6508,8 +6468,7 @@ const VX = (() => {
       add("marked","Markdown parser",!!window.marked);
       add("purify","DOMPurify",!!window.DOMPurify);
       add("highlight","Highlight.js",!!window.hljs);
-      add("deep","DeepSeek configured",!!text(CFG.deepKey));
-      add("sil","SiliconFlow configured",!!text(CFG.siliconKey));
+      add("backend","Supabase authenticated proxy",window.VeyrostBackend.isAuthenticated());
       add("agent","Primary agent",!!Agents.get("orchestrator"));
       add("expert","Expert agent",!!Agents.get("silicon-expert"));
       add("tools","Tool registry",Tools.all().length>0,`${Tools.all().length} tools`);
@@ -6524,10 +6483,10 @@ const VX = (() => {
   const SecurityCenter = {
     secretInventory() {
       return [
-        {id:"deepseek",present:!!text(CFG.deepKey),source:"current session",redacted:true},
-        {id:"siliconflow",present:!!text(CFG.siliconKey),source:"current session",redacted:true},
-        {id:"github",present:!!text(CFG.ghToken),source:"current session",redacted:true},
-        {id:"google",present:!!text(CFG.gKey),source:"current session",redacted:true}
+        {id:"deepseek",present:window.VeyrostBackend.isAuthenticated(),source:"Supabase Edge Function secret store",redacted:true},
+{id:"siliconflow",present:window.VeyrostBackend.isAuthenticated(),source:"Supabase Edge Function secret store",redacted:true},
+{id:"github",present:window.VeyrostBackend.isAuthenticated(),source:"Supabase Edge Function secret store",redacted:true},
+{id:"google",present:window.VeyrostBackend.isAuthenticated(),source:"Supabase Edge Function secret store",redacted:true}
       ];
     },
     policy() {
@@ -6646,6 +6605,8 @@ const VX = (() => {
     for (const provider of memoryState.providers) {
       if (provider && typeof provider === "object") delete provider.apiKey;
     }
+    for (const integration of memoryState.integrations) if (integration && integration.config) integration.config = Security.redactAny(integration.config);
+    saveCfg();
     Providers.init();
     Agents.init();
     Integrations.init();
@@ -6820,7 +6781,7 @@ const VXUI = (() => {
   function renderIntegrations(){
     const root=el("advIntegrations"); if(!root)return;
     const items=VX.Integrations.all();
-    root.innerHTML=`<div class="advList">${items.map(i=>`<div class="advListRow"><div class="grow"><div class="title">${esc(i.name)}</div><div class="sub">${esc(i.type)} · ${(i.capabilities||[]).join(", ")}</div></div>${pill(i.status,i.status==="configured"?"ok":i.status==="requires-oauth"?"warn":"")}${i.id==="supabase"?button("Configure",`configure-supabase`):""}${i.id==="github"?pill(CFG.ghToken?"TOKEN SET":"NO TOKEN",CFG.ghToken?"ok":"warn"):""}</div>`).join("")}</div><div style="height:12px"></div><div class="advCard"><h4>Integration policy</h4><p>OAuth integrations are represented as connectors until a valid user-granted OAuth flow is configured. Veyrost does not pretend an OAuth connection exists when it does not.</p></div>`;
+    root.innerHTML=`<div class="advList">${items.map(i=>`<div class="advListRow"><div class="grow"><div class="title">${esc(i.name)}</div><div class="sub">${esc(i.type)} · ${(i.capabilities||[]).join(", ")}</div></div>${pill(i.status,i.status==="configured"?"ok":i.status==="requires-oauth"?"warn":"")}${i.id==="supabase"?button("Configure",`configure-supabase`):""}${i.id==="github"?pill(window.VeyrostBackend.isAuthenticated()?"SESSION":"SIGN IN",window.VeyrostBackend.isAuthenticated()?"ok":"warn"):""}</div>`).join("")}</div><div style="height:12px"></div><div class="advCard"><h4>Integration policy</h4><p>OAuth integrations are represented as connectors until a valid user-granted OAuth flow is configured. Veyrost does not pretend an OAuth connection exists when it does not.</p></div>`;
   }
 
   function renderFiles(){
@@ -6896,13 +6857,7 @@ const VXUI = (() => {
     try{VX.Agents.save({name,providerId:provider,model,role:"custom",description:"Custom agent",permissions:["read"],tools:[]});renderPage("agents");toast("Agent created");}catch(e){toast(text(e.message||e));}
   }
 
-  function openProviderForm(){
-    const name=prompt("Provider name:","Custom AI");if(!name)return;
-    const baseURL=prompt("Chat Completions URL:","https://example.com/v1/chat/completions");if(!baseURL)return;
-    const apiKey=prompt("API key (kept in memory for this session only; re-enter after reload):","");
-    const model=prompt("Default model:","model-name");if(!model)return;
-    try{VX.Providers.save({id:name,name,baseURL,apiKey,models:[model],defaultModel:model,capabilities:["chat","stream"]});renderPage("providers");toast("Provider added");}catch(e){toast(text(e.message||e));}
-  }
+  function openProviderForm(){ toast("Custom providers are disabled until a server-side host and secret are allowlisted."); }
 
   function openProjectForm(){
     const name=prompt("Project name:","New Project");if(!name)return;
@@ -6925,10 +6880,7 @@ const VXUI = (() => {
   }
 
   function openSupabaseForm(){
-    const url=prompt("Supabase project URL:","");if(!url)return;
-    const key=prompt("Supabase publishable/anon key:","");if(!key)return;
-    VX.Integrations.configure("supabase",{url,key});
-    void VX.Integrations.testSupabase(url,key).then(r=>toast(r.ok?`Supabase OK · ${r.status}`:`Supabase test failed: ${r.error||r.status}`));
+    void VX.Integrations.testSupabase().then(r=>toast(r.ok?"Supabase proxy OK · "+r.status:"Proxy test failed: "+(r.error||r.status)));
     renderPage("integrations");
   }
 
