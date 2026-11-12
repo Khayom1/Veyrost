@@ -95,3 +95,30 @@ html.veyrost-layout-editing #menu-toggle{touch-action:none!important}
   .language-switch button{min-width:18px;font-size:7px}
 }
 .menu-repair-notice[hidden]{display:none!important}
+
+
+/* Mobile header: reserve a stable visible slot for EN / RU / TJ. */
+@media screen and (max-width: 760px) {
+  .site-header .header-inner { width: calc(100% - 20px) !important; gap: 6px !important; }
+  .site-header .brand { display: none !important; }
+  .site-header .header-actions { display: flex !important; flex: 1 1 auto !important; min-width: 0 !important; justify-content: flex-end !important; gap: 5px !important; }
+  .site-header .header-actions > .language-switch { display: flex !important; flex: 0 0 auto !important; visibility: visible !important; opacity: 1 !important; position: static !important; width: auto !important; height: auto !important; overflow: visible !important; }
+  .site-header .language-switch button { display: inline-flex !important; visibility: visible !important; opacity: 1 !important; flex: 0 0 auto !important; min-width: 23px !important; padding: 5px 4px !important; font-size: 8px !important; }
+  .site-header .aura-btn, .site-header .edit-btn { flex: 0 0 auto !important; white-space: nowrap !important; padding: 6px 6px !important; font-size: 7px !important; }
+}
+@media screen and (max-width: 380px) {
+  .site-header .header-inner { width: calc(100% - 14px) !important; gap: 4px !important; }
+  .site-header .header-actions { gap: 3px !important; }
+  .site-header .language-switch button { min-width: 20px !important; padding: 4px 2px !important; font-size: 7px !important; }
+  .site-header .aura-btn, .site-header .edit-btn { padding: 5px 4px !important; font-size: 6px !important; letter-spacing: 0 !important; }
+}
+
+/* Detached Menu remains disabled for navigation, but becomes draggable in edit mode. */
+html.veyrost-menu-detached.veyrost-layout-editing #menu-toggle {
+  pointer-events: auto !important;
+  opacity: .72 !important;
+  filter: none !important;
+  cursor: grab !important;
+  touch-action: none !important;
+}
+html.veyrost-menu-detached.veyrost-layout-editing #menu-toggle:active { cursor: grabbing !important; }
