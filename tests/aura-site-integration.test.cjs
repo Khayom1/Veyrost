@@ -86,6 +86,15 @@ test("the directory contains every repository record without exposing private so
   assert.ok(projects.some(p=>p.repo==="textivo"));
 });
 
+test("shared script binds all three language buttons and keeps selectors valid", () => {
+  assert.match(site, /\\$\\$\\("\\[data-lang\\]"\\)\\.forEach\\(button=>button\\.addEventListener\\("click"/);
+  assert.doesNotMatch(site, /\\$\\$\\$|\\$\\(\\s*["']\\[data-lang\\]/);
+  for (const locale of ["en","ru","tj"]) assert.match(html,new RegExp('data-lang="' + locale + '"'));
+  assert.match(site, /auraButton\\.addEventListener\\("click"/);
+  assert.match(site, /editButton\\?\\.addEventListener\\("click"/);
+  assert.match(css, /@media\\(max-width:760px\\)[\\s\\S]*?\\.language-switch\\{display:flex\\}/);
+});
+
 test("shared initialization uses querySelectorAll for every multi-element control list", () => {
   for (const selector of [
     '[data-close-menu]',
