@@ -29,7 +29,7 @@ test("provider and shared HTTP traffic is sent only through the authenticated pr
 test("browser proxy client keeps user tokens in memory and never persists them", () => {
   assert.match(backend, /let session = null/);
   assert.match(backend, /fetch\(PROXY_URL/);
-  assert.match(backend, /Authorization: "Bearer " \+ session\.accessToken/);
+  assert.match(backend, /"Authorization": "Bearer " \+ session\.accessToken/);
   assert.match(backend, /apikey: publishableKey/);
   assert.doesNotMatch(backend, /localStorage|sessionStorage/);
   assert.match(backend, /action: "refresh"/);
@@ -37,8 +37,8 @@ test("browser proxy client keeps user tokens in memory and never persists them",
 test("Supabase gateway enforces JWT on proxy and allows only auth bootstrap without JWT", () => {
   assert.match(config, /\[functions\.veyrost-proxy\]\s*verify_jwt = true/);
   assert.match(config, /\[functions\.veyrost-auth\]\s*verify_jwt = false/);
-  assert.match(proxy, /claims\.role !== "authenticated"/);
-  assert.match(proxy, /typeof claims\.sub !== "string"/);
+  assert.match(proxy, /claims\.role!=="authenticated"/);
+  assert.match(proxy, /typeof claims\.sub!=="string"/);
 });
 test("provider and integration credentials are injected only from Edge Function secrets", () => {
   for (const name of ["DEEPSEEK_API_KEY", "SILICONFLOW_API_KEY", "GITHUB_TOKEN", "GOOGLE_API_KEY", "GOOGLE_CX"]) {
@@ -49,7 +49,7 @@ test("provider and integration credentials are injected only from Edge Function 
 });
 test("proxy allowlists upstream hosts and restricts GitHub routes", () => {
   for (const host of ["api.deepseek.com", "api.siliconflow.com", "api.github.com", "www.googleapis.com", "s.jina.ai", "r.jina.ai"]) {
-    assert.ok(proxy.includes('host === "' + host + '"'), "missing allowlisted host " + host);
+    assert.ok(new RegExp('host===["\\\\"]' + host.replace(/\\./g,"\\\\.") + '["\\\\"]').test(proxy), "missing allowlisted host " + host);
   }
   assert.match(proxy, /function githubRoute/);
   assert.match(proxy, /actions\/secrets/);
@@ -63,7 +63,7 @@ test("proxy rejects private targets and Jina Reader nested private URLs", () => 
 });
 test("proxy applies request size, user rate and origin limits", () => {
   assert.match(proxy, /MAX_BODY_BYTES = 1_000_000/);
-  assert.match(proxy, /maxRequestsPerMinute \?\? 90/);
+  assert.match(proxy, /maxRequestsPerMinute\?\?90/);
   assert.match(proxy, /origin_not_allowed/);
   assert.match(proxy, /rate_limit_exceeded/);
 });
