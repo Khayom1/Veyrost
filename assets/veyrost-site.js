@@ -20,7 +20,10 @@ const closeMobileMenu=()=>{
   menu?.setAttribute("aria-expanded","false");
   menu?.setAttribute("aria-label","Open navigation");
 };
-menu?.addEventListener("click",()=>{
+menu?.addEventListener("click",(event)=>{
+  if(menu.dataset.detached==="true"||document.documentElement.classList.contains("veyrost-layout-editing")){
+    event.preventDefault();event.stopImmediatePropagation();return;
+  }
   const open=!mobile?.classList.contains("open");
   mobile?.classList.toggle("open",open);
   mobile?.setAttribute("aria-hidden",String(!open));
@@ -168,15 +171,21 @@ function menuIsDetached(){
 function updateMenuRepairNotice(){
   if(!menu)return;
   const detached=menuIsDetached();
+  menu.dataset.detached=String(detached);
   menuRepairNotice.hidden=!detached;
+  menu.setAttribute("aria-disabled",String(detached));
+  menu.setAttribute("tabindex",detached?"-1":"0");
+  menu.setAttribute("aria-expanded","false");
+  if(detached)mobile?.classList.remove("open");
   const t=translations[language]||translations.en;
   menuRepairText.textContent=t.menuRisk;
   menuRepairButton.textContent=t.repairMenu;
+  document.documentElement.classList.toggle("veyrost-menu-detached",detached);
 }
 menuRepairButton.addEventListener("click",()=>{
   if(!menu)return;
-  // Repair only the primary Menu control; do not reset any other layout item.
   menu.style.translate="0px 0px";
+  menu.dataset.detached="false";
   twoStepArmed.delete(menu);
   updateMenuRepairNotice();
   toast((translations[language]||translations.en).menuRestored);
@@ -202,8 +211,14 @@ function moveDrag(x,y,source){
 }
 function finishDrag(){
   if(!drag)return;
-  const moved=drag.moved;drag=null;
+  const moved=drag.moved;
+  const movedElement=drag.el;
+  drag=null;
   if(moved)savePositions();
+  if(movedElement===menu&&moved){
+    menu.setAttribute("aria-expanded","false");
+    mobile?.classList.remove("open");
+  }
   updateMenuRepairNotice();
 }
 function setEditMode(value){
@@ -230,7 +245,7 @@ document.addEventListener("pointerdown",event=>{
     toast("Locked for the first attempt. Drag again to move this control.");
     return;
   }
-  if(target.hasAttribute("data-two-step-drag"))twoStepArmed.delete(target);
+  // After the initial two-attempt confirmation, future drags require one attempt.
   event.preventDefault();event.stopImmediatePropagation();
   startDrag(event.clientX,event.clientY,"pointer");
 });
@@ -238,6 +253,10 @@ document.addEventListener("pointermove",event=>moveDrag(event.clientX,event.clie
 document.addEventListener("pointerup",()=>{if(drag?.source==="pointer")finishDrag()});
 document.addEventListener("pointercancel",()=>{if(drag?.source==="pointer")finishDrag()});
 document.addEventListener("click",event=>{
+  const menuTarget=event.target?.closest?.("#menu-toggle");
+  if(menuTarget&&(menuTarget.dataset.detached==="true"||editMode)){
+    event.preventDefault();event.stopImmediatePropagation();return;
+  }
   if(editMode&&event.target?.closest?.("[data-veyrost-layout-item]")){
     event.preventDefault();event.stopImmediatePropagation();
   }
