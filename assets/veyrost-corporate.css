@@ -46,3 +46,9 @@ main{min-height:70vh}.page-hero{padding:76px 0 56px;border-bottom:1px solid var(
 .mobile-nav a{width:100%;justify-content:flex-start;gap:14px}
 .menu-settings-icon{display:block;flex:0 0 18px;width:18px;height:18px;color:#b8a9ff}
 .mobile-nav a[href*="#workspace-settings"]{border-top:1px solid #ffffff18;margin-top:8px;padding-top:15px;color:#d7ccff}
+
+/* Hard override: the dropdown is a vertical flex stack, never a grid. */
+#mobile-nav.mobile-nav{display:none;grid-template-columns:none!important;grid-auto-flow:row!important;flex-direction:column!important;align-items:stretch!important}
+#mobile-nav.mobile-nav.open{display:flex!important;flex-direction:column!important;flex-wrap:nowrap!important;grid-template-columns:none!important;grid-auto-flow:row!important}
+#mobile-nav.mobile-nav>a{display:flex!important;flex:0 0 auto!important;width:100%!important;min-width:0!important;min-height:48px;box-sizing:border-box}
+#mobile-nav.mobile-nav>.menu-divider{display:block!important;flex:0 0 1px!important;width:auto!important}
