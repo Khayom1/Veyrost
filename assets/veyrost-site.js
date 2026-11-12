@@ -1,3 +1,4 @@
+import "../matter-engine.js";
 import { AuraController } from "../aura-engine.mjs";
 
 const $ = (selector, root=document) => root.querySelector(selector);
@@ -142,6 +143,37 @@ function savePositions(){
 }
 let editMode=false,drag=null;
 const editButton=$("#layout-toggle");
+const physicalBodies=new Map();
+let physicsWorld=null,physicsFrame=0;
+function clearButtonPhysics(){
+  if(physicsFrame)cancelAnimationFrame(physicsFrame);
+  physicsFrame=0;
+  physicalBodies.forEach(({el})=>{el.style.scale="";el.style.transformOrigin="";});
+  physicalBodies.clear();physicsWorld=null;
+}
+function renderButtonPhysics(){
+  if(!editMode||!physicsWorld)return;
+  physicsWorld.step(1/60);
+  for(const [el,body] of physicalBodies){
+    const origin=body.__origin,base=body.__base,c=body.compression||0;
+    el.style.translate=(base.x+body.x-origin.x)+"px "+(base.y+body.y-origin.y)+"px";
+    el.style.scale=body.compressionAxis==="x"?(1-c)+" "+(1+c*.55):(1+c*.55)+" "+(1-c);
+  }
+  physicsFrame=requestAnimationFrame(renderButtonPhysics);
+}
+function initButtonPhysics(){
+  clearButtonPhysics();
+  if(!window.VEYROST_MATTER?.MatterWorld)return;
+  physicsWorld=new window.VEYROST_MATTER.MatterWorld(window.innerWidth,window.innerHeight,{gravity:0,positionCorrection:.9});
+  const buttons=$("button:not(#layout-toggle):not(#aura-toggle):not(.menu-repair-button):not([disabled])");
+  buttons.forEach((el,index)=>{
+    const rect=el.getBoundingClientRect(),base=offset(el);
+    const body=physicsWorld.add({id:el.id||el.dataset.layoutId||("ui-button-"+index),x:rect.left,y:rect.top,width:rect.width,height:rect.height,mass:el.id==="menu-toggle"?2.4:1,elasticity:.24,friction:.42,maxCompression:.13,material:"soft-rubber"});
+    body.__origin={x:rect.left,y:rect.top};body.__base=base;
+    physicalBodies.set(el,body);el.style.transformOrigin="center";
+  });
+  physicsFrame=requestAnimationFrame(renderButtonPhysics);
+}
 const editHint=$("#edit-hint");
 const cursor=$("#aura-pointer");
 
@@ -241,28 +273,31 @@ function offset(el){
 }
 function startDrag(x,y,source){
   if(!editMode||drag)return false;
-  const el=document.elementFromPoint(x,y)?.closest?.("[data-veyrost-layout-item]");
+  const hit=document.elementFromPoint(x,y),button=hit?.closest?.("button");
+  const el=button&&physicalBodies.has(button)?button:hit?.closest?.("[data-veyrost-layout-item]");
   if(!el)return false;
-  const p=offset(el);
-  drag={el,source,startX:x,startY:y,baseX:p.x,baseY:p.y,moved:false};
+  const p=offset(el),body=physicalBodies.get(el);
+  if(body&&!physicsWorld.beginDrag(body.id,x,y))return false;
+  drag={el,body,source,startX:x,startY:y,baseX:p.x,baseY:p.y,moved:false,lastX:x,lastY:y,lastTime:performance.now(),vx:0,vy:0};
   return true;
 }
 function moveDrag(x,y,source){
   if(!drag||drag.source!==source)return;
   const dx=x-drag.startX,dy=y-drag.startY;
   if(Math.hypot(dx,dy)>3)drag.moved=true;
-  drag.el.style.translate=(drag.baseX+dx)+"px "+(drag.baseY+dy)+"px";
+  if(drag.body&&physicsWorld){
+    const now=performance.now(),dt=Math.max(.008,(now-drag.lastTime)/1000);
+    drag.vx=(x-drag.lastX)/dt;drag.vy=(y-drag.lastY)/dt;
+    drag.lastX=x;drag.lastY=y;drag.lastTime=now;physicsWorld.dragTo(x,y);
+  }else drag.el.style.translate=(drag.baseX+dx)+"px "+(drag.baseY+dy)+"px";
 }
 function finishDrag(){
   if(!drag)return;
-  const moved=drag.moved;
-  const movedElement=drag.el;
+  const moved=drag.moved,movedElement=drag.el;
+  if(drag.body&&physicsWorld)physicsWorld.endDrag(drag.vx,drag.vy);
   drag=null;
   if(moved)savePositions();
-  if(movedElement===menu&&moved){
-    menu.setAttribute("aria-expanded","false");
-    mobile?.classList.remove("open");
-  }
+  if(movedElement===menu&&moved){menu.setAttribute("aria-expanded","false");mobile?.classList.remove("open");}
   updateMenuRepairNotice();
 }
 function setEditMode(value){
@@ -275,7 +310,8 @@ function setEditMode(value){
     editButton.setAttribute("aria-pressed",String(editMode));
   }
   if(editHint)editHint.hidden=!editMode;
-  if(!editMode)finishDrag();
+  if(editMode)initButtonPhysics();
+  else {finishDrag();clearButtonPhysics();}
 }
 editButton?.addEventListener("click",()=>setEditMode(!editMode));
 document.addEventListener("pointerdown",event=>{
