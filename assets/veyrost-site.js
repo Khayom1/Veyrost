@@ -317,7 +317,8 @@ editButton?.addEventListener("click",()=>setEditMode(!editMode));
 document.addEventListener("pointerdown",event=>{
   if(!editMode||event.button!==0)return;
   if(event.target?.closest?.("#layout-toggle"))return;
-  const target=event.target?.closest?.("[data-veyrost-layout-item]");
+  const physicalButton=event.target?.closest?.("button");
+  const target=physicalButton&&physicalBodies.has(physicalButton)?physicalButton:event.target?.closest?.("[data-veyrost-layout-item]");
   if(!target)return;
   if(target===menu&&!menuIsDetached()&&!twoStepArmed.has(target)){
     twoStepArmed.add(target);
@@ -337,7 +338,8 @@ document.addEventListener("click",event=>{
   if(menuTarget&&(menuTarget.dataset.detached==="true"||editMode)){
     event.preventDefault();event.stopImmediatePropagation();return;
   }
-  if(editMode&&event.target?.closest?.("[data-veyrost-layout-item]")){
+  const physicalButton=event.target?.closest?.("button");
+  if(editMode&&((physicalButton&&physicalBodies.has(physicalButton))||event.target?.closest?.("[data-veyrost-layout-item]"))){
     event.preventDefault();event.stopImmediatePropagation();
   }
 },true);
