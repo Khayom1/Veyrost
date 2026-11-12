@@ -298,3 +298,25 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
 @keyframes veyrost-repair-tool-work{from{transform:rotate(-12deg) translateY(1px)}to{transform:rotate(12deg) translateY(-2px)}}
 @keyframes veyrost-repair-tool-done{to{opacity:0;transform:scale(1.25)}}
 @keyframes veyrost-menu-repair-pulse{from{filter:drop-shadow(0 0 3px #8ff4e466)}to{filter:drop-shadow(0 0 13px #8ff4e4)}}
+
+
+/* Repair crew v2: isolated positioning; never inherit legacy robot transforms. */
+.veyrost-repair-layer .veyrost-tech-person{
+  position:fixed!important;left:0;top:0;right:auto!important;bottom:auto!important;
+  width:82px!important;min-width:82px!important;height:auto!important;margin:0!important;
+  display:flex!important;flex-direction:column!important;align-items:center!important;
+  opacity:0;transform:none!important;translate:none!important;scale:1!important;
+  z-index:2147483647!important;pointer-events:none!important;will-change:left,top,opacity!important;
+  transition:left 620ms cubic-bezier(.2,.75,.25,1),top 620ms cubic-bezier(.2,.75,.25,1),opacity 260ms ease!important;
+}
+.veyrost-repair-layer .veyrost-tech-person svg{
+  display:block!important;width:82px!important;height:96px!important;max-width:none!important;
+}
+.veyrost-repair-layer .veyrost-tech-person.is-boarding{
+  opacity:0!important;transform:scale(.45)!important;transform-origin:bottom center!important;
+  transition:opacity 420ms ease,transform 420ms ease!important;
+}
+@media(max-width:760px){
+  .veyrost-repair-layer .veyrost-tech-person{width:58px!important;min-width:58px!important}
+  .veyrost-repair-layer .veyrost-tech-person svg{width:58px!important;height:68px!important}
+}
