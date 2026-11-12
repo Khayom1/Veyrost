@@ -5,9 +5,16 @@ export const PROTECTED_CONTROL_STATES = Object.freeze({
   REPAIRING: "repairing"
 });
 
+function normalizeControlId(id) {
+  if (id === null || id === undefined) throw new TypeError("Protected control ID must be non-empty.");
+  const key = String(id).trim();
+  if (!key) throw new TypeError("Protected control ID must be non-empty.");
+  return key;
+}
+
 export class ProtectedControlState {
   constructor(id) {
-    this.id = String(id);
+    this.id = normalizeControlId(id);
     this.state = PROTECTED_CONTROL_STATES.MOUNTED;
     this.pullCount = 0;
     this.revision = 0;
@@ -19,6 +26,10 @@ export class ProtectedControlState {
     }
     if (this.state === PROTECTED_CONTROL_STATES.DETACHED) {
       return { accepted: true, state: this.state, reason: "already-detached" };
+    }
+    if (this.state !== PROTECTED_CONTROL_STATES.MOUNTED &&
+        this.state !== PROTECTED_CONTROL_STATES.RESISTING) {
+      return { accepted: false, state: this.state, reason: "invalid-state" };
     }
     this.pullCount += 1;
     if (this.pullCount === 1) {
@@ -34,6 +45,13 @@ export class ProtectedControlState {
   beginRepair() {
     if (this.state !== PROTECTED_CONTROL_STATES.DETACHED) return false;
     this.state = PROTECTED_CONTROL_STATES.REPAIRING;
+    this.revision += 1;
+    return true;
+  }
+
+  cancelRepair() {
+    if (this.state !== PROTECTED_CONTROL_STATES.REPAIRING) return false;
+    this.state = PROTECTED_CONTROL_STATES.DETACHED;
     this.revision += 1;
     return true;
   }
@@ -64,10 +82,13 @@ export class ProtectedControlState {
 }
 
 export function createProtectedControlRegistry(ids = []) {
+  if (ids == null || typeof ids[Symbol.iterator] !== "function") {
+    throw new TypeError("Protected control IDs must be iterable.");
+  }
   const controls = new Map();
   for (const id of ids) {
-    const key = String(id);
-    if (!key || controls.has(key)) throw new Error("Protected control IDs must be unique.");
+    const key = normalizeControlId(id);
+    if (controls.has(key)) throw new Error("Protected control IDs must be unique.");
     controls.set(key, new ProtectedControlState(key));
   }
   return controls;
