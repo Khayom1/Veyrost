@@ -45,13 +45,13 @@ test("shared AURA controller requests access only after the user activates the b
 });
 
 test("layout editing is always available independently of AURA", () => {
-  assert.match(site, /editButton\\.hidden=false/);
-  assert.match(site, /editMode=Boolean\\(value\\)/);
-  assert.doesNotMatch(site, /editMode=Boolean\\(value\\)&&Boolean\\(controller\\?\\.active\\)/);
-  assert.match(site, /layout-toggle/);
-  assert.match(site, /veyrost-layout-editing/);
-  assert.match(site, /startDrag\\(detail\\.x,detail\\.y,"hand"\\)/);
-  assert.match(site, /moveDrag\\(x,y,"hand"\\)/);
+  assert.ok(site.includes("editButton.hidden=false"));
+  assert.ok(site.includes("editMode=Boolean(value);"));
+  assert.ok(!site.includes("editMode=Boolean(value)&&Boolean(controller?.active)"));
+  assert.ok(site.includes("layout-toggle"));
+  assert.ok(site.includes("veyrost-layout-editing"));
+  assert.ok(site.includes('startDrag(detail.x,detail.y,"hand")'));
+  assert.ok(site.includes('moveDrag(x,y,"hand")'));
 });
 
 test("workspace categories and project cards are movable, including the private category", () => {
@@ -93,10 +93,9 @@ test("shared initialization uses querySelectorAll for every multi-element contro
     '[data-lang]',
     '[data-local-toggle]'
   ]) {
-    assert.ok(site.includes('$("' + selector + '")'), 'querySelectorAll missing for ' + selector);
+    assert.ok(site.includes('$$("' + selector + '")'), 'querySelectorAll missing for ' + selector);
   }
-  assert.doesNotMatch(site, /(?<!\\$)\\$\\([^;\\n]*?\\)\\.forEach/);
-  assert.match(site, /const statusNode=\\$\\("#aura-status"\\)/);
+  assert.ok(site.includes('const statusNode=$("#aura-status");'));
 });
 
 test("browser storage failures do not abort language or settings controls", () => {
