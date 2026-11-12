@@ -217,15 +217,22 @@ function menuIsDetached(){
   return Math.abs(x)>2||Math.abs(y)>2;
 }
 let detachedMenuWires=null;
+let menuHomePosition=null;
+function captureMenuHomePosition(){
+  if(!menu)return;
+  const rect=menu.getBoundingClientRect();
+  menuHomePosition={left:rect.left+window.scrollX,top:rect.top+window.scrollY};
+}
 function syncDetachedMenuWires(detached){
   if(!menu)return;
   if(!detached){
     detachedMenuWires?.remove();detachedMenuWires=null;return;
   }
-  const raw=(menu.style.translate||"0px 0px").trim().split(/\\s+/);
-  const dx=Number.parseFloat(raw[0])||0,dy=Number.parseFloat(raw[1])||0;
-  const rect=menu.getBoundingClientRect();
-  const x=rect.left-dx,y=rect.top-dy;
+  // Keep the severed cable at the button's authored home position, never derive it
+  // from the detached button's current position or its transform.
+  if(!menuHomePosition)captureMenuHomePosition();
+  const x=menuHomePosition.left-window.scrollX;
+  const y=menuHomePosition.top-window.scrollY;
   if(!detachedMenuWires){
     detachedMenuWires=document.createElement("div");
     detachedMenuWires.className="veyrost-detached-wires";
