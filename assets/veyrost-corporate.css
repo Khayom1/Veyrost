@@ -371,3 +371,24 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
 #menu-toggle{position:relative!important;z-index:10060!important}
 .site-header .veyrost-detached-wires{position:fixed!important;z-index:1!important;pointer-events:none!important}
 .site-header #menu-toggle{position:relative!important;z-index:10060!important}
+
+/* Seven independent, restrained live leads. Keep the aperture visible and the MENU control above it. */
+.site-header{position:sticky!important;z-index:1000!important;isolation:isolate!important}
+.site-header .veyrost-detached-wires{position:fixed!important;z-index:10050!important;pointer-events:none!important}
+.site-header #menu-toggle{position:relative!important;z-index:10060!important}
+.veyrost-detached-wires .wire{transform-box:fill-box;transform-origin:center}
+.veyrost-detached-wires .wire-a{animation:veyrost-wire-a 3.1s ease-in-out infinite alternate}
+.veyrost-detached-wires .wire-b{animation:veyrost-wire-b 2.8s ease-in-out infinite alternate}
+.veyrost-detached-wires .wire-c{animation:veyrost-wire-c 3.4s ease-in-out infinite alternate}
+.veyrost-detached-wires .wire-d{animation:veyrost-wire-d 2.7s ease-in-out infinite alternate}
+.veyrost-detached-wires .wire-e{animation:veyrost-wire-e 3.2s ease-in-out infinite alternate}
+.veyrost-detached-wires .wire-f{animation:veyrost-wire-f 2.9s ease-in-out infinite alternate}
+.veyrost-detached-wires .wire-g{animation:veyrost-wire-g 3.5s ease-in-out infinite alternate}
+@keyframes veyrost-wire-a{to{translate:-1px -1px}}
+@keyframes veyrost-wire-b{to{translate:.4px -1.2px}}
+@keyframes veyrost-wire-c{to{translate:1px -.8px}}
+@keyframes veyrost-wire-d{to{translate:1.2px .2px}}
+@keyframes veyrost-wire-e{to{translate:1px 1px}}
+@keyframes veyrost-wire-f{to{translate:-.3px 1.2px}}
+@keyframes veyrost-wire-g{to{translate:-1px .8px}}
+@media(prefers-reduced-motion:reduce){.veyrost-detached-wires .wire{animation:none!important}}
