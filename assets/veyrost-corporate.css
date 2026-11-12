@@ -164,3 +164,16 @@ html.veyrost-menu-detached.veyrost-layout-editing #menu-toggle[data-veyrost-layo
  .veyrost-repair-robot{transition-duration:80ms!important}
  .veyrost-repair-robot.is-working svg,.veyrost-repair-robot .robot-arm{animation:none!important}
 }
+
+
+/* Robot visibility and deliberate repair timing across mobile browsers. */
+.veyrost-repair-robot{
+  display:flex!important;visibility:visible!important;opacity:1!important;
+  position:fixed!important;z-index:2147483647!important;
+  width:max-content!important;min-width:72px!important;
+  transform-origin:center center!important;pointer-events:none!important;
+  isolation:isolate!important;
+}
+.veyrost-repair-robot svg{display:block!important;visibility:visible!important;opacity:1!important;width:72px!important;height:84px!important}
+.veyrost-repair-robot span{display:block!important;white-space:nowrap!important;font-size:8px!important}
+.veyrost-repair-robot.is-leaving{opacity:0!important;transform:translate3d(110vw,-40px,0)!important}
