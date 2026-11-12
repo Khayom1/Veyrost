@@ -40,3 +40,9 @@ main{min-height:70vh}.page-hero{padding:76px 0 56px;border-bottom:1px solid var(
 @media(max-width:760px){.header-inner{gap:10px}.site-header{height:66px}.menu-toggle{width:36px;height:36px;flex-basis:36px}.mobile-nav{left:12px;width:min(330px,calc(100vw - 24px))}.header-actions{gap:5px}.aura-btn,.edit-btn{padding:7px 7px;font-size:8px}}
 @media(max-width:410px){.brand-name,.brand-sub{display:block}.brand-name{font-size:10px}.brand-sub{font-size:6px}.header-inner{gap:7px}.menu-toggle{width:33px;height:33px;flex-basis:33px}.aura-btn,.edit-btn{font-size:7px;padding:7px 5px}}
 @media(prefers-reduced-motion:reduce){.mobile-nav,.mobile-nav a,.menu-toggle span{transition:none!important}}
+
+/* Final menu layout correction: one full-width row per destination. */
+.mobile-nav.open{grid-template-columns:1fr!important}
+.mobile-nav a{width:100%;justify-content:flex-start;gap:14px}
+.menu-settings-icon{display:block;flex:0 0 18px;width:18px;height:18px;color:#b8a9ff}
+.mobile-nav a[href*="#workspace-settings"]{border-top:1px solid #ffffff18;margin-top:8px;padding-top:15px;color:#d7ccff}
