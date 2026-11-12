@@ -483,6 +483,33 @@ export class SpatialWorldController {
     this.protectedSockets.set(definition.id, socket);
   }
 
+  _buildRepairVisual() {
+    this.repairVisual = new THREE.Group();
+    this.repairVisual.name = "VEYROST-Repair-Cable";
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.BufferAttribute(new Float32Array(13 * 3), 3));
+    this.repairCableMaterial = new THREE.LineBasicMaterial({
+      color: 0xffb45e,
+      transparent: true,
+      opacity: 0.96
+    });
+    this.repairCable = new THREE.Line(geometry, this.repairCableMaterial);
+    this.repairVisual.add(this.repairCable);
+    this.repairConnector = new THREE.Mesh(
+      new THREE.SphereGeometry(0.075, 10, 8),
+      new THREE.MeshStandardMaterial({
+        color: 0xffc06e,
+        emissive: 0x9b4a0c,
+        emissiveIntensity: 0.8,
+        metalness: 0.55,
+        roughness: 0.28
+      })
+    );
+    this.repairVisual.add(this.repairConnector);
+    this.repairVisual.visible = false;
+    this.scene.add(this.repairVisual);
+  }
+
   _buildProtectedRepairControl() {
     const button = this.document.createElement("button");
     button.type = "button";
@@ -651,9 +678,166 @@ export class SpatialWorldController {
     if (this.depthPlus) this.depthPlus.disabled = !available;
   }
 
-  repairDetachedControls() {
+  startProtectedRepair() {
+    if (!this.running || this.paused || this.maintenanceLock) return false;
+    if (this.serviceCrew?.sequence?.snapshot?.().phase !== "ready") {
+      this._emitStatus("repair-awaiting-technicians");
+      return false;
+    }
+    const next = [...this.protectedControls.entries()].find(([, control]) =>
+      control.snapshot().state === PROTECTED_CONTROL_STATES.DETACHED
+    );
+    if (!next || !this.repairSequence.begin(next[0])) return false;
+    this.maintenanceLock = true;
+    this._prepareRepairTarget(next[0]);
+    if (this.repairButton) {
+      this.repairButton.disabled = true;
+      this.repairButton.textContent = COPY[this.language]?.repairing ?? COPY.en.repairing;
+      this.repairButton.setAttribute("aria-live", "polite");
+    }
+    this._emitStatus("maintenance-lock-engaged");
+    return true;
+  }
+
+  _prepareRepairTarget(id) {
+    this.repairTargetId = id;
+    const body = this.physics?.get(id);
+    const depthBody = this.depthPhysics?.get(id);
+    if (body) {
+      body.anchored = true;
+      body.vx = 0;
+      body.vy = 0;
+      body.dragging = false;
+    }
+    if (depthBody) {
+      depthBody.anchored = true;
+      depthBody.velocityZ = 0;
+    }
+    if (this.repairVisual) this.repairVisual.visible = true;
+    if (this.repairConnector) this.repairConnector.visible = true;
+    this._emitStatus("repair-target-secured");
+  }
+
+  _updateRepairVisual(snapshot) {
+    const id = this.repairTargetId;
+    const panel = id ? this.panelGroups.get(id) : null;
+    const socket = id ? this.protectedSockets.get(id) : null;
+    if (!panel || !socket || !this.repairCable) return;
+    this._repairStart.copy(socket.position);
+    this._repairStart.x -= 0.46;
+    this._repairStart.z += 0.06;
+    this._repairEnd.copy(panel.group.position);
+    this._repairEnd.x += 0.46;
+    this._repairEnd.z += 0.12;
+
+    const phase = snapshot.phase;
+    const isConnected = phase === REPAIR_PHASES.VERIFYING ||
+      phase === REPAIR_PHASES.RESTORING || phase === REPAIR_PHASES.COMPLETE;
+    this.repairCableMaterial.color.set(isConnected ? 0x65f2c2 :
+      phase === REPAIR_PHASES.CONNECTING ? 0x69e7ff : 0xffb45e);
+    const attribute = this.repairCable.geometry.attributes.position;
+    const count = attribute.count;
+    const sag = phase === REPAIR_PHASES.TUG_OF_WAR ? 0.42 :
+      phase === REPAIR_PHASES.CONNECTING ? 0.12 : 0.22;
+    for (let i = 0; i < count; i++) {
+      const t = i / (count - 1);
+      const x = this._repairStart.x + (this._repairEnd.x - this._repairStart.x) * t;
+      const y = this._repairStart.y + (this._repairEnd.y - this._repairStart.y) * t -
+        Math.sin(Math.PI * t) * sag;
+      const z = this._repairStart.z + (this._repairEnd.z - this._repairStart.z) * t +
+        Math.sin(Math.PI * t) * 0.08;
+      attribute.setXYZ(i, x, y, z);
+    }
+    attribute.needsUpdate = true;
+    this.repairCable.geometry.computeBoundingSphere();
+
+    const connectorProgress = phase === REPAIR_PHASES.CONNECTING ? snapshot.progress :
+      isConnected ? 1 : 0.18;
+    this.repairConnector.position.lerpVectors(
+      this._repairStart, this._repairEnd, connectorProgress
+    );
+    this.repairConnector.material.color.set(isConnected ? 0x65f2c2 : 0xffc06e);
+  }
+
+  _updateRepairInteraction(delta) {
+    if (!this.maintenanceLock || !this.repairTargetId || !this.repairSequence) return;
+    const snapshot = this.repairSequence.update(delta);
+    const id = this.repairTargetId;
+    const body = this.physics?.get(id);
+    const phase = snapshot.phase;
+    if (body) {
+      let offsetX = 0, offsetY = 0;
+      if (phase === REPAIR_PHASES.TUG_OF_WAR) {
+        const pull = Math.sin(snapshot.progress * Math.PI * 4);
+        offsetX = pull * 24;
+        offsetY = Math.cos(snapshot.progress * Math.PI * 4) * 7;
+      } else if (phase === REPAIR_PHASES.ALIGNING) {
+        const blend = 1 - snapshot.progress;
+        offsetX = Math.sin(Math.PI * 2 * (1 - blend)) * 8 * blend;
+      } else if (phase === REPAIR_PHASES.CONNECTING) {
+        offsetX = Math.sin(snapshot.progress * Math.PI) * 3;
+      }
+      body.x = body.initial.x + offsetX;
+      body.y = body.initial.y + offsetY;
+      body.vx = 0;
+      body.vy = 0;
+    }
+
+    const crew = this.serviceCrew;
+    if (crew?.leadTechnician && crew?.supportTechnician) {
+      const lead = crew.leadTechnician.userData.limbs;
+      const support = crew.supportTechnician.userData.limbs;
+      const tug = phase === REPAIR_PHASES.TUG_OF_WAR ? Math.sin(snapshot.progress * Math.PI * 4) : 0;
+      const connect = phase === REPAIR_PHASES.CONNECTING ? snapshot.progress : 0;
+      lead.leftArm.rotation.z = -0.65 - tug * 0.48 - connect * 0.25;
+      lead.rightArm.rotation.z = 0.65 + tug * 0.48 + connect * 0.25;
+      support.leftArm.rotation.z = -0.68 + tug * 0.42;
+      support.rightArm.rotation.z = 0.68 - tug * 0.42;
+    }
+
+    this._updateRepairVisual(snapshot);
+    if (phase === REPAIR_PHASES.COMPLETE) this._finishProtectedRepair();
+  }
+
+  _finishProtectedRepair() {
+    const id = this.repairTargetId;
+    const repaired = id ? this.repairDetachedControls(id) : 0;
+    if (!repaired) {
+      const body = this.physics?.get(id);
+      const depthBody = this.depthPhysics?.get(id);
+      if (body) body.anchored = false;
+      if (depthBody) depthBody.anchored = false;
+      this.repairSequence.fail();
+      this.maintenanceLock = false;
+      if (this.repairButton) this.repairButton.disabled = false;
+      if (this.repairVisual) this.repairVisual.visible = false;
+      this.repairTargetId = null;
+      this._emitStatus("repair-rollback");
+      return;
+    }
+
+    const next = [...this.protectedControls.entries()].find(([, control]) =>
+      control.snapshot().state === PROTECTED_CONTROL_STATES.DETACHED
+    );
+    if (next) {
+      this.repairSequence.reset();
+      this.repairSequence.begin(next[0]);
+      this._prepareRepairTarget(next[0]);
+      return;
+    }
+
+    this.maintenanceLock = false;
+    this.repairTargetId = null;
+    if (this.repairVisual) this.repairVisual.visible = false;
+    if (this.repairButton) this.repairButton.disabled = false;
+    if (this.serviceCrew?.depart()) this._emitStatus("maintenance-complete");
+    this._emitStatus("protected-interface-restored");
+  }
+
+  repairDetachedControls(targetId = null) {
     let repaired = 0;
     for (const [id, control] of this.protectedControls) {
+      if (targetId && id !== targetId) continue;
       const body = this.physics?.get(id);
       const depthBody = this.depthPhysics?.get(id);
       if (!body || !depthBody || !control.beginRepair()) continue;
