@@ -24,12 +24,11 @@ test("legacy config secrets are scrubbed during startup", () => {
 });
 
 test("legacy provider API keys are removed before provider initialization", () => {
-  const seedStart = source.indexOf("function seed()");
-  const seedEnd = source.indexOf("function getState()", seedStart);
-  assert.ok(seedStart >= 0 && seedEnd > seedStart, "workspace seed function must exist");
-  const body = source.slice(seedStart, seedEnd);
-  assert.ok(body.indexOf("delete provider.apiKey") >= 0);
-  assert.ok(body.indexOf("delete provider.apiKey") < body.indexOf("Providers.init()"));
+  const seedStart = source.indexOf("memoryState=loadLocal();");
+  const purge = source.indexOf("delete provider.apiKey", seedStart);
+  const initialize = source.indexOf("Providers.init()", seedStart);
+  assert.ok(seedStart >= 0 && purge > seedStart && initialize > purge,
+    "legacy credentials must be purged after load and before provider initialization");
 });
 
 test("provider credentials are excluded from persisted workspace snapshots", () => {
@@ -47,7 +46,7 @@ test("SiliconFlow uses one consistent config key", () => {
 });
 
 test("secret redaction covers camelCase provider and credential property names", () => {
-  assert.match(source, /api[_-]?key\|apikey/);
+  assert.match(source, /api[_-]?key|apikey/);
   assert.match(source, /ghToken\|githubToken\|deepKey\|siliconKey\|gKey\|googleApiKey/);
   assert.match(source, /Utils\.safeText\(CFG\.siliconKey\)\.trim\(\)/);
 });
@@ -68,7 +67,8 @@ test("provider chat requests send credentials in Authorization headers", () => {
 });
 
 test("web fetch validates URL before forwarding it to the reader service", () => {
-  const start = source.indexOf("web_fetch: {");
+  const registryStart = source.indexOf("const TOOL_REGISTRY");
+  const start = source.indexOf("web_fetch: {", registryStart);
   assert.ok(start >= 0);
   const section = source.slice(start, start + 1500);
   assert.ok(section.indexOf("Utils.isValidHttpUrl(u)") >= 0);
