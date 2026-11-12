@@ -638,31 +638,34 @@ export class SpatialWorldController {
   repairDetachedControls() {
     let repaired = 0;
     for (const [id, control] of this.protectedControls) {
-      if (!control.beginRepair()) continue;
       const body = this.physics?.get(id);
       const depthBody = this.depthPhysics?.get(id);
-      if (body) {
-        body.vx = 0;
-        body.vy = 0;
-        body.dragging = false;
-        this.physics.repair(id);
-        if (depthBody) {
-          depthBody.anchored = true;
-          depthBody.z = depthBody.initialZ;
-          depthBody.velocityZ = 0;
-          const depthPanel = this.panelGroups.get(id);
-          if (depthPanel) depthPanel.group.userData.depth = depthBody.z;
-        }
-        control.completeRepair();
-        const socket = this.protectedSockets.get(id);
-        if (socket) socket.visible = false;
-        const panel = this.panelGroups.get(id);
-        if (panel) {
-          panel.group.visible = true;
-          panel.group.scale.set(1, 1, 1);
-        }
-        repaired += 1;
+      if (!body || !depthBody || !control.beginRepair()) continue;
+      body.vx = 0;
+      body.vy = 0;
+      body.dragging = false;
+      const planarRestored = this.physics.repair(id);
+      if (!planarRestored) {
+        control.cancelRepair();
+        continue;
       }
+      depthBody.anchored = true;
+      depthBody.z = depthBody.initialZ;
+      depthBody.velocityZ = 0;
+      const depthPanel = this.panelGroups.get(id);
+      if (depthPanel) depthPanel.group.userData.depth = depthBody.z;
+      if (!control.completeRepair()) {
+        control.cancelRepair();
+        continue;
+      }
+      const socket = this.protectedSockets.get(id);
+      if (socket) socket.visible = false;
+      const panel = this.panelGroups.get(id);
+      if (panel) {
+        panel.group.visible = true;
+        panel.group.scale.set(1, 1, 1);
+      }
+      repaired += 1;
     }
     if (this.repairButton && !this._hasDetachedProtectedControl()) {
       this.repairButton.style.display = "none";
@@ -909,9 +912,31 @@ export class SpatialWorldController {
     if (!body) return false;
     if (this.protectedIds.has(id) && body.anchored) {
       const lifecycle = this.protectedControls.get(id);
-      const result = lifecycle?.pull();
-      const release = this.physics.tryDetach(id);
-      if (!result?.accepted || !release.detached) {
+      if (!lifecycle) return false;
+      const result = lifecycle.pull();
+      const isValidAttempt = result.reason === "first-pull-resisted" ||
+        result.reason === "mount-released";
+      const release = isValidAttempt
+        ? this.physics.tryDetach(id)
+        : { detached: false, reason: "invalid-lifecycle-transition" };
+      const synchronized = result.reason === "first-pull-resisted"
+        ? !release.detached && body.anchored
+        : result.reason === "mount-released" && release.detached && body.detached && !body.anchored;
+      if (!synchronized) {
+        this.physics.repair(id);
+        lifecycle.reset();
+        const depthBody = this.depthPhysics?.get(id);
+        if (depthBody) {
+          depthBody.anchored = true;
+          depthBody.z = depthBody.initialZ;
+          depthBody.velocityZ = 0;
+        }
+        const socket = this.protectedSockets.get(id);
+        if (socket) socket.visible = false;
+        this._emitStatus("protected-integrity-reset");
+        return false;
+      }
+      if (!result.accepted) {
         const panel = this.panelGroups.get(id);
         if (panel) {
           panel.group.position.x += 0.035;
