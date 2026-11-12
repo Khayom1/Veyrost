@@ -294,8 +294,7 @@ display:flex;justify-content:space-between;align-items:center;color:#eee}
 <h3 style="margin-top:18px;font-size:14px">Supabase account · Backend access</h3>
 <div class="hint">Воридшавӣ ба proxy-и серверӣ. API key-ҳои провайдерҳо дар Supabase Edge Function Secrets нигоҳ дошта мешаванд.</div>
 <label>Email</label><input id="sAuthEmail" type="email" autocomplete="username" placeholder="you@example.com">
-<label>Supabase Publishable Key (калиди оммавӣ)</label><input id="sSupabasePublicKey" type="password" autocomplete="off" placeholder="sb_publishable_...">
-<div class="hint">Ин калид махфӣ нест ва барои browser иҷозат аст. Онро аз Supabase → Settings → API Keys гиред. Provider API key-ҳоро дар инҷо нанависед.</div>
+<div class="hint">Publishable key-и лоиҳа дар client ҳамчун калиди оммавӣ истифода мешавад; provider API key-ҳо дар Supabase Edge Function Secrets мемонанд.</div>
 <label>Password</label><input id="sAuthPassword" type="password" autocomplete="current-password" placeholder="Ҳадди ақал 8 аломат">
 <div class="row"><button id="sAuthSignIn" type="button">Ворид шудан</button><button id="sAuthSignUp" type="button">Сохтани ҳисоб</button><button id="sAuthSignOut" type="button">Баромадан</button></div>
 <div class="hint" id="sAuthStatus" role="status">Ҳолат: ворид нашудаед.</div>
@@ -5272,8 +5271,6 @@ async function updateBackendAuth(action) {
   const status = document.getElementById("sAuthStatus");
   const email = document.getElementById("sAuthEmail").value.trim();
   const password = document.getElementById("sAuthPassword").value;
-  const publicKey = document.getElementById("sSupabasePublicKey").value.trim();
-  if (publicKey) window.VeyrostBackend.setPublishableKey(publicKey);
   const controls = ["sAuthSignIn","sAuthSignUp","sAuthSignOut"].map(id=>document.getElementById(id));
   controls.forEach(button=>button.disabled=true);
   status.textContent = "Supabase Auth-ро месанҷам…";
