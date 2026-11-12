@@ -5138,20 +5138,8 @@ UI.lastFocus = document.activeElement instanceof HTMLElement ? document.activeEl
 document.getElementById("sOwner").value =
 CFG.owner;
 
-document.getElementById("sDeep").value =
-CFG.deepKey;
-
-document.getElementById("sSilicon").value =
-CFG.siliconKey;
-
-document.getElementById("sGh").value =
-CFG.ghToken;
-
-document.getElementById("sGKey").value =
-CFG.gKey;
-
-document.getElementById("sGcx").value =
-CFG.gcx;
+document.getElementById("sAuthStatus").textContent =
+window.VeyrostBackend.isAuthenticated() ? "Ҳолат: Supabase session фаъол аст." : "Ҳолат: ворид нашудаед.";
 
 document.getElementById("sSys").value =
 CFG.sys;
@@ -5208,41 +5196,6 @@ document.getElementById(
 ).value ||
 "Соҳиб"
 ).trim() || "Соҳиб";
-
-CFG.deepKey =
-(
-document.getElementById(
-"sDeep"
-).value || ""
-).trim();
-
-CFG.siliconKey =
-(
-document.getElementById(
-"sSilicon"
-).value || ""
-).trim();
-
-CFG.ghToken =
-(
-document.getElementById(
-"sGh"
-).value || ""
-).trim();
-
-CFG.gKey =
-(
-document.getElementById(
-"sGKey"
-).value || ""
-).trim();
-
-CFG.gcx =
-(
-document.getElementById(
-"sGcx"
-).value || ""
-).trim();
 
 CFG.sys =
 (
@@ -5312,6 +5265,40 @@ closeSettings();
 
 UI.renderChat();
 };
+
+async function updateBackendAuth(action) {
+  const status = document.getElementById("sAuthStatus");
+  const email = document.getElementById("sAuthEmail").value.trim();
+  const password = document.getElementById("sAuthPassword").value;
+  const controls = ["sAuthSignIn","sAuthSignUp","sAuthSignOut"].map(id=>document.getElementById(id));
+  controls.forEach(button=>button.disabled=true);
+  status.textContent = "Supabase Auth-ро месанҷам…";
+  try {
+    if (action === "sign_in") {
+      const result = await window.VeyrostBackend.signIn(email,password);
+      if (!result.access_token) throw new Error("Session барнагашт. Email confirmation ё танзими Auth-ро санҷед.");
+      status.textContent = "Ворид шудед. Proxy омода аст.";
+      document.getElementById("sAuthPassword").value = "";
+    } else if (action === "sign_up") {
+      const result = await window.VeyrostBackend.signUp(email,password);
+      if (result.needs_email_confirmation) status.textContent = "Ҳисоб сохта шуд. Барои фаъолсозӣ email-ро тасдиқ кунед.";
+      else {
+        status.textContent = "Ҳисоб сохта ва ворид шудед.";
+        document.getElementById("sAuthPassword").value = "";
+      }
+    } else {
+      await window.VeyrostBackend.signOut();
+      status.textContent = "Аз ҳисоб баромадед.";
+    }
+  } catch (error) {
+    status.textContent = "Хато: " + String(error?.message || error).slice(0,180);
+  } finally {
+    controls.forEach(button=>button.disabled=false);
+  }
+}
+document.getElementById("sAuthSignIn").onclick = () => updateBackendAuth("sign_in");
+document.getElementById("sAuthSignUp").onclick = () => updateBackendAuth("sign_up");
+document.getElementById("sAuthSignOut").onclick = () => updateBackendAuth("sign_out");
 
 document.getElementById(
 "debugClose"
@@ -6757,7 +6744,7 @@ const VXUI = (() => {
   function renderProviders(){
     const root=el("advProviders"); if(!root)return;
     const providers=VX.Providers.all();
-    root.innerHTML=`<div class="advActions"><button class="primary" data-vx-action="new-provider">+ Add provider / API</button></div><div style="height:10px"></div><div class="advList">${providers.map(p=>`<div class="advListRow"><div class="grow"><div class="title">${esc(p.name)} ${p.builtin?pill("BUILTIN"):pill("CUSTOM","ok")}</div><div class="sub">${esc(p.baseURL)} · ${esc(p.defaultModel||p.models?.[0]||"no model")}</div></div>${p.apiKey?pill("KEY SET","ok"):pill("NO KEY","warn")}${button("Health",`health-provider:${p.id}`)}${p.builtin?"":button("Delete",`delete-provider:${p.id}`,"danger")}</div>`).join("")}</div>`;
+    root.innerHTML=`<div class="advActions"><button class="primary" data-vx-action="new-provider">+ Add provider / API</button></div><div style="height:10px"></div><div class="advList">${providers.map(p=>`<div class="advListRow"><div class="grow"><div class="title">${esc(p.name)} ${p.builtin?pill("BUILTIN"):pill("CUSTOM","ok")}</div><div class="sub">${esc(p.baseURL)} · ${esc(p.defaultModel||p.models?.[0]||"no model")}</div></div>${p.builtin?pill("SERVER-MANAGED","ok"):pill("SERVER ROUTE REQUIRED","warn")}${button("Health",`health-provider:${p.id}`)}${p.builtin?"":button("Delete",`delete-provider:${p.id}`,"danger")}</div>`).join("")}</div>`;
   }
 
   function renderProjects(){
