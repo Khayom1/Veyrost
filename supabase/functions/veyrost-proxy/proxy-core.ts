@@ -6,6 +6,13 @@ const WINDOW_MS = 60_000;
 function json(data: unknown, status: number, headers: HeadersInit = {}) {
   return new Response(JSON.stringify(data), {status,headers:{...JSON_HEADERS,...headers}});
 }
+function projectPublishableKey(env:Env):string {
+  const direct=env.get("SUPABASE_PUBLISHABLE_KEY")||env.get("VEYROST_SUPABASE_PUBLISHABLE_KEY");
+  if(direct)return direct;
+  const raw=env.get("SUPABASE_PUBLISHABLE_KEYS");
+  if(raw){try{const parsed=JSON.parse(raw);if(typeof parsed.default==="string")return parsed.default;}catch{}}
+  return env.get("SUPABASE_ANON_KEY")||"";
+}
 function decodeClaims(token:string):Record<string,unknown>|null {
   try {
     const part=token.split(".")[1]; if(!part)return null;
@@ -72,6 +79,9 @@ export function createProxyHandler(options:HandlerOptions) {
     const claims=decodeClaims(match[1]);
     if(!claims||claims.role!=="authenticated"||typeof claims.sub!=="string"||!claims.sub||
        (typeof claims.exp==="number"&&claims.exp*1000<=now()))return json({error:"authenticated_user_required"},401,ch);
+    const expectedPublishableKey=projectPublishableKey(options.env);
+    if(!expectedPublishableKey)return json({error:"supabase_publishable_key_unavailable"},503,ch);
+    if(req.headers.get("apikey")!==expectedPublishableKey)return json({error:"invalid_publishable_key"},401,ch);
     const bucket=buckets.get(claims.sub);
     if(!bucket||now()-bucket.start>=WINDOW_MS)buckets.set(claims.sub,{start:now(),count:1});
     else {bucket.count++;if(bucket.count>limit)return json({error:"rate_limit_exceeded"},429,{...ch,"retry-after":"60"});}
