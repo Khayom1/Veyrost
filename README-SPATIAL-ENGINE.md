@@ -86,7 +86,7 @@ These checks harden the source lifecycle. They do not replace browser interactio
 
 ## Phase 4 — service crew 3D scene
 
-The spatial route now mounts a procedural 3D maintenance vehicle and two articulated technicians with helmets, safety vests and tool gear. The vehicle enters and parks; a roof-mounted metal ladder unfolds; the lead technician climbs while the support technician remains at ground level. The sequence uses a deterministic, bounded state machine and pauses with the spatial simulation. A guarded departure action folds the ladder before the crew and vehicle leave. Tug-of-war, protected-control locking during maintenance, cable repair, dialogue and sound remain later-phase work. The character assets are procedural low-poly models, not scanned or photorealistic rigged characters.
+The spatial route now mounts a procedural 3D maintenance vehicle and two articulated technicians with helmets, safety vests and tool gear. The vehicle enters and parks; a roof-mounted metal ladder unfolds; the lead technician climbs while the support technician remains at ground level. The sequence uses a deterministic, bounded state machine and pauses with the spatial simulation. A guarded departure action folds the ladder before the crew and vehicle leave. Technician-led tug-of-war, maintenance locking, cable reconnection and protected mount restoration are now part of Phase 5. Dialogue and spatial sound remain future work. The character assets are procedural low-poly models, not scanned or photorealistic rigged characters.
 
 
 ## Phase 5 — interaction and repair
