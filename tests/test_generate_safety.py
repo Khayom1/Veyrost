@@ -50,10 +50,13 @@ class GeneratorSafetyTests(unittest.TestCase):
             (root / "posts").mkdir()
             (root / "posts" / "article.html").write_text("article", encoding="utf-8")
             calls = []
+            diff_calls = 0
             def fake_run(args, **kwargs):
+                nonlocal diff_calls
                 calls.append(args)
                 if "diff" in args:
-                    return mock.Mock(returncode=1, args=args, stdout="", stderr="")
+                    diff_calls += 1
+                    return mock.Mock(returncode=0 if diff_calls == 1 else 1, args=args, stdout="", stderr="")
                 return mock.Mock(returncode=0, args=args, stdout="", stderr="")
             with mock.patch.object(generator.subprocess, "run", side_effect=fake_run):
                 result = generator.publish_generated_files(
