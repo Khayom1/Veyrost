@@ -90,12 +90,12 @@ const checks = [
   ["PRO-09","Protected control lifecycle","Failed repairs roll back to detached state","protected-control.mjs",/cancelRepair\(\)[\s\S]*PROTECTED_CONTROL_STATES\.REPAIRING[\s\S]*PROTECTED_CONTROL_STATES\.DETACHED/],
 
 
-  ["CREW-01","Technician service sequence","Rigged realistic technician character models",null,null],
-  ["CREW-02","Technician service sequence","Service vehicle arrival and departure animation",null,null],
+  ["CREW-01","Technician service sequence","Procedurally articulated technicians with safety helmets, vests and tool gear","service-crew.mjs",/function makeTechnician[\\s\\S]*this\\.supportTechnician = makeTechnician/],
+  ["CREW-02","Technician service sequence","Service vehicle arrival and controlled departure animation","service-crew-state.mjs",/ARRIVING: "arriving"[\\s\\S]*DEPARTING: "departing"/],
   ["CREW-03","Technician service sequence","Physical tug-of-war interaction with held UI object",null,null],
   ["CREW-04","Technician service sequence","Interface lock state controlled by technician sequence",null,null],
-  ["CREW-05","Technician service sequence","Vehicle ladder extraction and unfolding",null,null],
-  ["CREW-06","Technician service sequence","Technician ladder climbing animation",null,null],
+  ["CREW-05","Technician service sequence","Vehicle ladder extraction and unfolding animation","service-crew.mjs",/function makeExtensionLadder[\\s\\S]*ladderPivot\\.rotation\\.z = 1\\.04 \\* deployed/],
+  ["CREW-06","Technician service sequence","Technician climbing with articulated limb motion","service-crew.mjs",/const climbing = phase === SERVICE_CREW_PHASES\\.CLIMBING[\\s\\S]*leadLimbs\\.leftLeg\\.rotation\\.x/],
   ["CREW-07","Technician service sequence","Hand-animated cable reconnection and repair",null,null],
   ["CREW-08","Technician service sequence","Ladder folding, vehicle exit and UI restoration",null,null],
 
