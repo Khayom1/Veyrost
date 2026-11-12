@@ -231,7 +231,7 @@ function syncDetachedMenuWires(detached){
     detachedMenuWires.className="veyrost-detached-wires";
     detachedMenuWires.setAttribute("aria-hidden","true");
     detachedMenuWires.innerHTML='<svg viewBox="0 0 176 112" focusable="false" role="presentation"><defs><radialGradient id="wall-break-depth" cx="45%" cy="42%" r="65%"><stop stop-color="#020408"/><stop offset=".72" stop-color="#070b11"/><stop offset="1" stop-color="#121a24"/></radialGradient><linearGradient id="wall-break-edge" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#aab0b8" stop-opacity=".72"/><stop offset=".48" stop-color="#525d68" stop-opacity=".8"/><stop offset="1" stop-color="#202a35" stop-opacity=".95"/></linearGradient><linearGradient id="cable-jacket" x1="0" y1="0" x2="1" y2=".18"><stop offset="0" stop-color="#020509"/><stop offset=".42" stop-color="#101720"/><stop offset=".7" stop-color="#34404a"/><stop offset="1" stop-color="#75818b"/></linearGradient><linearGradient id="cable-gold" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#17130e"/><stop offset=".5" stop-color="#72552e"/><stop offset="1" stop-color="#d7aa63"/></linearGradient><linearGradient id="cable-teal" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0b1719"/><stop offset=".5" stop-color="#246b69"/><stop offset="1" stop-color="#78c9bd"/></linearGradient><linearGradient id="cable-red" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1b1110"/><stop offset=".5" stop-color="#754238"/><stop offset="1" stop-color="#d28b78"/></linearGradient><filter id="wall-break-shadow" x="-30%" y="-35%" width="170%" height="180%"><feGaussianBlur stdDeviation="3"/></filter></defs><path d="M18 20l11-8 14 4 9-7 14 5 10-6 13 9 11-2 8 10-5 12 7 10-9 9-13 1-8 10-14-4-10 7-13-7-12 3-7-10-12-4 5-12-7-10z" fill="#000" opacity=".7" filter="url(#wall-break-shadow)"/><path d="M20 20l10-7 13 4 10-7 13 5 10-6 12 8 11-2 8 10-5 11 7 10-9 9-12 1-8 9-13-4-10 7-12-7-12 3-7-10-11-4 4-12-7-9z" fill="url(#wall-break-depth)" stroke="url(#wall-break-edge)" stroke-width="2.2" stroke-linejoin="bevel"/><path d="M28 20l9-3 7 4 10-5 9 5 9-4 11 7 9-1 5 8-4 8 5 8-9 5-9-2-8 7-10-4-8 5-9-6-10 2-4-8-8-3 4-9-5-7z" fill="#020509" opacity=".98"/><path d="M22 19l-9-7m16 2l-3-9m36 8l5-9m30 20l10-5m-8 34l11 7m-36 8l-3 10m-32-9l-9 8m-7-34l-10 2" fill="none" stroke="#87919b" stroke-opacity=".62" stroke-width="1.4" stroke-linecap="round"/><path d="M53 43C49 38 51 34 55 30S51 19 56 9M54 49C50 55 53 60 57 66S53 79 57 88M56 46C69 44 81 49 94 46S117 45 132 46" fill="none" stroke="#000" stroke-width="7" stroke-linecap="round" opacity=".78" filter="url(#wall-break-shadow)"/><path d="M53 43C49 38 51 34 55 30S51 19 56 9M54 49C50 55 53 60 57 66S53 79 57 88M56 46C69 44 81 49 94 46S117 45 132 46" fill="none" stroke="url(#cable-jacket)" stroke-width="5.3" stroke-linecap="round"/><path d="M53 43C49 38 51 34 55 30S51 19 56 9" fill="none" stroke="url(#cable-gold)" stroke-width="1.5" stroke-linecap="round"/><path d="M54 49C50 55 53 60 57 66S53 79 57 88" fill="none" stroke="url(#cable-teal)" stroke-width="1.5" stroke-linecap="round"/><path d="M56 46C69 44 81 49 94 46S117 45 132 46" fill="none" stroke="url(#cable-red)" stroke-width="1.5" stroke-linecap="round"/><path d="M56 9l-3-4m3 4l3-4m1 79l-3 4m3-4l3 4m73-42l5-3m-5 3l5 3" fill="none" stroke="#d5a66d" stroke-width="1.15" stroke-linecap="round"/><path d="M53 43l-2-3m3 5l-4-1M54 49l-3 3m4-1l-2 5M132 46l4-2m-4 4l4 2" fill="none" stroke="#e3b77b" stroke-width=".9" stroke-linecap="round"/><path d="M56 9l-1-5m1 5l2-5m-1 84l-2 5m2-5l3 5m74-47l6-2m-6 2l6 3" fill="none" stroke="#b8733c" stroke-width=".75" stroke-linecap="round"/></svg>';
-    document.body.append(detachedMenuWires);
+    (menu.closest(".site-header")||document.body).append(detachedMenuWires);
   }
   // Size the break to the real MENU footprint; keep the aperture centered on its home position.
   // The aperture spans roughly x=20..110 and y=7..76 in the 176x112 SVG viewBox.
@@ -404,11 +404,9 @@ function finishDrag(){
   drag=null;
   if(moved)savePositions();
   if(movedElement===menu&&moved){
-    const parts=(menu.style.translate||"0px 0px").trim().split(/\s+/);
-    const dx=Number.parseFloat(parts[0])||0,dy=Number.parseFloat(parts[1])||0;
-    // Reconnect only on release, with a deliberate 18px magnetic tolerance.
-    if(Math.hypot(dx,dy)<=18){menu.style.translate="0px 0px";detachedMenuState=false;}
-    else detachedMenuState=true;
+    // Once detached, MENU remains physically disconnected regardless of where it is released.
+    // Only the technician repair sequence or a full page reload may restore it.
+    detachedMenuState=true;
     menu.setAttribute("aria-expanded","false");mobile?.classList.remove("open");
   }
   updateMenuRepairNotice();
