@@ -161,14 +161,27 @@ function renderButtonPhysics(){
   }
   physicsFrame=requestAnimationFrame(renderButtonPhysics);
 }
+function ensurePhysicsTestButtons(){
+  let panel=$("#veyrost-physics-test-panel");
+  if(!panel){
+    panel=document.createElement("div");
+    panel.id="veyrost-physics-test-panel";
+    panel.className="veyrost-physics-test-panel";
+    panel.setAttribute("aria-label","Physics test controls");
+    panel.innerHTML='<span class="physics-test-label">PHYSICS TEST</span><button type="button" data-physics-test="light">LIGHT · 0.6</button><button type="button" data-physics-test="standard">STANDARD · 1.0</button><button type="button" data-physics-test="heavy">HEAVY · 2.4</button><button type="button" data-physics-test="spring">SPRING · 0.8</button>';
+    document.body.append(panel);
+  }
+  panel.hidden=!editMode;
+}
 function initButtonPhysics(){
   clearButtonPhysics();
+  ensurePhysicsTestButtons();
   if(!window.VEYROST_MATTER?.MatterWorld)return;
   physicsWorld=new window.VEYROST_MATTER.MatterWorld(window.innerWidth,window.innerHeight,{gravity:0,positionCorrection:.9});
   const buttons=$("button:not(#layout-toggle):not(#aura-toggle):not(.menu-repair-button):not([disabled])");
   buttons.forEach((el,index)=>{
     const rect=el.getBoundingClientRect(),base=offset(el);
-    const body=physicsWorld.add({id:el.id||el.dataset.layoutId||("ui-button-"+index),x:rect.left,y:rect.top,width:rect.width,height:rect.height,mass:el.id==="menu-toggle"?2.4:1,elasticity:.24,friction:.42,maxCompression:.13,material:"soft-rubber"});
+    const body=physicsWorld.add({id:el.id||el.dataset.layoutId||("ui-button-"+index),x:rect.left,y:rect.top,width:rect.width,height:rect.height,mass:el.dataset.physicsTest==="light"?.6:el.dataset.physicsTest==="heavy"?2.4:el.dataset.physicsTest==="spring"?.8:el.id==="menu-toggle"?2.4:1,elasticity:el.dataset.physicsTest==="spring"?.82:.24,friction:.42,maxCompression:.16,material:"soft-rubber"});
     body.__origin={x:rect.left,y:rect.top};body.__base=base;
     physicalBodies.set(el,body);el.style.transformOrigin="center";
   });
@@ -310,6 +323,7 @@ function setEditMode(value){
     editButton.setAttribute("aria-pressed",String(editMode));
   }
   if(editHint)editHint.hidden=!editMode;
+  const physicsPanel=$("#veyrost-physics-test-panel");if(physicsPanel)physicsPanel.hidden=!editMode;
   if(editMode)initButtonPhysics();
   else {finishDrag();clearButtonPhysics();}
 }
