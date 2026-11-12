@@ -345,7 +345,7 @@ menuRepairButton.addEventListener("click",async()=>{
     await wait(500);
     // Reveal the real MENU only after the repair sequence is complete.
     menu.style.transition="none";menu.style.translate="0px 0px";menu.style.visibility="";
-    menu.dataset.detached="false";updateMenuRepairNotice();
+    detachedMenuState=false;menu.dataset.detached="false";updateMenuRepairNotice();
     carried.style.opacity="0";
     await wait(260);
     techA.classList.remove("is-working");techB.classList.remove("is-working");
