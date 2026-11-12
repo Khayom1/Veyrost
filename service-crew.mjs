@@ -172,7 +172,7 @@ export class ServiceCrew3D {
       phase === SERVICE_CREW_PHASES.FOLDING ? 1 : 1 - state.progress;
     this.vehicle.position.x = -12 + 7.3 * arrival;
     this.vehicle.userData.wheels.forEach(wheel => { wheel.rotation.x += deltaSeconds * 3.2; });
-    this.vehicle.userData.beacon.material.emissiveIntensity = 0.55 + Math.sin(state.elapsed * 8) * 0.18;
+    this.vehicle.userData.beacon.emissiveIntensity = 0.55 + Math.sin(state.elapsed * 8) * 0.18;
 
     const deployed = phase === SERVICE_CREW_PHASES.DEPLOYING ? state.progress :
       phase === SERVICE_CREW_PHASES.CLIMBING || phase === SERVICE_CREW_PHASES.READY ? 1 :
@@ -181,7 +181,7 @@ export class ServiceCrew3D {
 
     const climbing = phase === SERVICE_CREW_PHASES.CLIMBING ? state.progress :
       phase === SERVICE_CREW_PHASES.READY ? 1 :
-      phase === SERVICE_CREW_PHASES.FOLDING || phase === SERVICE_CREW_PHASES.DEPARTING ? 1 : 0;
+      phase === SERVICE_CREW_PHASES.FOLDING ? 1 - state.progress : 0;
     this.leadTechnician.position.set(
       -2.5 + 0.95 * climbing,
       -4.6 + 3.0 * climbing,
