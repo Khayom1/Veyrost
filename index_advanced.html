@@ -6368,7 +6368,7 @@ const VX = (() => {
     },
     async testSupabase() {
       const started=performance.now();
-      try { const result=await window.VeyrostBackend.health(); return {ok:result.ok,status:result.status,latency:Math.round(performance.now()-started)}; }
+      try { const result=await window.VeyrostBackend.health(); return {ok:result.ok,status:result.status,latency:Math.round(performance.now()-started),configured:result.data?.configured||{}}; }
       catch(e) { return {ok:false,error:clean(e?.message||e)}; }
     }
   };
@@ -6866,7 +6866,12 @@ const VXUI = (() => {
   }
 
   function openSupabaseForm(){
-    void VX.Integrations.testSupabase().then(r=>toast(r.ok?"Supabase proxy OK · "+r.status:"Proxy test failed: "+(r.error||r.status)));
+    void VX.Integrations.testSupabase().then(r=>{
+      if(!r.ok){toast("Proxy test failed: "+(r.error||r.status));return;}
+      const c=r.configured||{};
+      const summary=["DeepSeek","SiliconFlow","GitHub","Google"].map((name,i)=>name+":"+(Object.values(c)[i]?"OK":"missing")).join(" · ");
+      toast("Supabase proxy OK · "+summary);
+    });
     renderPage("integrations");
   }
 
