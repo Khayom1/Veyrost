@@ -14,11 +14,24 @@ const toast = (message) => {
 // Shared navigation and mobile menu.
 const menu=$("#menu-toggle");
 const mobile=$("#mobile-nav");
+const closeMobileMenu=()=>{
+  mobile?.classList.remove("open");
+  menu?.setAttribute("aria-expanded","false");
+  menu?.setAttribute("aria-label","Open navigation");
+};
 menu?.addEventListener("click",()=>{
-  const open=mobile?.classList.toggle("open")||false;
+  const open=mobile ? !mobile.classList.contains("open") : false;
+  mobile?.classList.toggle("open",open);
   menu.setAttribute("aria-expanded",String(open));
+  menu.setAttribute("aria-label",open?"Close navigation":"Open navigation");
 });
-$$("[data-close-menu]").forEach(link=>link.addEventListener("click",()=>mobile?.classList.remove("open")));
+$("[data-close-menu]").forEach(link=>link.addEventListener("click",closeMobileMenu));
+document.addEventListener("keydown",event=>{if(event.key==="Escape")closeMobileMenu()});
+document.addEventListener("click",event=>{
+  if(!mobile?.classList.contains("open"))return;
+  if(event.target?.closest?.("#mobile-nav,#menu-toggle"))return;
+  closeMobileMenu();
+});
 
 // Complete site localization: translate every rendered text node, not only navigation labels.
 import { dictionaries } from "./veyrost-i18n.js?v=20261112-7";
