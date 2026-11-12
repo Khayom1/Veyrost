@@ -101,7 +101,10 @@ export function validateSavedLayout(value, allowedIds = SPATIAL_PANELS.map(panel
     if (!panel || typeof panel.id !== "string" || !allowed.has(panel.id) || seen.has(panel.id)) continue;
     const x = Number(panel.x), y = Number(panel.y);
     const z = panel.z === undefined ? undefined : Number(panel.z);
-    if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+    // Persisted x/y values are normalized viewport coordinates, not pixels.
+    // Reject out-of-range records instead of silently clamping corrupted data
+    // during restoration and potentially hiding a broken save payload.
+    if (!Number.isFinite(x) || !Number.isFinite(y) || x < 0 || x > 1 || y < 0 || y > 1) continue;
     if (z !== undefined && (!Number.isFinite(z) || z < -1.25 || z > 1.25)) continue;
     seen.add(panel.id);
     panels.push(z === undefined ? { id: panel.id, x, y } : { id: panel.id, x, y, z });
