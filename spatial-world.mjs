@@ -680,7 +680,13 @@ export class SpatialWorldController {
 
   startProtectedRepair() {
     if (!this.running || this.paused || this.maintenanceLock) return false;
-    if (this.serviceCrew?.sequence?.snapshot?.().phase !== "ready") {
+    const crewPhase = this.serviceCrew?.sequence?.snapshot?.().phase;
+    if (crewPhase === "complete") {
+      this.serviceCrew.recall();
+      this._emitStatus("repair-awaiting-technicians");
+      return false;
+    }
+    if (crewPhase !== "ready") {
       this._emitStatus("repair-awaiting-technicians");
       return false;
     }
