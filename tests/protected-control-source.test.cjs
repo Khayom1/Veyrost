@@ -22,7 +22,7 @@ test("detached controls reveal a fixed mount socket and repair action", () => {
   assert.match(runtime, /_buildProtectedSocket/);
   assert.match(runtime, /socket\.visible = true/);
   assert.match(runtime, /spatial-repair-control/);
-  assert.match(runtime, /repairDetachedControls\(\)/);
+  assert.match(runtime, /repairDetachedControls\\(targetId = null\\)/);
 });
 
 test("repair requires both physics bodies and recovers failed transitions", () => {
