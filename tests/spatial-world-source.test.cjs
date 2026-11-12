@@ -89,3 +89,19 @@ test("depth HUD stays clear of repair action and AURA pinches bypass its canvas 
   assert.match(source, /repairButton\?\.style\.display === "block"[\s\S]*max\(132px, env\(safe-area-inset-bottom\)\)/);
   assert.match(source, /elementFromPoint[\s\S]*spatial-depth-control[\s\S]*spatial-repair-control/);
 });
+
+test("responsive resize preserves panel centers, clamps bounds, and ends active drags", () => {
+  assert.match(source, /if \(this\.activeDrag\) this\.physics\.endDrag\(0, 0\)/);
+  assert.match(source, /\(\(body\.x \+ oldWidth \/ 2\) \/ Math\.max\(1, previousWidth\)\) \* width/);
+  assert.match(source, /\(\(body\.y \+ oldHeight \/ 2\) \/ Math\.max\(1, previousHeight\)\) \* height/);
+  assert.match(source, /body\.x = Math\.max\(0, Math\.min\(width - body\.width/);
+  assert.match(source, /body\.y = Math\.max\(0, Math\.min\(height - body\.height/);
+});
+
+test("lost pointer capture, window blur, and hidden-page transitions cancel interactions", () => {
+  assert.match(source, /addEventListener\("lostpointercapture", this\._pointerCancel\)/);
+  assert.match(source, /addEventListener\("blur", this\._windowBlur/);
+  assert.match(source, /addEventListener\("visibilitychange", this\._visibilityChange\)/);
+  assert.match(source, /removeEventListener\("lostpointercapture", this\._pointerCancel\)/);
+  assert.match(source, /removeEventListener\("visibilitychange", this\._visibilityChange\)/);
+});
