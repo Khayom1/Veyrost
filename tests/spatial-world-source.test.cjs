@@ -40,6 +40,13 @@ test("3D renderer caps pixel ratio for mobile performance", () => {
   assert.match(source, /width < 680 \? 1\.2 : 1\.5/);
 });
 
+test("pause freezes physics and procedural animation without stopping rendering", () => {
+  assert.match(source, /this\.animationTime = 0/);
+  assert.match(source, /if \(!this\.paused\) this\.animationTime \+= frameDelta/);
+  assert.match(source, /if \(!this\.paused\) \{[\s\S]*this\.physics\.step\(delta\)[\s\S]*this\.depthPhysics\.step\(delta\)[\s\S]*this\.core\.rotation\.y/);
+  assert.match(source, /this\.renderer\.render\(this\.scene, this\.camera\)/);
+});
+
 test("render loop and GPU resources are disposed", () => {
   assert.match(source, /setAnimationLoop\(null\)/);
   assert.match(source, /renderer\?\.dispose/);
