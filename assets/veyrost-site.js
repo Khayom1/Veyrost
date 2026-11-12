@@ -49,16 +49,32 @@ function translateDocument(){
       node.nodeValue=leading+translated+trailing;
     }else node.nodeValue=source;
   }
-  $$("[placeholder],[title],[aria-label]").forEach(el=>{
+  $("[placeholder],[title],[aria-label],[data-label]").forEach(el=>{
     if(!originalAttrs.has(el))originalAttrs.set(el,{});
     const saved=originalAttrs.get(el);
-    ["placeholder","title","aria-label"].forEach(name=>{
+    ["placeholder","title","aria-label","data-label"].forEach(name=>{
       if(el.hasAttribute(name)&&saved[name]===undefined)saved[name]=el.getAttribute(name);
       const source=saved[name];
-      if(source)el.setAttribute(name,dict[source]??dictionaries.en[source]??source);
+      if(!source)return;
+      const labelKeys={home:"Overview",projects:"Projects",studio:"Workspace",company:"Company",research:"Research",contact:"Contact",auraOff:"AURA OFF",auraOn:"AURA ON",move:"MOVE ITEMS"};
+      const key=name==="data-label"?(labelKeys[source]||source):source;
+      const value=dict[key]??dictionaries.en[key]??key;
+      if(name==="data-label")el.dataset.label=source;
+      else el.setAttribute(name,value);
+      if(name==="aria-label")el.setAttribute(name,value);
     });
   });
-  $$("[data-lang]").forEach(el=>el.classList.toggle("active",el.dataset.lang===language));
+  $("[data-lang]").forEach(el=>el.classList.toggle("active",el.dataset.lang===language));
+  const pageTitle=document.querySelector("title");
+  if(pageTitle){
+    if(!pageTitle.dataset.i18nSource)pageTitle.dataset.i18nSource=pageTitle.textContent;
+    pageTitle.textContent=dict[pageTitle.dataset.i18nSource]??dictionaries.en[pageTitle.dataset.i18nSource]??pageTitle.dataset.i18nSource;
+  }
+  const description=document.querySelector('meta[name="description"]');
+  if(description){
+    if(!description.dataset.i18nSource)description.dataset.i18nSource=description.content;
+    description.content=dict[description.dataset.i18nSource]??dictionaries.en[description.dataset.i18nSource]??description.dataset.i18nSource;
+  }
   document.documentElement.lang=language==="tj"?"tg":language;
   document.documentElement.dataset.language=language;
 }
@@ -69,6 +85,8 @@ function applyLanguage(){
   if(edit)edit.textContent=edit.getAttribute("aria-pressed")==="true"?(translations[language]||translations.en).done:(translations[language]||translations.en).move;
   const hint=$("#edit-hint");
   if(hint)hint.textContent=(translations[language]||translations.en).editHint;
+  const aura=$("#aura-toggle");
+  if(aura){const state=aura.getAttribute("aria-pressed")==="true";aura.textContent=state?(translations[language]||translations.en).auraOn:(translations[language]||translations.en).auraOff;}
 }
 $$("[data-lang]").forEach(button=>button.addEventListener("click",()=>{
   const next=button.dataset.lang||"en";
