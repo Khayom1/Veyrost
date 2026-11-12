@@ -119,8 +119,7 @@ applyLanguage();
 const languageObserver=new MutationObserver(records=>{if(records.some(record=>record.addedNodes.length))translateDocument()});
 languageObserver.observe(document.body,{childList:true,subtree:true});
 
-// Layout editor: all categories, cards and workspace modules can be repositioned.
-const LAYOUT_KEY="veyrost:corporate-layout:v1";
+// Layout editor: movable modules with two-step protection for Menu and Settings.
 const movable=()=>$$("[data-veyrost-layout-item]");
 function registerMovable(){
   movable().forEach((el,index)=>{
@@ -129,44 +128,22 @@ function registerMovable(){
     el.style.willChange="transform";
   });
 }
-function getPositions(){
-  const map=new Map();
-  try{
-    const saved=JSON.parse(localStorage.getItem(LAYOUT_KEY)||"{}");
-    if(saved&&typeof saved==="object")Object.entries(saved).forEach(([id,p])=>{
-      if(p&&Number.isFinite(p.x)&&Number.isFinite(p.y))map.set(id,p);
-    });
-  }catch(_){}
-  return map;
-}
 function restorePositions(){
-  const positions=getPositions();
   registerMovable();
-  movable().forEach(el=>{
-    const p=positions.get(el.dataset.layoutId);
-    if(p)el.style.translate=p.x+"px "+p.y+"px";
-  });
+  // Layout edits are session-only: always restore the authored layout on page load.
+  movable().forEach(el=>{el.style.translate="0px 0px"});
 }
 function savePositions(){
-  const positions={};
-  try {
-    const existing=JSON.parse(localStorage.getItem(LAYOUT_KEY)||"{}");
-    if(existing&&typeof existing==="object")Object.assign(positions,existing);
-  } catch (_) {}
-  movable().forEach(el=>{
-    const value=(el.style.translate||"0px 0px").split(/\\s+/);
-    const x=Number.parseFloat(value[0])||0,y=Number.parseFloat(value[1])||0;
-    if(x||y)positions[el.dataset.layoutId]={x,y};
-    else delete positions[el.dataset.layoutId];
-  });
-  try{localStorage.setItem(LAYOUT_KEY,JSON.stringify(positions));toast("Workspace arrangement saved.")}catch(_){toast("Could not save this layout on the device.")};
+  // Deliberately do not persist positions. Refreshing the site restores the original layout.
+  toast("Temporary layout applied. Refresh to restore the original positions.");
 }
 let editMode=false,drag=null;
 const editButton=$("#layout-toggle");
 const editHint=$("#edit-hint");
 const cursor=$("#aura-pointer");
+const twoStepArmed=new WeakSet();
 function offset(el){
-  const a=(el.style.translate||"0px 0px").split(/\s+/);
+  const a=(el.style.translate||"0px 0px").split(/\\s+/);
   return {x:Number.parseFloat(a[0])||0,y:Number.parseFloat(a[1])||0};
 }
 function startDrag(x,y,source){
@@ -206,6 +183,13 @@ document.addEventListener("pointerdown",event=>{
   if(event.target?.closest?.("#layout-toggle"))return;
   const target=event.target?.closest?.("[data-veyrost-layout-item]");
   if(!target)return;
+  if(target.hasAttribute("data-two-step-drag")&&!twoStepArmed.has(target)){
+    twoStepArmed.add(target);
+    event.preventDefault();event.stopImmediatePropagation();
+    toast("Locked for the first attempt. Drag again to move this control.");
+    return;
+  }
+  if(target.hasAttribute("data-two-step-drag"))twoStepArmed.delete(target);
   event.preventDefault();event.stopImmediatePropagation();
   startDrag(event.clientX,event.clientY,"pointer");
 });
