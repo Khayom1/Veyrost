@@ -392,3 +392,10 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
 @keyframes veyrost-wire-f{to{translate:-.3px 1.2px}}
 @keyframes veyrost-wire-g{to{translate:-1px .8px}}
 @media(prefers-reduced-motion:reduce){.veyrost-detached-wires .wire{animation:none!important}}
+
+/* Exposed industrial service robots: no clothing, matching chassis, distinct circuit-line colors. */
+.veyrost-repair-layer .veyrost-tech-person span{display:none!important}
+.veyrost-repair-layer .veyrost-tech-person svg{filter:drop-shadow(0 5px 8px rgba(0,0,0,.65)) drop-shadow(0 0 5px currentColor)!important}
+.veyrost-repair-layer .veyrost-tech-person{color:#6fe6d0}
+.veyrost-repair-layer .veyrost-tech-person:nth-of-type(2){color:#a98cff}
+.veyrost-repair-layer .veyrost-tech-person:nth-of-type(3){color:#a98cff}
