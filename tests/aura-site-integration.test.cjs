@@ -87,8 +87,8 @@ test("the directory contains every repository record without exposing private so
 });
 
 test("shared script binds all three language buttons and keeps selectors valid", () => {
-  assert.ok(site.includes('$("[data-lang]").forEach(button=>button.addEventListener("click"'));
-  assert.equal(site.includes("$$"), false);
+  assert.ok(site.includes('$$("[data-lang]").forEach(button=>button.addEventListener("click"'));
+  assert.equal(site.includes("$$$"), false);
   assert.equal(/^\\s*\\$\\("\\[data-lang\\]"\\)/m.test(site), false);
   for (const locale of ["en","ru","tj"]) assert.ok(html.includes('data-lang="' + locale + '"'));
   assert.ok(site.includes('auraButton.addEventListener("click"'));
