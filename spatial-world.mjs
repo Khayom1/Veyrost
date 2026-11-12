@@ -157,6 +157,8 @@ export class SpatialWorldController {
     this._pointerUp = this._pointerUp.bind(this);
     this._pointerCancel = this._pointerCancel.bind(this);
     this._wheel = this._wheel.bind(this);
+    this._visibilityChange = this._visibilityChange.bind(this);
+    this._windowBlur = this._windowBlur.bind(this);
   }
 
   start() {
@@ -735,7 +737,10 @@ export class SpatialWorldController {
     this.canvas.addEventListener("pointerdown", this._pointerDown);
     this.canvas.addEventListener("pointerup", this._pointerUp);
     this.canvas.addEventListener("pointercancel", this._pointerCancel);
+    this.canvas.addEventListener("lostpointercapture", this._pointerCancel);
     this.canvas.addEventListener("wheel", this._wheel, { passive: false });
+    this.window.addEventListener("blur", this._windowBlur, { passive: true });
+    this.document.addEventListener("visibilitychange", this._visibilityChange);
     this.canvas.addEventListener("contextmenu", event => event.preventDefault());
     if (typeof ResizeObserver !== "undefined") {
       this.resizeObserver = new ResizeObserver(this._resize);
@@ -762,29 +767,39 @@ export class SpatialWorldController {
     const layout = computeSpatialLayout(width, height);
     this.layout = layout;
     if (this.physics) {
-      const sx = width / Math.max(1, previousWidth);
-      const sy = height / Math.max(1, previousHeight);
+      // A viewport change invalidates the active pointer's screen-space origin.
+      // End the drag through the physics API before moving any bodies.
+      if (this.activeDrag) this.physics.endDrag(0, 0);
+      this.activeDrag = null;
+      this.physics.draggedId = null;
+
       for (const definition of layout.panels) {
         const body = this.physics.get(definition.id);
         if (!body) continue;
         const wasInitial = !this.hasCustomLayout && previousWidth === width && previousHeight === height;
-        if (wasInitial) {
-          body.x = definition.x;
-          body.y = definition.y;
-          body.width = definition.width;
-          body.height = definition.height;
-          body.initial.x = definition.x;
-          body.initial.y = definition.y;
-        } else {
-          body.x *= sx;
-          body.y *= sy;
-          body.width = definition.width;
-          body.height = definition.height;
-          body.x = Math.max(0, Math.min(width - body.width, body.x));
-          body.y = Math.max(0, Math.min(height - body.height, body.y));
-          body.initial.x = Math.max(0, Math.min(width - body.width, body.initial.x * sx));
-          body.initial.y = Math.max(0, Math.min(height - body.height, body.initial.y * sy));
-        }
+        const oldWidth = Math.max(1, body.width);
+        const oldHeight = Math.max(1, body.height);
+        const centerX = wasInitial
+          ? definition.centerX
+          : ((body.x + oldWidth / 2) / Math.max(1, previousWidth)) * width;
+        const centerY = wasInitial
+          ? definition.centerY
+          : ((body.y + oldHeight / 2) / Math.max(1, previousHeight)) * height;
+
+        body.width = definition.width;
+        body.height = definition.height;
+        body.x = Math.max(0, Math.min(width - body.width, centerX - body.width / 2));
+        body.y = Math.max(0, Math.min(height - body.height, centerY - body.height / 2));
+
+        const initialCenterX = wasInitial
+          ? definition.centerX
+          : ((body.initial.x + oldWidth / 2) / Math.max(1, previousWidth)) * width;
+        const initialCenterY = wasInitial
+          ? definition.centerY
+          : ((body.initial.y + oldHeight / 2) / Math.max(1, previousHeight)) * height;
+        body.initial.x = Math.max(0, Math.min(width - body.width, initialCenterX - body.width / 2));
+        body.initial.y = Math.max(0, Math.min(height - body.height, initialCenterY - body.height / 2));
+
         this._syncPanel(body, this.panelGroups.get(definition.id));
         const socket = this.protectedSockets.get(definition.id);
         if (socket) {
@@ -800,8 +815,6 @@ export class SpatialWorldController {
         }
       }
       this.physics.setBounds(width, height);
-      this.physics.draggedId = null;
-      this.activeDrag = null;
     }
     this.viewport = { width, height };
     if (this.core) {
@@ -839,6 +852,15 @@ export class SpatialWorldController {
 
   _pointerCancel() {
     this.cancelActiveInteraction();
+  }
+
+  _windowBlur() {
+    this.cancelActiveInteraction();
+    if (this.cursor3D) this.cursor3D.visible = false;
+  }
+
+  _visibilityChange() {
+    if (this.document?.visibilityState === "hidden") this._windowBlur();
   }
 
   _pointerVector(x, y) {
@@ -1182,8 +1204,11 @@ export class SpatialWorldController {
       this.canvas.removeEventListener("pointerdown", this._pointerDown);
       this.canvas.removeEventListener("pointerup", this._pointerUp);
       this.canvas.removeEventListener("pointercancel", this._pointerCancel);
+      this.canvas.removeEventListener("lostpointercapture", this._pointerCancel);
       this.canvas.removeEventListener("wheel", this._wheel);
     }
+    this.window.removeEventListener("blur", this._windowBlur);
+    this.document.removeEventListener("visibilitychange", this._visibilityChange);
     if (this.scene) {
       this.scene.traverse(object => {
         object.geometry?.dispose?.();
