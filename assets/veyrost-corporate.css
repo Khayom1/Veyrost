@@ -351,5 +351,4 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
 .veyrost-detached-wires .wire-spark{opacity:.75;animation:veyrost-wire-spark .9s ease-in-out infinite alternate}
 @keyframes veyrost-wall-reveal{from{opacity:0;transform:translateY(7px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes veyrost-wire-spark{from{opacity:.18}to{opacity:.9}}
-@media(max-width:480px){.veyrost-detached-wires{width:142px;height:100px}}
 @media(prefers-reduced-motion:reduce){.veyrost-detached-wires,.veyrost-detached-wires .wire-spark{animation:none}}
