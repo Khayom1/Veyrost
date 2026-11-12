@@ -58,3 +58,11 @@ html.veyrost-layout-editing #menu-toggle[data-veyrost-layout-item],
 html.veyrost-layout-editing #mobile-nav a[data-two-step-drag]{outline:1px dashed #a99affb5;outline-offset:4px;cursor:grab!important;touch-action:none!important}
 html.veyrost-layout-editing #menu-toggle[data-veyrost-layout-item]:active,
 html.veyrost-layout-editing #mobile-nav a[data-two-step-drag]:active{cursor:grabbing!important}
+
+/* Primary Menu recovery alert: visible only while the Menu control is displaced. */
+.menu-repair-notice{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);right:12px;z-index:10050;display:flex;align-items:center;gap:10px;max-width:min(440px,calc(100vw - 24px));padding:10px 12px;border:1px solid rgba(255,105,105,.55);border-radius:13px;background:rgba(22,12,20,.96);box-shadow:0 12px 36px rgba(0,0,0,.42);backdrop-filter:blur(14px);color:#ffe4e4;font:600 11px/1.35 Inter,system-ui,sans-serif}
+.menu-repair-notice[hidden]{display:none!important}
+.menu-repair-message{flex:1;min-width:0;letter-spacing:.045em}
+.menu-repair-button{flex:0 0 auto;border:1px solid rgba(190,170,255,.65);border-radius:8px;background:#cfc0ff;color:#171326;padding:9px 11px;font:800 10px/1 Inter,system-ui,sans-serif;letter-spacing:.045em;cursor:pointer}
+.menu-repair-button:focus-visible{outline:2px solid #fff;outline-offset:3px}
+@media(max-width:520px){.menu-repair-notice{right:8px;top:calc(env(safe-area-inset-top,0px) + 8px);max-width:calc(100vw - 16px);gap:7px;padding:8px}.menu-repair-button{padding:8px;font-size:9px}.menu-repair-message{font-size:9px}}
