@@ -53,6 +53,12 @@ test("render loop and GPU resources are disposed", () => {
   assert.match(source, /geometry\?\.dispose/);
 });
 
+test("procedural panel rotations are assigned as bounded offsets, not accumulated", () => {
+  assert.match(source, /panel\.group\.rotation\.x = Math\.sin\(elapsed \* 0\.31 \+ index\) \* 0\.00008/);
+  assert.match(source, /panel\.group\.rotation\.y = Math\.cos\(elapsed \* 0\.27 \+ index \* 0\.7\) \* 0\.00007/);
+  assert.doesNotMatch(source, /panel\.group\.rotation\.[xy] \+=/);
+});
+
 test("selected panels expose depth slider and accessible step buttons", () => {
   assert.match(source, /_buildDepthControl\(\)/);
   assert.match(source, /type = "range"/);
