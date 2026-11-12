@@ -5,7 +5,7 @@ const $$ = (selector, root=document) => [...root.querySelectorAll(selector)];
 const toast = (message) => {
   const node=$("#site-toast");
   if(!node) return;
-  node.textContent=message; node.classList.add("show");
+  node.textContent=(typeof dictionaries!=="undefined"?(dictionaries[language]||{})[message]||message:message); node.classList.add("show");
   clearTimeout(window.__veyrostToastTimer);
   window.__veyrostToastTimer=setTimeout(()=>node.classList.remove("show"),2200);
 };
@@ -215,7 +215,7 @@ if(video&&cursor&&auraButton){
       auraButton.disabled=state==="starting"||state==="loading";
       if(status){
         status.style.display=state==="off"?"none":"block";
-        status.textContent=message||state.toUpperCase();
+        status.textContent=(dictionaries[language]||{})[message]||message||state.toUpperCase();
       }
       if(!active)setEditMode(false);
       else if(editButton)editButton.hidden=false;
