@@ -240,3 +240,29 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
 .veyrost-repair-layer .veyrost-tech-person span{font-size:6px!important}
 .veyrost-repair-layer .veyrost-tech-vehicle{position:fixed!important;left:0;top:0;width:220px;height:100px;z-index:2147483646;display:flex;flex-direction:column;align-items:center;gap:0;will-change:left,top;transition:left 1450ms cubic-bezier(.2,.75,.2,1)!important}
 .veyrost-repair-layer .veyrost-tech-vehicle.is-driving-away{transition:left 1150ms cubic-bezier(.4,0,.8,.4)!important}
+
+
+/* Field-technician visual identity and grounded walking/repair motion. */
+.veyrost-repair-layer .veyrost-tech-person{width:82px!important;min-width:82px!important;gap:2px!important;filter:drop-shadow(0 7px 12px #000b)!important}
+.veyrost-repair-layer .veyrost-tech-person svg{width:82px!important;height:96px!important;overflow:visible!important}
+.veyrost-repair-layer .veyrost-tech-person span{font-size:6px!important;letter-spacing:.04em!important;color:#d9f8ff!important;border-color:#6fe6d080!important;background:linear-gradient(135deg,#101c2c,#182b3c)!important}
+.veyrost-repair-layer .veyrost-tech-person.is-walking svg{animation:veyrost-tech-walk .22s ease-in-out infinite alternate!important}
+.veyrost-repair-layer .veyrost-tech-person.is-walking .robot-arm-left{transform-origin:31px 66px;animation:veyrost-tech-arm .22s ease-in-out infinite alternate!important}
+.veyrost-repair-layer .veyrost-tech-person.is-walking .robot-arm-right{transform-origin:69px 66px;animation:veyrost-tech-arm .22s ease-in-out infinite alternate-reverse!important}
+.veyrost-repair-layer .veyrost-tech-person.is-working svg{animation:veyrost-tech-repair .32s ease-in-out infinite alternate!important}
+.veyrost-repair-layer .veyrost-tech-person.is-working .robot-arm-right{transform-origin:69px 66px;animation:veyrost-tech-tool .28s ease-in-out infinite alternate!important}
+@keyframes veyrost-tech-walk{from{transform:translateY(0) rotate(-1deg)}to{transform:translateY(-3px) rotate(1deg)}}
+@keyframes veyrost-tech-arm{from{rotate:-10deg}to{rotate:13deg}}
+@keyframes veyrost-tech-repair{from{transform:translateY(0)}to{transform:translateY(-2px)}}
+@keyframes veyrost-tech-tool{from{rotate:-18deg}to{rotate:24deg}}
+@media(max-width:760px){
+ .veyrost-repair-layer .veyrost-tech-person{width:72px!important;min-width:72px!important}
+ .veyrost-repair-layer .veyrost-tech-person svg{width:72px!important;height:86px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .veyrost-repair-layer .veyrost-tech-person.is-walking svg,
+ .veyrost-repair-layer .veyrost-tech-person.is-walking .robot-arm-left,
+ .veyrost-repair-layer .veyrost-tech-person.is-walking .robot-arm-right,
+ .veyrost-repair-layer .veyrost-tech-person.is-working svg,
+ .veyrost-repair-layer .veyrost-tech-person.is-working .robot-arm-right{animation:none!important}
+}
