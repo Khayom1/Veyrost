@@ -94,7 +94,7 @@ function applyLanguage(){
   const aura=$("#aura-toggle");
   if(aura){const state=aura.getAttribute("aria-pressed")==="true";aura.textContent=state?(translations[language]||translations.en).auraOn:(translations[language]||translations.en).auraOff;}
 }
-$$$("[data-lang]").forEach(button=>button.addEventListener("click",()=>{
+$("[data-lang]").forEach(button=>button.addEventListener("click",()=>{
   const next=button.dataset.lang||"en";
   if(!dictionaries[next])return;
   language=next;
