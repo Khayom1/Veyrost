@@ -336,19 +336,13 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
  .veyrost-repair-layer .veyrost-tech-person svg{width:58px!important;height:68px!important}
 }
 
-/* Wall-mounted junction damage: the plaster and cable roots stay at MENU's original anchor. */
+/* Transparent exposed cables: preserve the page's existing background without drawing a wall. */
 .veyrost-detached-wires{
- position:fixed;width:160px;height:112px;z-index:10040;pointer-events:none;
- opacity:1;filter:drop-shadow(0 7px 9px rgba(0,0,0,.48));
- animation:veyrost-wall-reveal .42s cubic-bezier(.18,.72,.24,1) both;
+ position:fixed;width:112px;height:72px;z-index:10040;pointer-events:none;
+ opacity:1;filter:drop-shadow(0 3px 4px rgba(0,0,0,.52));
+ animation:veyrost-wire-reveal .36s cubic-bezier(.18,.72,.24,1) both;
 }
 .veyrost-detached-wires svg{display:block;width:100%;height:100%;overflow:visible}
-.veyrost-detached-wires .wall-surface{stroke:#d0c2a7;stroke-opacity:.5;stroke-width:2}
-.veyrost-detached-wires .wall-grain,.veyrost-detached-wires .wall-crack{pointer-events:none}
-.veyrost-detached-wires .hole-rim{filter:drop-shadow(0 3px 3px #000b)}
-.veyrost-detached-wires .wire-jacket{stroke-linejoin:round}
-.veyrost-detached-wires .wire-core{stroke:#e7b45d;stroke-linejoin:round}
-.veyrost-detached-wires .wire-spark{opacity:.75;animation:veyrost-wire-spark .9s ease-in-out infinite alternate}
-@keyframes veyrost-wall-reveal{from{opacity:0;transform:translateY(7px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes veyrost-wire-spark{from{opacity:.18}to{opacity:.9}}
-@media(prefers-reduced-motion:reduce){.veyrost-detached-wires,.veyrost-detached-wires .wire-spark{animation:none}}
+.veyrost-detached-wires path{vector-effect:non-scaling-stroke}
+@keyframes veyrost-wire-reveal{from{opacity:0;transform:translateY(4px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){.veyrost-detached-wires{animation:none}}
