@@ -6,10 +6,18 @@
   let session = null;
   let publishableKey = "";
 
+  function setPublishableKey(value) {
+    const candidate = String(value || "").trim();
+    if (!candidate || candidate.length > 512) return false;
+    publishableKey = candidate;
+    return true;
+  }
+
   async function authRequest(payload) {
+    if (!publishableKey) throw Object.assign(new Error("Supabase publishable key is required."), { code: "publishable_key_required" });
     const response = await fetch(AUTH_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "apikey": publishableKey },
       body: JSON.stringify(payload),
       cache: "no-store"
     });
@@ -103,7 +111,7 @@
   }
 
   window.VeyrostBackend = Object.freeze({
-    signIn, signUp, signOut, isAuthenticated, accessToken,
+    signIn, signUp, signOut, isAuthenticated, accessToken, setPublishableKey,
     fetch: fetchThroughProxy, health,
     authUrl: AUTH_URL, proxyUrl: PROXY_URL
   });
