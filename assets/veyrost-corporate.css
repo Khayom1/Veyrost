@@ -212,3 +212,6 @@ html.veyrost-layout-editing button:not(#layout-toggle):not(#aura-toggle):not(.me
 html.veyrost-layout-editing button:not(#layout-toggle):not(#aura-toggle):not(.menu-repair-button):active{cursor:grabbing!important}
 
 
+
+/* Directional soft-body silhouette deformation for catalog cards. */
+html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,clip-path;}
