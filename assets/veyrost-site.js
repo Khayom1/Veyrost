@@ -164,14 +164,17 @@ function renderButtonPhysics(){
 function initButtonPhysics(){
   clearButtonPhysics();
   if(!window.VEYROST_MATTER?.MatterWorld)return;
-  physicsWorld=new window.VEYROST_MATTER.MatterWorld(window.innerWidth,window.innerHeight,{gravity:0,positionCorrection:.9});
+  const pageWidth=Math.max(document.documentElement.scrollWidth,document.body.scrollWidth,window.innerWidth);
+  const pageHeight=Math.max(document.documentElement.scrollHeight,document.body.scrollHeight,window.innerHeight);
+  physicsWorld=new window.VEYROST_MATTER.MatterWorld(pageWidth,pageHeight,{gravity:0,positionCorrection:.9});
   const catalogs=movable().filter(el=>!el.matches("#layout-toggle,#aura-toggle,#menu-toggle,.menu-repair-button,[disabled]"));
   catalogs.forEach((el,index)=>{
     const rect=el.getBoundingClientRect(),base=offset(el);
     const area=rect.width*rect.height;
     const mass=Math.max(.8,Math.min(4,area/18000));
-    const body=physicsWorld.add({id:el.id||el.dataset.layoutId||("catalog-body-"+index),x:rect.left,y:rect.top,width:rect.width,height:rect.height,mass,elasticity:.16,friction:.48,maxCompression:.08,material:"soft-rubber"});
-    body.__origin={x:rect.left,y:rect.top};body.__base=base;
+    const docX=rect.left+window.scrollX,docY=rect.top+window.scrollY;
+    const body=physicsWorld.add({id:el.id||el.dataset.layoutId||("catalog-body-"+index),x:docX,y:docY,width:rect.width,height:rect.height,mass,elasticity:.08,friction:.62,maxCompression:.08,material:"soft-rubber"});
+    body.__origin={x:docX,y:docY};body.__base=base;
     physicalBodies.set(el,body);el.style.transformOrigin="center";
   });
   physicsFrame=requestAnimationFrame(renderButtonPhysics);
@@ -279,7 +282,8 @@ function startDrag(x,y,source){
   const el=button&&physicalBodies.has(button)?button:hit?.closest?.("[data-veyrost-layout-item]");
   if(!el)return false;
   const p=offset(el),body=physicalBodies.get(el);
-  if(body&&!physicsWorld.beginDrag(body.id,x,y))return false;
+  const worldX=x+window.scrollX,worldY=y+window.scrollY;
+  if(body&&!physicsWorld.beginDrag(body.id,worldX,worldY))return false;
   drag={el,body,source,startX:x,startY:y,baseX:p.x,baseY:p.y,moved:false,lastX:x,lastY:y,lastTime:performance.now(),vx:0,vy:0};
   return true;
 }
@@ -290,7 +294,7 @@ function moveDrag(x,y,source){
   if(drag.body&&physicsWorld){
     const now=performance.now(),dt=Math.max(.008,(now-drag.lastTime)/1000);
     drag.vx=(x-drag.lastX)/dt;drag.vy=(y-drag.lastY)/dt;
-    drag.lastX=x;drag.lastY=y;drag.lastTime=now;physicsWorld.dragTo(x,y);
+    drag.lastX=x;drag.lastY=y;drag.lastTime=now;physicsWorld.dragTo(x+window.scrollX,y+window.scrollY);
   }else drag.el.style.translate=(drag.baseX+dx)+"px "+(drag.baseY+dy)+"px";
 }
 function finishDrag(){
