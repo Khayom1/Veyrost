@@ -86,6 +86,19 @@ test("the directory contains every repository record without exposing private so
   assert.ok(projects.some(p=>p.repo==="textivo"));
 });
 
+test("shared initialization uses querySelectorAll for every multi-element control list", () => {
+  for (const selector of [
+    '[data-close-menu]',
+    '[placeholder],[title],[aria-label],[data-label]',
+    '[data-lang]',
+    '[data-local-toggle]'
+  ]) {
+    assert.ok(site.includes('$("' + selector + '")'), 'querySelectorAll missing for ' + selector);
+  }
+  assert.doesNotMatch(site, /(?<!\\$)\\$\\([^;\\n]*?\\)\\.forEach/);
+  assert.match(site, /const statusNode=\\$\\("#aura-status"\\)/);
+});
+
 test("browser storage failures do not abort language or settings controls", () => {
   assert.match(site,/try\{language=localStorage\.getItem\("veyrost-language"\)/);
   assert.match(site,/try\{saved=localStorage\.getItem\(key\)\}catch\(_\)\{\}/);
