@@ -13,6 +13,8 @@
       friction: clamp(finite(o.friction, .22), 0, 1),
       maxCompression: clamp(finite(o.maxCompression, .16), 0, .35),
       compression: 0, compressionAxis: "y", compressionVelocity: 0,
+      deformation: { top: 0, right: 0, bottom: 0, left: 0 },
+      deformationAt: { top: .5, right: .5, bottom: .5, left: .5 },
       material: o.material || "hybrid", collisionEnabled: o.collisionEnabled !== false, anchored: Boolean(o.anchored),
       detached: Boolean(o.detached), detachAttempts: 0, dragging: false,
       pointerOffsetX: 0, pointerOffsetY: 0,
@@ -97,6 +99,7 @@
       for (const b of this.bodies.values()) {
         b.x = b.initial.x; b.y = b.initial.y; b.vx = 0; b.vy = 0;
         b.compression = 0; b.compressionVelocity = 0;
+        b.deformation = { top: 0, right: 0, bottom: 0, left: 0 };
         b.anchored = b.initial.anchored; b.detached = false;
         b.detachAttempts = 0; b.dragging = false;
       }
@@ -117,6 +120,7 @@
         }
         b.compressionVelocity += (-30 * b.compression - 8 * b.compressionVelocity) * dt;
         b.compression = clamp(b.compression + b.compressionVelocity * dt, 0, b.maxCompression);
+        for (const side of ["top","right","bottom","left"]) b.deformation[side] *= Math.exp(-5.5 * dt);
       }
       for (let pass = 0; pass < 8; pass++) {
         for (let i = 0; i < bodies.length; i++)
@@ -126,16 +130,19 @@
     }
     _contain(b, restitution) {
       const maxX = Math.max(0, this.width - b.width), maxY = Math.max(0, this.height - b.height);
-      if (b.x < 0) { b.x = 0; if (b.vx < 0) b.vx = restitution > 0 ? -b.vx * restitution : 0; this._compress(b, "x", Math.abs(b.vx)); }
-      else if (b.x > maxX) { b.x = maxX; if (b.vx > 0) b.vx = restitution > 0 ? -b.vx * restitution : 0; this._compress(b, "x", Math.abs(b.vx)); }
-      if (b.y < 0) { b.y = 0; if (b.vy < 0) b.vy = restitution > 0 ? -b.vy * restitution : 0; this._compress(b, "y", Math.abs(b.vy)); }
-      else if (b.y > maxY) { b.y = maxY; if (b.vy > 0) b.vy = restitution > 0 ? -b.vy * restitution : 0; this._compress(b, "y", Math.abs(b.vy)); }
+      if (b.x < 0) { b.x = 0; if (b.vx < 0) b.vx = restitution > 0 ? -b.vx * restitution : 0; this._compress(b, "left", Math.abs(b.vx), .5); }
+      else if (b.x > maxX) { b.x = maxX; if (b.vx > 0) b.vx = restitution > 0 ? -b.vx * restitution : 0; this._compress(b, "right", Math.abs(b.vx), .5); }
+      if (b.y < 0) { b.y = 0; if (b.vy < 0) b.vy = restitution > 0 ? -b.vy * restitution : 0; this._compress(b, "top", Math.abs(b.vy), .5); }
+      else if (b.y > maxY) { b.y = maxY; if (b.vy > 0) b.vy = restitution > 0 ? -b.vy * restitution : 0; this._compress(b, "bottom", Math.abs(b.vy), .5); }
     }
-    _compress(b, axis, speed) {
-      b.compressionAxis = axis;
-      const amount = clamp(speed / 1800, 0, 1) * b.maxCompression;
+    _compress(b, side, speed, position) {
+      const amount = clamp(speed / 1250, 0, 1) * Math.max(b.maxCompression, .12);
+      const key = ["top","right","bottom","left"].includes(side) ? side : "top";
+      b.deformation[key] = Math.max(b.deformation[key] || 0, amount);
+      b.deformationAt[key] = clamp(finite(position, .5), .08, .92);
       b.compression = Math.max(b.compression, amount);
-      b.compressionVelocity = Math.max(b.compressionVelocity, amount * 5);
+      b.compressionAxis = key === "left" || key === "right" ? "x" : "y";
+      b.compressionVelocity = Math.max(b.compressionVelocity, amount * 4);
     }
     _resolvePair(a, b) {
       if (!a.collisionEnabled || !b.collisionEnabled) return;
@@ -171,8 +178,17 @@
         }
       }
       const impact = Math.max(Math.abs(normalSpeed), penetration * 9);
-      this._compress(a, nx ? "x" : "y", impact);
-      this._compress(b, nx ? "x" : "y", impact);
+      if (nx) {
+        const aSide = nx > 0 ? "right" : "left", bSide = nx > 0 ? "left" : "right";
+        const aPos = clamp(((b.y + b.height/2) - a.y) / a.height, .08, .92);
+        const bPos = clamp(((a.y + a.height/2) - b.y) / b.height, .08, .92);
+        this._compress(a, aSide, impact, aPos); this._compress(b, bSide, impact, bPos);
+      } else {
+        const aSide = ny > 0 ? "bottom" : "top", bSide = ny > 0 ? "top" : "bottom";
+        const aPos = clamp(((b.x + b.width/2) - a.x) / a.width, .08, .92);
+        const bPos = clamp(((a.x + a.width/2) - b.x) / b.width, .08, .92);
+        this._compress(a, aSide, impact, aPos); this._compress(b, bSide, impact, bPos);
+      }
     }
   }
 
