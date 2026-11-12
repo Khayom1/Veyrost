@@ -66,3 +66,8 @@ html.veyrost-layout-editing #mobile-nav a[data-two-step-drag]:active{cursor:grab
 .menu-repair-button{flex:0 0 auto;border:1px solid rgba(190,170,255,.65);border-radius:8px;background:#cfc0ff;color:#171326;padding:9px 11px;font:800 10px/1 Inter,system-ui,sans-serif;letter-spacing:.045em;cursor:pointer}
 .menu-repair-button:focus-visible{outline:2px solid #fff;outline-offset:3px}
 @media(max-width:520px){.menu-repair-notice{right:8px;top:calc(env(safe-area-inset-top,0px) + 8px);max-width:calc(100vw - 16px);gap:7px;padding:8px}.menu-repair-button{padding:8px;font-size:9px}.menu-repair-message{font-size:9px}}
+
+/* A detached primary Menu control is visually and functionally disabled. */
+html.veyrost-menu-detached #menu-toggle{pointer-events:none!important;opacity:.42!important;filter:grayscale(1);cursor:not-allowed!important}
+html.veyrost-menu-detached #menu-toggle:focus{outline:none}
+html.veyrost-layout-editing #menu-toggle{touch-action:none!important}
