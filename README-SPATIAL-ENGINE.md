@@ -11,7 +11,7 @@ The corporate website is now a multi-page engineering portfolio:
 
 AURA is integrated through `assets/veyrost-site.js`. It provides a conventional hand-controlled cursor and an opt-in layout editor for workspace categories and project cards.
 
-**Important integration boundary:** `spatial-world.mjs`, `spatial-math.mjs`, and `spatial-depth-physics.mjs` remain experimental engine modules. The current multi-page website does not mount `SpatialWorldController` from a public route. Therefore the 3D floating-panel scene, depth HUD, and protected 3D repair flow must not be described as live website features. The source modules and source-level tests exist, but end-to-end website integration is still pending.
+**Public experimental route:** `spatial.html` mounts `SpatialWorldController` through `spatial-page.mjs`. The Workspace page links to this route explicitly; it does not replace the normal corporate website. The route connects AURA pinch-start/end, hand movement, hand-loss cancellation, and pause/resume to the spatial controller. Camera permission is requested only after the user activates AURA. This is an experimental browser feature, not an Android-certified release.
 
 ## Experimental engine architecture
 
@@ -36,13 +36,13 @@ The physics combination is hybrid **2.5D**: Matter owns X/Y motion and a separat
 
 These are source-level capabilities. They do not mean the 3D engine is currently connected to the corporate website or certified on an Android device.
 
-## Still required before public integration
+## Integration and remaining validation
 
-1. Add a deliberate 3D workspace route or an explicitly enabled mode inside `studio.html`.
-2. Connect AURA pinch, drag, cancel, hand-loss and pause states to the spatial controller.
-3. Add responsive controls and a clear exit path without replacing the corporate site unexpectedly.
-4. Run the full regression suite and verify camera/gesture interaction on Android and desktop browsers.
-5. Only then mark the spatial scene as a live feature.
+- `spatial.html` is the dedicated, explicitly opened 3D route.
+- `studio.html` links to the route; the default corporate pages remain unchanged.
+- `spatial-page.mjs` connects AURA pinch, drag, cancel, hand-loss and pause/resume states.
+- The route includes reset, depth controls, repair action, and an explicit exit to Workspace.
+- Full regression CI and physical Android camera/gesture acceptance must still pass before calling this production-ready.
 
 ## Still not implemented from the Service Crew concept
 
