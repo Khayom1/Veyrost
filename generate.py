@@ -7,6 +7,10 @@ import datetime
 import requests
 import sys
 import time
+import subprocess
+import html as html_stdlib
+from html.parser import HTMLParser
+from pathlib import Path
 
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
 DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions"
@@ -16,6 +20,8 @@ QUALITY_THRESHOLD = 80
 MAX_RETRIES = 5
 
 def call_deepseek(system_prompt, user_prompt, json_mode=True):
+    if not DEEPSEEK_API_KEY:
+        raise RuntimeError("DEEPSEEK_API_KEY is not configured; refusing an unauthenticated API request.")
     headers = {
         "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
         "Content-Type": "application/json"
@@ -151,10 +157,99 @@ def generate_banner(topic, slug):
             pass
     return img_name
 
+_ALLOWED_BODY_TAGS = {"p", "h2", "h3", "ul", "ol", "li", "strong", "em", "code", "pre", "blockquote"}
+
+class _SafeBodyParser(HTMLParser):
+    """Keep only a small formatting allowlist; discard every attribute and unsafe tag."""
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.parts = []
+        self.stack = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag in _ALLOWED_BODY_TAGS:
+            self.parts.append(f"<{tag}>")
+            self.stack.append(tag)
+
+    def handle_endtag(self, tag):
+        if tag not in _ALLOWED_BODY_TAGS or tag not in self.stack:
+            return
+        while self.stack:
+            current = self.stack.pop()
+            self.parts.append(f"</{current}>")
+            if current == tag:
+                break
+
+    def handle_data(self, data):
+        self.parts.append(html_stdlib.escape(data))
+
+    def close(self):
+        super().close()
+        while self.stack:
+            self.parts.append(f"</{self.stack.pop()}>")
+
+def sanitize_body_html(value):
+    parser = _SafeBodyParser()
+    parser.feed(str(value or ""))
+    parser.close()
+    return "".join(parser.parts)
+
+def safe_slug(value):
+    slug = re.sub(r"[^a-z0-9-]+", "-", str(value or "").lower()).strip("-")[:50].strip("-")
+    if not slug:
+        raise ValueError("Generated article slug is empty after sanitization.")
+    return slug
+
+def publish_generated_files(paths, repo_path, message):
+    """Stage only generated files and publish without invoking a shell."""
+    root = Path(repo_path).expanduser().resolve()
+    if not root.is_dir():
+        raise RuntimeError(f"Repository directory does not exist: {root}")
+    subprocess.run(
+        ["git", "-C", str(root), "rev-parse", "--is-inside-work-tree"],
+        check=True, capture_output=True, text=True
+    )
+    relative_paths = []
+    for candidate in paths:
+        target = (root / candidate).resolve()
+        try:
+            relative = target.relative_to(root)
+        except ValueError as exc:
+            raise ValueError(f"Refusing to publish a path outside the repository: {candidate}") from exc
+        if not target.is_file():
+            raise FileNotFoundError(f"Generated file does not exist: {relative}")
+        relative_paths.append(relative.as_posix())
+    if not relative_paths:
+        raise ValueError("No generated files were supplied for publishing.")
+    subprocess.run(
+        ["git", "-C", str(root), "add", "--", *relative_paths],
+        check=True, capture_output=True, text=True
+    )
+    staged = subprocess.run(
+        ["git", "-C", str(root), "diff", "--cached", "--quiet"],
+        check=False, capture_output=True, text=True
+    )
+    if staged.returncode == 0:
+        return False
+    if staged.returncode != 1:
+        raise subprocess.CalledProcessError(staged.returncode, staged.args, staged.stdout, staged.stderr)
+    subprocess.run(
+        ["git", "-C", str(root), "commit", "-m", str(message)],
+        check=True, capture_output=True, text=True
+    )
+    subprocess.run(
+        ["git", "-C", str(root), "push"],
+        check=True, capture_output=True, text=True
+    )
+    return True
+
 def make_html(lang, post, banner_name, date_str):
-    title = post["title"]
-    excerpt = post["excerpt"]
-    body = post["body_html"]
+    title = html_stdlib.escape(str(post["title"]), quote=True)
+    excerpt = html_stdlib.escape(str(post["excerpt"]), quote=True)
+    body = sanitize_body_html(post["body_html"])
+    banner_name = Path(str(banner_name)).name
+    if not re.fullmatch(r"[A-Za-z0-9._-]+", banner_name):
+        raise ValueError("Invalid banner filename.")
 
     if lang == "en":
         back = "← Back to home"
@@ -259,8 +354,8 @@ def main():
             en = article_data["en"]
             ru = article_data["ru"]
 
-            en["slug"] = re.sub(r"[^a-z0-9-]", "", en["slug"].lower().replace(" ", "-"))[:50]
-            ru["slug"] = re.sub(r"[^a-z0-9-]", "", ru["slug"].lower().replace(" ", "-"))[:50]
+            en["slug"] = safe_slug(en["slug"])
+            ru["slug"] = safe_slug(ru["slug"])
 
             today = datetime.date.today().isoformat()
 
@@ -279,9 +374,20 @@ def main():
             update_sitemap([(en['slug'], "en"), (ru['slug'], "ru")])
 
             print("📤 Ирсол ба GitHub...")
-            post_title = en['title'][:40]
-            os.system(f'cd {SITE_PATH} && git add . && git commit -m "Verified Post: {post_title}" && git push')
-            print("🎉 Мақола бо муваффақият санҷида шуд ва нашр гардид!")
+            post_title = re.sub(r"\\s+", " ", str(en["title"])).strip()[:40]
+            generated_paths = [
+                f"posts/{en['slug']}-en.html",
+                f"posts/{ru['slug']}-ru.html",
+                f"posts/{banner_name}",
+                "sitemap.xml",
+            ]
+            published = publish_generated_files(
+                generated_paths, SITE_PATH, f"Verified Post: {post_title}"
+            )
+            if published:
+                print("🎉 Мақола ва танҳо файлҳои тавлидшуда ба GitHub ирсол шуданд.")
+            else:
+                print("ℹ️ Тағйироти нав барои commit вуҷуд надошт.")
             return
         else:
             print(f"❌ Идея рад шуд (Баҳо: {score}). Сабаб: {analysis.get('analysis_summary', '')}")
