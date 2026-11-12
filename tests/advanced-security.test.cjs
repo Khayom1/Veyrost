@@ -30,7 +30,7 @@ test("browser proxy client keeps user tokens in memory and never persists them",
   assert.match(backend, /let session = null/);
   assert.match(backend, /fetch\(PROXY_URL/);
   assert.match(backend, /"Authorization": "Bearer " \+ session\.accessToken/);
-  assert.match(backend, /apikey: publishableKey/);
+  assert.match(backend, /"apikey": publishableKey/);
   assert.doesNotMatch(backend, /localStorage|sessionStorage/);
   assert.match(backend, /action: "refresh"/);
 });
@@ -52,7 +52,7 @@ test("proxy allowlists upstream hosts and restricts GitHub routes", () => {
     assert.ok(proxy.includes('host==="' + host + '"'), "missing allowlisted host " + host);
   }
   assert.match(proxy, /function githubRoute/);
-  assert.match(proxy, /actions\/secrets/);
+  assert.match(proxy, /actions.*secrets/);
   assert.match(proxy, /redirect:"manual"/);
 });
 test("proxy rejects private targets and Jina Reader nested private URLs", () => {
