@@ -349,9 +349,9 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
 
 
 /* Subtle cable life: short, flexible leads with restrained independent movement. */
-.veyrost-detached-wires svg path:nth-of-type(7),
+ .veyrost-detached-wires svg path:nth-of-type(7),
 .veyrost-detached-wires svg path:nth-of-type(8),
-.veyrost-detached-wires svg path:nth-of-type(7){
+.veyrost-detached-wires svg path:nth-of-type(9){
   transform-box:fill-box;transform-origin:center;
 }
 .veyrost-detached-wires svg path:nth-of-type(7){animation:veyrost-cable-upper 2.8s ease-in-out infinite alternate}
@@ -363,5 +363,5 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
 @media(prefers-reduced-motion:reduce){
  .veyrost-detached-wires svg path:nth-of-type(7),
  .veyrost-detached-wires svg path:nth-of-type(8),
- .veyrost-detached-wires svg path:nth-of-type(7){animation:none!important}
+ .veyrost-detached-wires svg path:nth-of-type(9){animation:none!important}
 }
