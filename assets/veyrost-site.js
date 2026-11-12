@@ -238,13 +238,13 @@ document.addEventListener("pointerdown",event=>{
   if(event.target?.closest?.("#layout-toggle"))return;
   const target=event.target?.closest?.("[data-veyrost-layout-item]");
   if(!target)return;
-  if(target.hasAttribute("data-two-step-drag")&&!twoStepArmed.has(target)){
+  if(target===menu&&!menuIsDetached()&&!twoStepArmed.has(target)){
     twoStepArmed.add(target);
     event.preventDefault();event.stopImmediatePropagation();
     toast("Locked for the first attempt. Drag again to move this control.");
     return;
   }
-  // After the initial two-attempt confirmation, future drags require one attempt.
+  // Menu requires two attempts only while it is still at its original position; after its first detach, all later drags use one attempt.
   event.preventDefault();event.stopImmediatePropagation();
   startDrag(event.clientX,event.clientY,"pointer");
 });
