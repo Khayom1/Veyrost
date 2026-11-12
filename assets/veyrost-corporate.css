@@ -122,3 +122,17 @@ html.veyrost-menu-detached.veyrost-layout-editing #menu-toggle {
   touch-action: none !important;
 }
 html.veyrost-menu-detached.veyrost-layout-editing #menu-toggle:active { cursor: grabbing !important; }
+
+
+/* Highest-specificity recovery: detached Menu must receive pointer input while editing. */
+html.veyrost-menu-detached.veyrost-layout-editing #menu-toggle[data-veyrost-layout-item] {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  filter: none !important;
+  cursor: grab !important;
+  touch-action: none !important;
+  z-index: 10060 !important;
+}
+html.veyrost-menu-detached.veyrost-layout-editing #menu-toggle[data-veyrost-layout-item]:active {
+  cursor: grabbing !important;
+}
