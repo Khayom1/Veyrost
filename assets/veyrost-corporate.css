@@ -399,3 +399,12 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
 .veyrost-repair-layer .veyrost-tech-person{color:#6fe6d0}
 .veyrost-repair-layer .veyrost-tech-person:nth-of-type(2){color:#a98cff}
 .veyrost-repair-layer .veyrost-tech-person:nth-of-type(3){color:#a98cff}
+
+/* Two robots perform separate repair jobs: one carries the MENU, the other reconnects the seven wall leads. */
+.veyrost-repair-layer .veyrost-tech-person.is-wiring svg{animation:veyrost-wire-tech  .38s ease-in-out infinite alternate!important}
+.veyrost-repair-layer .veyrost-tech-person.is-wiring svg path:nth-of-type(7),
+.veyrost-repair-layer .veyrost-tech-person.is-wiring svg path:nth-of-type(8){transform-box:fill-box;transform-origin:center;animation:veyrost-wire-hand .24s ease-in-out infinite alternate}
+.veyrost-detached-wires.is-reconnecting svg{filter:drop-shadow(0 0 3px rgba(111,230,208,.9))!important}
+.veyrost-detached-wires.is-reconnecting .wire{animation-duration:.24s!important;filter:drop-shadow(0 0 3px rgba(111,230,208,.8))}
+@keyframes veyrost-wire-tech{to{transform:translateY(-2px) rotate(-1deg)}}
+@keyframes veyrost-wire-hand{to{translate:0 -2px}}
