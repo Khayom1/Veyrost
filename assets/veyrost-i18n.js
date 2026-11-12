@@ -319,4 +319,29 @@ Object.assign(tj,{
 "VEYROST · Engineering Group":"VEYROST · Гурӯҳи муҳандисӣ","Search repositories, features, languages…":"Ҷустуҷӯи репозиторҳо, хусусиятҳо, забонҳо…","Filter by engineering domain":"Филтр аз рӯйи самти муҳандисӣ","Main navigation":"Паймоиши асосӣ","Open navigation":"Кушодани паймоиш","Interface language":"Забони интерфейс","VEYROST home":"Саҳифаи асосии VEYROST"
 });
 
+
+Object.assign(ru,{
+"Camera stopped because the page became hidden.":"Камера остановлена, поскольку страница стала неактивной.","Camera released.":"Камера отключена.",
+"Hand tracking could not be initialized.":"Не удалось инициализировать отслеживание рук.","AURA requires a video source and a cursor element.":"Для AURA необходимы источник видео и элемент курсора.",
+"Camera access requires HTTPS or localhost.":"Для доступа к камере требуется HTTPS или localhost.","This browser does not provide camera access.":"Этот браузер не поддерживает доступ к камере.",
+"Requesting camera permission…":"Запрашивается разрешение на использование камеры…","Loading on-device hand tracking…":"Загружается локальное отслеживание рук…",
+"AURA is active. Camera frames are processed on this device.":"AURA активна. Кадры камеры обрабатываются на этом устройстве.",
+"AURA could not start.":"Не удалось запустить AURA.","Hand tracking stopped unexpectedly.":"Отслеживание рук неожиданно остановлено.",
+"Could not save this layout on the device.":"Не удалось сохранить макет на устройстве.","AURA paused.":"AURA приостановлена.","AURA resumed.":"AURA возобновлена.",
+"Search repositories, features, languages…":"Поиск репозиториев, функций, языков…","Filter by engineering domain":"Фильтр по инженерному направлению",
+"Open navigation":"Открыть навигацию","Main navigation":"Главная навигация","Interface language":"Язык интерфейса","VEYROST home":"Главная страница VEYROST",
+"Research and engineering domains · VEYROST":"Исследования и инженерные направления · VEYROST"
+});
+Object.assign(tj,{
+"Camera stopped because the page became hidden.":"Камера қатъ шуд, зеро саҳифа ғайрифаъол гардид.","Camera released.":"Камера хомӯш карда шуд.",
+"Hand tracking could not be initialized.":"Пайгирии даст оғоз карда нашуд.","AURA requires a video source and a cursor element.":"Барои AURA манбаи видео ва унсури курсор лозим аст.",
+"Camera access requires HTTPS or localhost.":"Барои дастрасӣ ба камера HTTPS ё localhost лозим аст.","This browser does not provide camera access.":"Ин браузер дастрасӣ ба камераро дастгирӣ намекунад.",
+"Requesting camera permission…":"Иҷозати истифодаи камера пурсида мешавад…","Loading on-device hand tracking…":"Пайгирии маҳаллии даст бор карда мешавад…",
+"AURA is active. Camera frames are processed on this device.":"AURA фаъол аст. Кадрҳои камера дар ҳамин дастгоҳ коркард мешаванд.",
+"AURA could not start.":"AURA оғоз карда нашуд.","Hand tracking stopped unexpectedly.":"Пайгирии даст ногаҳон қатъ шуд.",
+"Could not save this layout on the device.":"Ин тарҳ дар дастгоҳ нигоҳ дошта нашуд.","AURA paused.":"AURA таваққуф шуд.","AURA resumed.":"AURA аз нав фаъол шуд.",
+"Search repositories, features, languages…":"Ҷустуҷӯи репозиторҳо, хусусиятҳо ва забонҳо…","Filter by engineering domain":"Филтр аз рӯйи самти муҳандисӣ",
+"Open navigation":"Кушодани паймоиш","Main navigation":"Паймоиши асосӣ","Interface language":"Забони интерфейс","VEYROST home":"Саҳифаи асосии VEYROST"
+});
+
 export const dictionaries = { en, ru, tj };
