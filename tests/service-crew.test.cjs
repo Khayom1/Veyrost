@@ -91,3 +91,15 @@ test("ready and completed states remain stable under additional updates", async 
   assert.equal(sequence.snapshot().phase, SERVICE_CREW_PHASES.COMPLETE);
   assert.equal(sequence.snapshot().revision, revision);
 });
+
+test("completed service crew can be recalled for a later protected repair", async () => {
+  const { ServiceCrewSequence, SERVICE_CREW_PHASES } = await api;
+  const sequence = new ServiceCrewSequence();
+  for (let i = 0; i < 100; i++) sequence.update(0.1);
+  assert.equal(sequence.snapshot().phase, SERVICE_CREW_PHASES.READY);
+  assert.equal(sequence.depart(), true);
+  for (let i = 0; i < 100; i++) sequence.update(0.1);
+  assert.equal(sequence.snapshot().phase, SERVICE_CREW_PHASES.COMPLETE);
+  assert.equal(sequence.recall(), true);
+  assert.equal(sequence.snapshot().phase, SERVICE_CREW_PHASES.ARRIVING);
+});
