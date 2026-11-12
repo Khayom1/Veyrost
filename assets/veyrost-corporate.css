@@ -480,3 +480,63 @@ html.veyrost-layout-editing [data-veyrost-layout-item]{will-change:translate,cli
 .veyrost-repair-layer .veyrost-tech-person.is-wire-reach .robot-welder{opacity:1!important}
 .veyrost-repair-layer .veyrost-tech-person.is-wire-reach .robot-welder .welder-beam{opacity:1!important;animation:veyrost-welder-spark .13s steps(2,end) infinite!important}
 .veyrost-detached-wires .wire.is-connecting{filter:drop-shadow(0 0 6px rgba(137,255,235,.95))!important}
+
+
+/* Mechanical service-vehicle doors, grounded robot shadows and a visible walk cycle. */
+.veyrost-repair-layer .veyrost-tech-vehicle{perspective:700px!important;transform-style:preserve-3d!important}
+.veyrost-repair-layer .vehicle-door{
+  transform-box:fill-box;transform-origin:0% 50%;transform-style:preserve-3d;
+  transition:transform .42s cubic-bezier(.2,.78,.25,1),filter .32s ease;backface-visibility:visible
+}
+.veyrost-repair-layer .vehicle-door-b{transform-origin:100% 50%}
+.veyrost-repair-layer .veyrost-tech-vehicle.is-door-open .vehicle-door-a{
+  transform:rotateY(-72deg) translateX(-3px);filter:drop-shadow(0 0 5px rgba(111,230,208,.55))
+}
+.veyrost-repair-layer .veyrost-tech-vehicle.is-door-open .vehicle-door-b{
+  transform:rotateY(72deg) translateX(3px);filter:drop-shadow(0 0 5px rgba(111,230,208,.55))
+}
+.veyrost-repair-layer .veyrost-tech-person{position:fixed!important;isolation:isolate!important}
+.veyrost-repair-layer .veyrost-tech-person .robot-ground-shadow{
+  position:absolute!important;z-index:0!important;left:15%!important;bottom:-1px!important;
+  width:70%!important;height:8px!important;display:block!important;border-radius:50%!important;
+  background:radial-gradient(ellipse at center,rgba(0,0,0,.78) 0%,rgba(0,0,0,.48) 48%,rgba(0,0,0,0) 76%)!important;
+  filter:blur(1.3px)!important;opacity:.78!important;transform:scaleX(1)!important;
+  transform-origin:center!important;transition:opacity .28s ease,transform .22s ease!important;pointer-events:none!important
+}
+.veyrost-repair-layer .veyrost-tech-person>svg{position:relative!important;z-index:1!important;overflow:visible!important}
+.veyrost-repair-layer .veyrost-tech-person.is-walking .robot-ground-shadow{
+  animation:veyrost-ground-shadow-step .32s ease-in-out infinite alternate!important
+}
+.veyrost-repair-layer .veyrost-tech-person.is-boarding .robot-ground-shadow{opacity:.18!important;transform:scaleX(.56)!important}
+.veyrost-repair-layer .veyrost-tech-person.is-walking>svg{
+  transform-origin:50% 82%!important;animation:veyrost-robot-walk-body .32s ease-in-out infinite alternate!important
+}
+.veyrost-repair-layer .veyrost-tech-person.is-walking .robot-arm-left{
+  transform-box:view-box!important;transform-origin:33px 44px!important;
+  animation:veyrost-robot-walk-arm .32s ease-in-out infinite alternate!important
+}
+.veyrost-repair-layer .veyrost-tech-person.is-walking .robot-arm-right{
+  transform-box:view-box!important;transform-origin:67px 44px!important;
+  animation:veyrost-robot-walk-arm .32s ease-in-out infinite alternate-reverse!important
+}
+.veyrost-repair-layer .veyrost-tech-person.is-boarding{
+  transform:translateY(-8px) scale(.42)!important;transform-origin:50% 85%!important;
+  transition:opacity .42s ease,transform .42s cubic-bezier(.2,.8,.25,1)!important
+}
+@keyframes veyrost-robot-walk-body{
+  0%{transform:translateY(1px) rotate(-1.3deg)}
+  50%{transform:translateY(-1.5px) rotate(0deg)}
+  100%{transform:translateY(1px) rotate(1.3deg)}
+}
+@keyframes veyrost-robot-walk-arm{from{transform:rotate(-19deg)}to{transform:rotate(19deg)}}
+@keyframes veyrost-ground-shadow-step{
+  from{transform:scaleX(.84) scaleY(.9);opacity:.58}
+  to{transform:scaleX(1.08) scaleY(1.08);opacity:.86}
+}
+@media(prefers-reduced-motion:reduce){
+  .veyrost-repair-layer .vehicle-door{transition:none!important}
+  .veyrost-repair-layer .veyrost-tech-person.is-walking>svg,
+  .veyrost-repair-layer .veyrost-tech-person.is-walking .robot-arm-left,
+  .veyrost-repair-layer .veyrost-tech-person.is-walking .robot-arm-right,
+  .veyrost-repair-layer .veyrost-tech-person.is-walking .robot-ground-shadow{animation:none!important}
+}
