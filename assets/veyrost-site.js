@@ -21,7 +21,7 @@ menu?.addEventListener("click",()=>{
 $$("[data-close-menu]").forEach(link=>link.addEventListener("click",()=>mobile?.classList.remove("open")));
 
 // Complete site localization: translate every rendered text node, not only navigation labels.
-import { dictionaries } from "./veyrost-i18n.js";
+import { dictionaries } from "./veyrost-i18n.js?v=20261112-7";
 let language="en";
 try{language=localStorage.getItem("veyrost-language")||"en"}catch(_){}
 if(!dictionaries[language])language="en";
