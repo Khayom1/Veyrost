@@ -31,7 +31,7 @@ function validHttps(value:string):URL|null {
 }
 function originAllowed(origin:string|null,env:Env):string|null {
   if(!origin)return null;
-  const list=(env.get("VEYROST_ALLOWED_ORIGINS")||"").split(",").map(x=>x.trim()).filter(Boolean);
+  const list=(env.get("VEYROST_ALLOWED_ORIGINS")||"https://veyrost.is-a.dev,https://khayom1.github.io").split(",").map(x=>x.trim()).filter(Boolean);
   if(!list.length)return "*";
   return list.includes(origin)?origin:null;
 }
