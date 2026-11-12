@@ -2,9 +2,14 @@ function assertEquals(actual:unknown,expected:unknown,message="values differ"){i
 function assertStringIncludes(actual:string,expected:string){if(!actual.includes(expected))throw new Error("expected string to include "+expected);}
 import { createProxyHandler } from "./proxy-core.ts";
 const token=(role="authenticated",sub="user-123",exp=2_000_000_000)=>"h."+btoa(JSON.stringify({role,sub,exp})).replace(/=/g,"").replace(/\+/g,"-").replace(/\//g,"_")+".s";
-const env=(v:Record<string,string>={})=>({get:(k:string)=>v[k]});
-const req=(body:unknown,bearer=token())=>new Request("https://edge.test/functions/v1/veyrost-proxy",{method:"POST",headers:{"content-type":"application/json","authorization":bearer?"Bearer "+bearer:""},body:JSON.stringify(body)});
+const env=(v:Record<string,string>={})=>({get:(k:string)=>v[k]??(k==="SUPABASE_PUBLISHABLE_KEY"?"public-key":undefined)});
+const req=(body:unknown,bearer=token())=>new Request("https://edge.test/functions/v1/veyrost-proxy",{method:"POST",headers:{"content-type":"application/json","authorization":bearer?"Bearer "+bearer:"","apikey":"public-key"},body:JSON.stringify(body)});
 Deno.test("requires an authenticated Supabase user",async()=>{const h=createProxyHandler({env:env(),fetchImpl:async()=>new Response("no")});assertEquals((await h(req({action:"health"},""))).status,401);assertEquals((await h(req({action:"health"},token("anon")))).status,401);});
+Deno.test("rejects a missing or incorrect project publishable key",async()=>{
+  const h=createProxyHandler({env:env(),fetchImpl:async()=>Response.json({})});
+  const r=new Request("https://edge.test/functions/v1/veyrost-proxy",{method:"POST",headers:{"authorization":"Bearer "+token(),"apikey":"wrong","content-type":"application/json","apikey":"public-key"},body:JSON.stringify({action:"health"})});
+  assertEquals((await h(r)).status,401);
+});
 Deno.test("health works without external calls",async()=>{const h=createProxyHandler({env:env(),fetchImpl:async()=>{throw Error("unexpected");}});const r=await h(req({action:"health"}));assertEquals(r.status,200);assertEquals(await r.json(),{ok:true,authenticated:true,configured:{deepseek:false,siliconflow:false,github:false,google:false}});});
 Deno.test("DeepSeek secret is injected by server",async()=>{let init:RequestInit|undefined;const h=createProxyHandler({env:env({DEEPSEEK_API_KEY:"server-secret"}),fetchImpl:async(_u,i)=>{init=i;return new Response("data: [DONE]",{headers:{"content-type":"text/event-stream"}});}});const r=await h(req({target:"https://api.deepseek.com/chat/completions",method:"POST",headers:{authorization:"Bearer attacker"},body:"{}"}));assertEquals(r.status,200);assertEquals(new Headers(init?.headers).get("authorization"),"Bearer server-secret");assertStringIncludes(r.headers.get("content-type")||"","text/event-stream");});
 Deno.test("GitHub token is server-only and secret routes are denied",async()=>{let init:RequestInit|undefined;const h=createProxyHandler({env:env({GITHUB_TOKEN:"gh-secret"}),fetchImpl:async(_u,i)=>{init=i;return Response.json([]);}});assertEquals((await h(req({target:"https://api.github.com/user/repos",method:"GET"}))).status,200);assertEquals(new Headers(init?.headers).get("authorization"),"Bearer gh-secret");assertEquals((await h(req({target:"https://api.github.com/repos/a/b/actions/secrets",method:"GET"}))).status,403);});
