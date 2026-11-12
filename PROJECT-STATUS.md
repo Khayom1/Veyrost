@@ -21,13 +21,14 @@ The checklist uses binary source evidence. It does not measure visual quality, u
 | Spatial layout persistence | 4 | 4 | 100.00% |
 | Protected control lifecycle | 9 | 9 | 100.00% |
 | Technician service sequence | 4 | 8 | 50.00% |
+| Interaction and repair | 6 | 6 | 100.00% |
 | Dialogue and spatial audio | 0 | 5 | 0.00% |
 | Engineering agent system | 0 | 3 | 0.00% |
 | Validation and release | 4 | 6 | 66.67% |
-| **Total** | **84** | **98** | **85.71%** |
+| **Total** | **90** | **104** | **86.54%** |
 
-- Implemented source criteria: **84 / 98**
-- Pending criteria: **14 / 98**
+- Implemented source criteria: **90 / 104**
+- Pending criteria: **14 / 104**
 - Failed source criteria: **0**
 - Any later source edit must be validated again before merge.
 
@@ -58,6 +59,16 @@ The checklist uses binary source evidence. It does not measure visual quality, u
 - The two-stage release now verifies that the lifecycle and Matter physics agree before allowing detachment. A mismatch restores the protected mount rather than leaving inconsistent state.
 - Repair requires both planar and depth bodies and completes only after the planar mount is restored.
 - Four additional source-evidence checks cover these integrity guarantees.
+
+## Phase 5 — interaction and repair
+
+- Added a guarded repair transaction with bounded stages: maintenance lock, technician tug-of-war, panel alignment, cable reconnection, verification and mount restoration.
+- The maintenance lock prevents mouse, touch and AURA input from moving the protected panel while technicians handle it.
+- Both technicians animate their arm poses during the tugging and cable-connection work.
+- A live 3D cable is drawn between the fixed mount and the detached panel; its connector travels to the panel and changes state after verification.
+- The detached panel remains under the planar and depth physics lifecycle; the sequence secures it, simulates bounded tug forces, and restores both physics bodies and the protected-control state only after verification.
+- Multiple detached protected controls are repaired sequentially. The service crew folds the ladder and departs after the final mount is restored.
+- Pause freezes the sequence; layout reset cancels it; scene disposal releases its visual resources.
 
 ## Phase 4 — service crew 3D
 
