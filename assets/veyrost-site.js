@@ -11,30 +11,31 @@ const toast = (message) => {
   window.__veyrostToastTimer=setTimeout(()=>node.classList.remove("show"),2200);
 };
 
-// Shared navigation and mobile menu.
+// Shared animated navigation: one vertical dropdown across all breakpoints.
 const menu=$("#menu-toggle");
 const mobile=$("#mobile-nav");
 const closeMobileMenu=()=>{
   mobile?.classList.remove("open");
+  mobile?.setAttribute("aria-hidden","true");
   menu?.setAttribute("aria-expanded","false");
   menu?.setAttribute("aria-label","Open navigation");
 };
 menu?.addEventListener("click",()=>{
-  const open=mobile ? !mobile.classList.contains("open") : false;
+  const open=!mobile?.classList.contains("open");
   mobile?.classList.toggle("open",open);
+  mobile?.setAttribute("aria-hidden",String(!open));
   menu.setAttribute("aria-expanded",String(open));
   menu.setAttribute("aria-label",open?"Close navigation":"Open navigation");
 });
-$("[data-close-menu]").forEach(link=>link.addEventListener("click",closeMobileMenu));
+$$("[data-close-menu]").forEach(link=>link.addEventListener("click",closeMobileMenu));
 document.addEventListener("keydown",event=>{if(event.key==="Escape")closeMobileMenu()});
 document.addEventListener("click",event=>{
   if(!mobile?.classList.contains("open"))return;
   if(event.target?.closest?.("#mobile-nav,#menu-toggle"))return;
   closeMobileMenu();
 });
-
 // Complete site localization: translate every rendered text node, not only navigation labels.
-import { dictionaries } from "./veyrost-i18n.js?v=20261112-7";
+import { dictionaries } from "./veyrost-i18n.js?v=20261112-9";
 let language="en";
 try{language=localStorage.getItem("veyrost-language")||"en"}catch(_){}
 if(!dictionaries[language])language="en";
