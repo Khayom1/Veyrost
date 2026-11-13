@@ -18,5 +18,7 @@ export function stageAt(time) {
 export function wireProgress(time, index) {
   if (!Number.isInteger(index) || index < 0 || index > 6) throw new RangeError("wire index must be 0..6");
   const start = 14 + index * 1.8;
-  return Math.max(0, Math.min(1, (time - start) / 1.1));
+  const progress = (time - start) / 1.1;
+  if (progress >= 1 - 1e-9) return 1;
+  return Math.max(0, Math.min(1, progress));
 }
