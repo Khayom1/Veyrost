@@ -59,7 +59,7 @@ export function createServiceScene(T,loader,stateLabel,notice){
  const cables=[];
  for(let i=0;i<7;i++){const curve=new T.CatmullRomCurve3([new T.Vector3(0,0,0),new T.Vector3(0,.1,0),new T.Vector3(0,.2,0)]);const mesh=new T.Mesh(new T.TubeGeometry(curve,20,.018,6,false),cableMat[i]);scene.add(mesh);cables.push(mesh)}
  const assetWarnings=[];
- const loadAsset=(url,target,kind)=>loader.load(url,g=>{target.clear();target.add(g.scene);g.scene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}})},undefined,()=>assetWarnings.push(kind+" GLB missing; procedural proxy active"));
+ const loadAsset=(url,target,kind)=>loader.load(url,g=>{g.scene.name=kind+"-glb";target.add(g.scene);g.scene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});if(g.animations?.length) notice.textContent=kind+" GLB loaded ("+g.animations.length+" clips); rig binding pending";},undefined,()=>assetWarnings.push(kind+" GLB missing; procedural proxy active"));
  // Hybrid asset hooks: add files to 3d/assets when licensed, optimized GLBs are available.
  const ASSET_BASE="./assets/";
  loadAsset(ASSET_BASE+"service-vehicle.glb",vehicle,"vehicle");
