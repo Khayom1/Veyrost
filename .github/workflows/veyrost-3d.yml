@@ -1,0 +1,32 @@
+name: VEYROST 3D prototype checks
+on:
+  push:
+    branches:
+      - feature/veyrost-3d-parallel
+  pull_request:
+    branches:
+      - main
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntax-check 3D modules
+        run: |
+          node --check 3d/src/main.js
+          node --check 3d/src/scene.js
+          node --check 3d/src/sequence-contract.mjs
+      - name: Test deterministic sequence
+        run: node --test tests/veyrost-3d-sequence.test.mjs
+      - name: Verify parallel scene entry points
+        run: |
+          test -f 3d/index.html
+          grep -q 'src/main.js' 3d/index.html
+          grep -q 'service-vehicle.glb' 3d/src/scene.js
+          grep -q 'robot-technician.glb' 3d/src/scene.js
+          grep -q 'robot-assistant.glb' 3d/src/scene.js
