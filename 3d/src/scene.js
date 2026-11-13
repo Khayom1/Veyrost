@@ -81,9 +81,23 @@ export function createServiceScene(T,loader,stateLabel,notice){
   notice.textContent="Vehicle GLB loaded · "+(left&&right?"hinge pivots detected":"door pivot nodes not found");
  }
  const ASSET_BASE="./assets/";
- loader.load(ASSET_BASE+"service-vehicle.glb",bindVehicleAsset,undefined,()=>assetWarnings.push("vehicle GLB missing; procedural proxy active"));
- loader.load(ASSET_BASE+"robot-technician.glb",g=>bindRobotAsset(tech,g,"technician"),undefined,()=>assetWarnings.push("technician GLB missing; procedural proxy active"));
- loader.load(ASSET_BASE+"robot-assistant.glb",g=>bindRobotAsset(assistant,g,"assistant"),undefined,()=>assetWarnings.push("assistant GLB missing; procedural proxy active"));
+ async function loadGLBAsset(filename,onLoad,onError){
+  try{
+   const response=await fetch(ASSET_BASE+filename+".gz");
+   if(!response.ok)throw new Error("HTTP "+response.status+" for "+filename+".gz");
+   if(typeof DecompressionStream!=="function")throw new Error("This browser cannot decompress gzip GLB assets");
+   const compressed=await response.arrayBuffer();
+   const stream=new Blob([compressed]).stream().pipeThrough(new DecompressionStream("gzip"));
+   const data=await new Response(stream).arrayBuffer();
+   loader.parse(data,ASSET_BASE,onLoad,onError);
+  }catch(error){
+   // Allows a developer to use unpacked .glb files when running a local asset-editing build.
+   loader.load(ASSET_BASE+filename,onLoad,undefined,onError);
+  }
+ }
+ loadGLBAsset("service-vehicle.glb",bindVehicleAsset,()=>assetWarnings.push("vehicle GLB unavailable; procedural proxy active"));
+ loadGLBAsset("robot-technician.glb",g=>bindRobotAsset(tech,g,"technician"),()=>assetWarnings.push("technician GLB unavailable; procedural proxy active"));
+ loadGLBAsset("robot-assistant.glb",g=>bindRobotAsset(assistant,g,"assistant"),()=>assetWarnings.push("assistant GLB unavailable; procedural proxy active"));
  function getHandWorld(actor,side){
   actor.root.updateMatrixWorld(true);
   const bone=actor.rig?.bones[`hand_${side}`];
