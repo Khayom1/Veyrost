@@ -21,12 +21,12 @@ export function createServiceScene(T,loader,stateLabel,notice){
  const sockets=[];
  for(let i=0;i<7;i++){const s=new T.Mesh(new T.CylinderGeometry(.055,.055,.035,12),gold);s.rotation.x=Math.PI/2;s.position.set(-.48+i*.16,-.42,.24);mount.add(s);sockets.push(s)}
  // Procedural vehicle placeholder; replace by optimized Blender GLB via VEHICLE_ASSET.
- const vehicle=new T.Group();vehicle.position.set(-5,0,2.5);scene.add(vehicle);
- const body=new T.Mesh(new T.BoxGeometry(3.2,1.35,1.65),white);body.position.y=1.05;body.castShadow=true;vehicle.add(body);
- const cabin=new T.Mesh(new T.BoxGeometry(1.7,.9,1.5),dark);cabin.position.set(-.15,2.05,0);vehicle.add(cabin);
- const wind=new T.Mesh(new T.BoxGeometry(1.15,.56,.035),mat(0x4d8095,.55,.15));wind.position.set(.35,2.08,.77);vehicle.add(wind);
- const wheels=[];for(const x of [-1.05,1.05])for(const z of [-.83,.83]){const w=new T.Mesh(new T.CylinderGeometry(.38,.38,.2,24),dark);w.rotation.x=Math.PI/2;w.position.set(x,.48,z);w.castShadow=true;vehicle.add(w);wheels.push(w)}
- function makeDoor(side){const pivot=new T.Group();pivot.position.set(side*1.15,1.55,side*.79);vehicle.add(pivot);const d=new T.Mesh(new T.BoxGeometry(.85,1.05,.09),white);d.position.set(side*.42,-.12,0);d.castShadow=true;pivot.add(d);return pivot}
+ const vehicle=new T.Group();vehicle.position.set(-5,0,2.5);scene.add(vehicle);const vehicleProxy=new T.Group();vehicle.add(vehicleProxy);
+ const body=new T.Mesh(new T.BoxGeometry(3.2,1.35,1.65),white);body.position.y=1.05;body.castShadow=true;vehicleProxy.add(body);
+ const cabin=new T.Mesh(new T.BoxGeometry(1.7,.9,1.5),dark);cabin.position.set(-.15,2.05,0);vehicleProxy.add(cabin);
+ const wind=new T.Mesh(new T.BoxGeometry(1.15,.56,.035),mat(0x4d8095,.55,.15));wind.position.set(.35,2.08,.77);vehicleProxy.add(wind);
+ const wheels=[];for(const x of [-1.05,1.05])for(const z of [-.83,.83]){const w=new T.Mesh(new T.CylinderGeometry(.38,.38,.2,24),dark);w.rotation.x=Math.PI/2;w.position.set(x,.48,z);w.castShadow=true;vehicleProxy.add(w);wheels.push(w)}
+ function makeDoor(side){const pivot=new T.Group();pivot.position.set(side*1.15,1.55,side*.79);vehicleProxy.add(pivot);const d=new T.Mesh(new T.BoxGeometry(.85,1.05,.09),white);d.position.set(side*.42,-.12,0);d.castShadow=true;pivot.add(d);return pivot}
  const leftDoor=makeDoor(-1),rightDoor=makeDoor(1);
  // Articulated procedural stand-in with pivots; replace by skinned Blender rigs for production.
  function makeRobot(color){
@@ -71,18 +71,65 @@ export function createServiceScene(T,loader,stateLabel,notice){
   notice.textContent=kind+" skinned GLB loaded · "+Object.keys(bones).length+" bones · "+Object.keys(actions).length+" clips";
  }
  function bindVehicleAsset(gltf){
+  vehicleProxy.visible=false;
   const model=gltf.scene;model.name="service-vehicle-glb";vehicle.add(model);
   model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});
   const left=model.getObjectByName("door_left_pivot")||model.getObjectByName("Door_Left_Pivot");
   const right=model.getObjectByName("door_right_pivot")||model.getObjectByName("Door_Right_Pivot");
-  if(left){vehicle.remove(leftDoor);vehicle.userData.leftDoor=left}
-  if(right){vehicle.remove(rightDoor);vehicle.userData.rightDoor=right}
+  if(left){leftDoor.parent?.remove(leftDoor);vehicle.userData.leftDoor=left}
+  if(right){rightDoor.parent?.remove(rightDoor);vehicle.userData.rightDoor=right}
   notice.textContent="Vehicle GLB loaded · "+(left&&right?"hinge pivots detected":"door pivot nodes not found");
  }
  const ASSET_BASE="./assets/";
  loader.load(ASSET_BASE+"service-vehicle.glb",bindVehicleAsset,undefined,()=>assetWarnings.push("vehicle GLB missing; procedural proxy active"));
  loader.load(ASSET_BASE+"robot-technician.glb",g=>bindRobotAsset(tech,g,"technician"),undefined,()=>assetWarnings.push("technician GLB missing; procedural proxy active"));
  loader.load(ASSET_BASE+"robot-assistant.glb",g=>bindRobotAsset(assistant,g,"assistant"),undefined,()=>assetWarnings.push("assistant GLB missing; procedural proxy active"));
+ function getHandWorld(actor,side){
+  actor.root.updateMatrixWorld(true);
+  const bone=actor.rig?.bones[`hand_${side}`];
+  if(bone)return bone.getWorldPosition(new T.Vector3());
+  return actor.limbs[side==="r"?1:0].hand.getWorldPosition(new T.Vector3());
+ }
+ function aimSkinnedArm(actor,side,target){
+  const rig=actor.rig;if(!rig)return;
+  const upper=rig.bones[`upper_arm_${side}`],fore=rig.bones[`forearm_${side}`],hand=rig.bones[`hand_${side}`];
+  if(!upper||!fore||!hand)return;
+  actor.root.updateMatrixWorld(true);
+  const shoulder=upper.getWorldPosition(new T.Vector3());
+  const upperLength=fore.position.length(),foreLength=hand.position.length();
+  const delta=target.clone().sub(shoulder),rawDistance=delta.length();
+  const distance=clamp(rawDistance,Math.abs(upperLength-foreLength)+.015,upperLength+foreLength-.015);
+  const direction=delta.normalize();
+  const pole=new T.Vector3(side==="l"?-1:1,0,0);
+  let perpendicular=new T.Vector3().crossVectors(direction,pole);
+  if(perpendicular.lengthSq()<1e-5)perpendicular.crossVectors(direction,new T.Vector3(0,1,0));
+  perpendicular.normalize();
+  const along=(upperLength*upperLength-foreLength*foreLength+distance*distance)/(2*distance);
+  const height=Math.sqrt(Math.max(0,upperLength*upperLength-along*along));
+  const elbowTarget=shoulder.clone().addScaledVector(direction,along).addScaledVector(perpendicular,height);
+  const aimBone=(bone,child,from,to)=>{
+   const parent=bone.parent;
+   parent.updateWorldMatrix(true,false);
+   const inverse=parent.getWorldQuaternion(new T.Quaternion()).invert();
+   const localDirection=to.clone().sub(from).normalize().applyQuaternion(inverse);
+   const restDirection=child.position.clone().normalize();
+   bone.quaternion.setFromUnitVectors(restDirection,localDirection);
+   actor.root.updateMatrixWorld(true);
+  };
+  aimBone(upper,fore,shoulder,elbowTarget);
+  const elbow=fore.getWorldPosition(new T.Vector3());
+  aimBone(fore,hand,elbow,target);
+  actor.root.updateMatrixWorld(true);
+ }
+ function updateCableMeshes(time){
+  cables.forEach((c,i)=>{
+   const progress=wireProgress(time,i),end=sockets[i].getWorldPosition(new T.Vector3());
+   const start=getHandWorld(assistant,"r"),tip=start.clone().lerp(end,progress);
+   const curve=new T.CatmullRomCurve3([start,new T.Vector3((start.x+end.x)/2,1.65,-2.0),tip]);
+   c.geometry.dispose();c.geometry=new T.TubeGeometry(curve,18,.018,6,false);
+   c.visible=time>=14+i*1.8;c.userData.locked=progress>=1;
+  });
+ }
  function setRigAction(actor,state){
   if(!actor.rig)return;
   const wanted=Object.keys(actor.rig.actions).find(name=>rigAliases[state].some(alias=>name.includes(alias)));
@@ -111,6 +158,11 @@ export function createServiceScene(T,loader,stateLabel,notice){
   }
   // Button is detached during the repair interval, then returned to its mount.
   const detached=t>=11&&t<31;
+  tech.ikTargets=detached?[
+   {side:"l",target:new T.Vector3(.57,2.03,-2.35)},
+   {side:"r",target:new T.Vector3(1.13,2.03,-2.35)}
+  ]:[];
+
   if(detached){mount.remove(button);scene.add(button);button.position.set(.85,2.05,-2.35);button.rotation.y=-.16}
   else{if(button.parent!==mount){scene.remove(button);mount.add(button)}button.position.set(0,0,0);button.rotation.set(0,0,0)}
   // Two-bone IK aims both technician hands at the detached MENU.
@@ -126,22 +178,29 @@ export function createServiceScene(T,loader,stateLabel,notice){
    aimArm(tech,tech.limbs[0],center.clone().add(new T.Vector3(-.28,-.02,0)));
    aimArm(tech,tech.limbs[1],center.clone().add(new T.Vector3(.28,-.02,0)));
   }
-  // Each cable is routed from the assistant hand to an individual socket.
-  cables.forEach((c,i)=>{
-   const progress=wireProgress(t,i),active=t>=14+i*1.8&&t<15.1+i*1.8;
-   const end=sockets[i].getWorldPosition(new T.Vector3());
-   const start=assistant.limbs[1].hand.getWorldPosition(new T.Vector3());
-   const tip=start.clone().lerp(end,progress);
-   const curve=new T.CatmullRomCurve3([start,new T.Vector3((start.x+end.x)/2,1.65,-2.0),tip]);
-   c.geometry.dispose();c.geometry=new T.TubeGeometry(curve,18,.018,6,false);c.visible=t>=14+i*1.8;
-   if(active) aimArm(assistant,assistant.limbs[1],end.clone().add(new T.Vector3(0,.04,.08)));
-   c.userData.locked=progress>=1;
-  });
+  assistant.ikTargets=[];
+  for(let i=0;i<7;i++){
+   const active=t>=14+i*1.8&&t<15.1+i*1.8;
+   if(active){
+    const end=sockets[i].getWorldPosition(new T.Vector3());
+    assistant.ikTargets=[{side:"r",target:end.clone().add(new T.Vector3(0,.04,.08))}];
+    aimArm(assistant,assistant.limbs[1],end.clone().add(new T.Vector3(0,.04,.08)));
+    break;
+   }
+  }
   stateLabel.textContent=stageAt(t).replaceAll("_"," ");
   if(t>=seq.duration){seq.running=false;stateLabel.textContent="SEQUENCE COMPLETE"}
  }
  updatePose(0);
- function update(dt){if(seq.running){seq.time+=dt;updatePose(Math.min(seq.time,seq.duration))}for(const actor of [tech,assistant])actor.rig?.mixer.update(dt)}
+ function update(dt){
+  if(seq.running){seq.time+=dt;updatePose(Math.min(seq.time,seq.duration))}
+  for(const actor of [tech,assistant])actor.rig?.mixer.update(dt);
+  for(const actor of [tech,assistant]){
+   for(const target of actor.ikTargets||[])aimSkinnedArm(actor,target.side,target.target);
+   actor.root.updateMatrixWorld(true);
+  }
+  updateCableMeshes(seq.time);
+ }
  function setQuality(tier){const max=tier==="cinematic"?1536:tier==="balanced"?1024:512;key.shadow.mapSize.set(max,max);key.shadow.needsUpdate=true}
  return {scene,camera,sequence:seq,update, setQuality};
 }
