@@ -137,11 +137,15 @@ export function createServiceScene(T,loader,stateLabel,notice){
  }
  function updateCableMeshes(time){
   cables.forEach((c,i)=>{
+   const startTime=14+i*1.8;
+   if(time<startTime){c.visible=false;c.userData.locked=false;return}
+   if(c.userData.locked)return;
    const progress=wireProgress(time,i),end=sockets[i].getWorldPosition(new T.Vector3());
    const start=getHandWorld(assistant,"r"),tip=start.clone().lerp(end,progress);
    const curve=new T.CatmullRomCurve3([start,new T.Vector3((start.x+end.x)/2,1.65,-2.0),tip]);
    c.geometry.dispose();c.geometry=new T.TubeGeometry(curve,18,.018,6,false);
-   c.visible=time>=14+i*1.8;c.userData.locked=progress>=1;
+   c.visible=true;
+   c.userData.locked=progress>=1;
   });
  }
  function setRigAction(actor,state){
@@ -150,7 +154,7 @@ export function createServiceScene(T,loader,stateLabel,notice){
   if(wanted===actor.rig.active)return;
   if(actor.rig.active)actor.rig.actions[actor.rig.active]?.fadeOut(.18);
   if(wanted){actor.rig.actions[wanted].reset().fadeIn(.18).play();actor.rig.active=wanted}else actor.rig.active=null;
- } const seq={time:0,running:false,duration:SEQUENCE_DURATION,play(){this.running=true;this.time=0;},reset(){this.running=false;this.time=0;updatePose(0)}};
+ } const seq={time:0,running:false,duration:SEQUENCE_DURATION,lastCableUpdate:-Infinity,play(){this.running=true;this.time=0;this.lastCableUpdate=-Infinity;updateCableMeshes(0);},reset(){this.running=false;this.time=0;updatePose(0);updateCableMeshes(0);this.lastCableUpdate=0}};
  function updatePose(t){
   const phase=(start,end)=>smooth((t-start)/(end-start));
   const approach=phase(0,3),doorsOut=phase(3,4),exit=phase(4,7),walk=phase(7,11),repair=phase(11,31),returnWalk=phase(35,40),board=phase(40,44),depart=phase(44,46);
@@ -207,13 +211,15 @@ export function createServiceScene(T,loader,stateLabel,notice){
  }
  updatePose(0);
  function update(dt){
-  if(seq.running){seq.time+=dt;updatePose(Math.min(seq.time,seq.duration))}
+  if(seq.running){
+   seq.time+=dt;updatePose(Math.min(seq.time,seq.duration));
+   if(seq.time-seq.lastCableUpdate>=.08){updateCableMeshes(seq.time);seq.lastCableUpdate=seq.time}
+  }
   for(const actor of [tech,assistant])actor.rig?.mixer.update(dt);
   for(const actor of [tech,assistant]){
    for(const target of actor.ikTargets||[])aimSkinnedArm(actor,target.side,target.target);
    actor.root.updateMatrixWorld(true);
   }
-  updateCableMeshes(seq.time);
  }
  function setQuality(tier){const max=tier==="cinematic"?1536:tier==="balanced"?1024:512;key.shadow.mapSize.set(max,max);key.shadow.needsUpdate=true}
  return {scene,camera,sequence:seq,update, setQuality};
