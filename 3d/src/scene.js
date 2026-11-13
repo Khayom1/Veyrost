@@ -30,28 +30,28 @@ export function createServiceScene(T,loader,stateLabel,notice){
  const leftDoor=makeDoor(-1),rightDoor=makeDoor(1);
  // Articulated procedural stand-in with pivots; replace by skinned Blender rigs for production.
  function makeRobot(color){
-  const root=new T.Group();scene.add(root);const shell=mat(color,.72,.24),joint=mat(0x242d3a,.75,.3),glow=mat(0x67e7f0,.35,.2);
-  const torso=new T.Mesh(new T.BoxGeometry(.58,.76,.34),shell);torso.position.y=1.35;root.add(torso);
-  const chest=new T.Mesh(new T.BoxGeometry(.34,.12,.025),glow);chest.position.set(0,1.45,.18);root.add(chest);
-  const head=new T.Mesh(new T.BoxGeometry(.4,.38,.36),shell);head.position.y=1.95;root.add(head);
-  const visor=new T.Mesh(new T.BoxGeometry(.29,.1,.025),glow);visor.position.set(0,1.98,.19);root.add(visor);
+  const root=new T.Group();scene.add(root);const proxy=new T.Group();root.add(proxy);const shell=mat(color,.72,.24),joint=mat(0x242d3a,.75,.3),glow=mat(0x67e7f0,.35,.2);
+  const torso=new T.Mesh(new T.BoxGeometry(.58,.76,.34),shell);torso.position.y=1.35;proxy.add(torso);
+  const chest=new T.Mesh(new T.BoxGeometry(.34,.12,.025),glow);chest.position.set(0,1.45,.18);proxy.add(chest);
+  const head=new T.Mesh(new T.BoxGeometry(.4,.38,.36),shell);head.position.y=1.95;proxy.add(head);
+  const visor=new T.Mesh(new T.BoxGeometry(.29,.1,.025),glow);visor.position.set(0,1.98,.19);proxy.add(visor);
   const limbs=[];
   for(const side of [-1,1]){
-   const shoulder=new T.Group();shoulder.position.set(side*.38,1.62,0);root.add(shoulder);
+   const shoulder=new T.Group();shoulder.position.set(side*.38,1.62,0);proxy.add(shoulder);
    const upper=new T.Mesh(new T.CylinderGeometry(.105,.13,.48,12),shell);upper.position.y=-.25;shoulder.add(upper);
    const elbow=new T.Group();elbow.position.y=-.5;shoulder.add(elbow);
    const fore=new T.Mesh(new T.CylinderGeometry(.075,.095,.43,12),joint);fore.position.y=-.21;elbow.add(fore);
    const hand=new T.Group();hand.position.y=-.43;elbow.add(hand);
    const palm=new T.Mesh(new T.BoxGeometry(.16,.1,.2),shell);hand.add(palm);
    for(let f=0;f<4;f++){const finger=new T.Mesh(new T.BoxGeometry(.025,.12,.035),joint);finger.position.set(-.06+f*.04,-.09,.07);hand.add(finger)}
-   const hip=new T.Group();hip.position.set(side*.19,.98,0);root.add(hip);
+   const hip=new T.Group();hip.position.set(side*.19,.98,0);proxy.add(hip);
    const thigh=new T.Mesh(new T.CylinderGeometry(.12,.15,.48,12),shell);thigh.position.y=-.24;hip.add(thigh);
    const knee=new T.Group();knee.position.y=-.48;hip.add(knee);
    const shin=new T.Mesh(new T.CylinderGeometry(.075,.11,.43,12),joint);shin.position.y=-.21;knee.add(shin);
    const foot=new T.Mesh(new T.BoxGeometry(.2,.1,.34),shell);foot.position.set(0,-.45,.1);knee.add(foot);
    limbs.push({shoulder,elbow,hand,hip,knee,side});
   }
-  root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});return {root,limbs};
+  root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});return {root,proxy,limbs,rig:null};
  }
  const tech=makeRobot(0xbcc8d8),assistant=makeRobot(0x657caa);
  tech.root.position.set(1.05,0,-2.0);assistant.root.position.set(-1.2,0,-2.0);
@@ -59,19 +59,44 @@ export function createServiceScene(T,loader,stateLabel,notice){
  const cables=[];
  for(let i=0;i<7;i++){const curve=new T.CatmullRomCurve3([new T.Vector3(0,0,0),new T.Vector3(0,.1,0),new T.Vector3(0,.2,0)]);const mesh=new T.Mesh(new T.TubeGeometry(curve,20,.018,6,false),cableMat[i]);scene.add(mesh);cables.push(mesh)}
  const assetWarnings=[];
- const loadAsset=(url,target,kind)=>loader.load(url,g=>{g.scene.name=kind+"-glb";target.add(g.scene);g.scene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});if(g.animations?.length) notice.textContent=kind+" GLB loaded ("+g.animations.length+" clips); rig binding pending";},undefined,()=>assetWarnings.push(kind+" GLB missing; procedural proxy active"));
- // Hybrid asset hooks: add files to 3d/assets when licensed, optimized GLBs are available.
+ const rigAliases={idle:["idle","stand","breathing"],walk:["walk","walking","locomotion"],repair:["repair","work","working","connect"],board:["enter","boarding","sit"]};
+ function bindRobotAsset(actor,gltf,kind){
+  actor.proxy.visible=false;
+  const model=gltf.scene;model.name=kind+"-skinned-rig";actor.root.add(model);
+  model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});
+  const bones={};model.traverse(o=>{if(o.isBone)bones[o.name.toLowerCase()]=o});
+  const mixer=new T.AnimationMixer(model),actions={};
+  for(const clip of gltf.animations||[]){actions[clip.name.toLowerCase()]=mixer.clipAction(clip)}
+  actor.rig={mixer,actions,bones,model,active:null};
+  notice.textContent=kind+" skinned GLB loaded · "+Object.keys(bones).length+" bones · "+Object.keys(actions).length+" clips";
+ }
+ function bindVehicleAsset(gltf){
+  const model=gltf.scene;model.name="service-vehicle-glb";vehicle.add(model);
+  model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});
+  const left=model.getObjectByName("door_left_pivot")||model.getObjectByName("Door_Left_Pivot");
+  const right=model.getObjectByName("door_right_pivot")||model.getObjectByName("Door_Right_Pivot");
+  if(left){vehicle.remove(leftDoor);vehicle.userData.leftDoor=left}
+  if(right){vehicle.remove(rightDoor);vehicle.userData.rightDoor=right}
+  notice.textContent="Vehicle GLB loaded · "+(left&&right?"hinge pivots detected":"door pivot nodes not found");
+ }
  const ASSET_BASE="./assets/";
- loadAsset(ASSET_BASE+"service-vehicle.glb",vehicle,"vehicle");
- loadAsset(ASSET_BASE+"robot-technician.glb",tech.root,"technician");
- loadAsset(ASSET_BASE+"robot-assistant.glb",assistant.root,"assistant");
- const seq={time:0,running:false,duration:SEQUENCE_DURATION,play(){this.running=true;this.time=0;},reset(){this.running=false;this.time=0;updatePose(0)}};
+ loader.load(ASSET_BASE+"service-vehicle.glb",bindVehicleAsset,undefined,()=>assetWarnings.push("vehicle GLB missing; procedural proxy active"));
+ loader.load(ASSET_BASE+"robot-technician.glb",g=>bindRobotAsset(tech,g,"technician"),undefined,()=>assetWarnings.push("technician GLB missing; procedural proxy active"));
+ loader.load(ASSET_BASE+"robot-assistant.glb",g=>bindRobotAsset(assistant,g,"assistant"),undefined,()=>assetWarnings.push("assistant GLB missing; procedural proxy active"));
+ function setRigAction(actor,state){
+  if(!actor.rig)return;
+  const wanted=Object.keys(actor.rig.actions).find(name=>rigAliases[state].some(alias=>name.includes(alias)));
+  if(wanted===actor.rig.active)return;
+  if(actor.rig.active)actor.rig.actions[actor.rig.active]?.fadeOut(.18);
+  if(wanted){actor.rig.actions[wanted].reset().fadeIn(.18).play();actor.rig.active=wanted}else actor.rig.active=null;
+ } const seq={time:0,running:false,duration:SEQUENCE_DURATION,play(){this.running=true;this.time=0;},reset(){this.running=false;this.time=0;updatePose(0)}};
  function updatePose(t){
   const phase=(start,end)=>smooth((t-start)/(end-start));
   const approach=phase(0,3),doorsOut=phase(3,4),exit=phase(4,7),walk=phase(7,11),repair=phase(11,31),returnWalk=phase(35,40),board=phase(40,44),depart=phase(44,46);
   vehicle.position.x=-5+approach*1.5-depart*7;
-  leftDoor.rotation.y=-doorsOut*.95+phase(40,41)*.95;
-  rightDoor.rotation.y=doorsOut*.95-phase(40,41)*.95;
+  const doorL=vehicle.userData.leftDoor||leftDoor,doorR=vehicle.userData.rightDoor||rightDoor;
+  doorL.rotation.y=-doorsOut*.95+phase(40,41)*.95;
+  doorR.rotation.y=doorsOut*.95-phase(40,41)*.95;
   const p1=new T.Vector3(-.95,0,.9),p2=new T.Vector3(.95,0,.9);
   for(const [i,actor] of [[0,tech],[1,assistant]]){
    const startX=i===0?-4:-4.8,goalX=i===0?1.05:-1.2;
@@ -81,6 +106,8 @@ export function createServiceScene(T,loader,stateLabel,notice){
    actor.root.rotation.y=repair>.05&&repair<.8?(i===0?-.18:.18):0;
    const gait=walk>0&&walk<1?Math.sin(t*9+i)*.55:returnWalk>0&&returnWalk<1?Math.sin(t*9+i)*.55:0;
    actor.limbs.forEach((l,j)=>{l.hip.rotation.x=(j===0?1:-1)*gait;l.knee.rotation.x=Math.max(0,-gait)*.8;l.shoulder.rotation.x=-gait*.45;l.elbow.rotation.z=i===0?-.35:.15});
+   const rigState=((walk>0&&walk<1)||(returnWalk>0&&returnWalk<1))?"walk":repair>0&&repair<1?"repair":board>0&&board<1?"board":"idle";
+   setRigAction(actor,rigState);
   }
   // Button is detached during the repair interval, then returned to its mount.
   const detached=t>=11&&t<31;
@@ -114,7 +141,7 @@ export function createServiceScene(T,loader,stateLabel,notice){
   if(t>=seq.duration){seq.running=false;stateLabel.textContent="SEQUENCE COMPLETE"}
  }
  updatePose(0);
- function update(dt){if(seq.running){seq.time+=dt;updatePose(Math.min(seq.time,seq.duration))}}
+ function update(dt){if(seq.running){seq.time+=dt;updatePose(Math.min(seq.time,seq.duration))}for(const actor of [tech,assistant])actor.rig?.mixer.update(dt)}
  function setQuality(tier){const max=tier==="cinematic"?1536:tier==="balanced"?1024:512;key.shadow.mapSize.set(max,max);key.shadow.needsUpdate=true}
  return {scene,camera,sequence:seq,update, setQuality};
 }
