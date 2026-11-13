@@ -3,16 +3,21 @@ on:
   push:
     branches:
       - feature/veyrost-3d-parallel
+    paths-ignore:
+      - "3d/assets/*.glb"
+      - "3d/assets/*.glb.gz"
   pull_request:
     branches:
       - main
 permissions:
-  contents: read
+  contents: write
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Generate deterministic GLB models
+        run: python3 3d/tools/generate_assets.py
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -22,7 +27,7 @@ jobs:
           node --check 3d/src/scene.js
           node --check 3d/src/sequence-contract.mjs
           node --check 3d/src/ik.mjs
-      - name: Test deterministic sequence
+      - name: Test deterministic sequence and GLB structure
         run: node --test tests/veyrost-3d-*.test.mjs
       - name: Verify parallel scene entry points
         run: |
@@ -31,3 +36,15 @@ jobs:
           grep -q 'service-vehicle.glb' 3d/src/scene.js
           grep -q 'robot-technician.glb' 3d/src/scene.js
           grep -q 'robot-assistant.glb' 3d/src/scene.js
+      - name: Commit generated GLB files to the feature branch
+        if: github.event_name == 'push'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add 3d/assets/*.glb 3d/assets/*.glb.gz
+          if git diff --cached --quiet; then
+            echo "Generated assets are already up to date."
+          else
+            git commit -m "build(3d): generate rigged GLB model assets"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
