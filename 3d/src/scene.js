@@ -1,3 +1,4 @@
+import { SEQUENCE_DURATION, stageAt, wireProgress } from "./sequence-contract.mjs";
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const smooth=t=>{t=clamp(t,0,1);return t*t*(3-2*t)};
 export function createServiceScene(T,loader,stateLabel,notice){
@@ -63,7 +64,7 @@ export function createServiceScene(T,loader,stateLabel,notice){
  loadAsset(ASSET_BASE+"service-vehicle.glb",vehicle,"vehicle");
  loadAsset(ASSET_BASE+"robot-technician.glb",tech.root,"technician");
  loadAsset(ASSET_BASE+"robot-assistant.glb",assistant.root,"assistant");
- const seq={time:0,running:false,duration:46,play(){this.running=true;this.time=0;},reset(){this.running=false;this.time=0;updatePose(0)}};
+ const seq={time:0,running:false,duration:SEQUENCE_DURATION,play(){this.running=true;this.time=0;},reset(){this.running=false;this.time=0;updatePose(0)}};
  function updatePose(t){
   const phase=(start,end)=>smooth((t-start)/(end-start));
   const approach=phase(0,3),doorsOut=phase(3,4),exit=phase(4,7),walk=phase(7,11),repair=phase(11,31),returnWalk=phase(35,40),board=phase(40,44),depart=phase(44,46);
@@ -86,13 +87,13 @@ export function createServiceScene(T,loader,stateLabel,notice){
   else{if(button.parent!==mount){scene.remove(button);mount.add(button)}button.position.set(0,0,0);button.rotation.set(0,0,0)}
   // Cable tips travel to sockets one by one. The current proxy is visual-only; final pass adds hand IK + connector locking.
   cables.forEach((c,i)=>{
-   const progress=clamp((t-(14+i*1.8))/1.1,0,1),active=t>=14+i*1.8&&t<15.1+i*1.8;
+   const progress=wireProgress(t,i),active=t>=14+i*1.8&&t<15.1+i*1.8;
    const start=new T.Vector3(-.8+i*.06,1.4,1.7),end=sockets[i].getWorldPosition(new T.Vector3());
    const tip=start.clone().lerp(end,progress);
    const curve=new T.CatmullRomCurve3([start,new T.Vector3((start.x+end.x)/2,1.2+Math.sin(t+i)*.08,1.8),tip]);
    c.geometry.dispose();c.geometry=new T.TubeGeometry(curve,16,.018,6,false);c.visible=active||progress>=1;
   });
-  stateLabel.textContent=t<3?"VEHICLE APPROACH":t<4?"SIDE DOORS OPEN":t<7?"TECHNICIANS EXIT":t<11?"WALK TO SERVICE PANEL":t<31?"INDIVIDUAL WIRE CONNECTIONS":t<35?"MENU REINSTALL":t<40?"RETURN TO VEHICLE":t<44?"BOARDING / DOORS CLOSE":"VEHICLE DEPARTURE";
+  stateLabel.textContent=stageAt(t).replaceAll("_"," ");
   if(t>=seq.duration){seq.running=false;stateLabel.textContent="SEQUENCE COMPLETE"}
  }
  updatePose(0);
