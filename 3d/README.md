@@ -33,3 +33,15 @@ Open `3d/index.html` through a static web server. The page imports Three.js modu
 4. Each wire is individually gripped, routed, inserted into a socket and locked.
 5. Scene can complete and reset deterministically.
 6. Test on target Android hardware; maintain adaptive quality and graceful WebGL failure.
+
+
+## Delivered GLB models
+
+The three runtime assets are stored in `3d/assets/*.glb.gz` to reduce repository and transfer size. The scene decompresses them in-browser and parses the resulting glTF 2.0 bytes through GLTFLoader.
+
+- Vehicle: separate body panels plus `door_left_pivot` and `door_right_pivot` nodes.
+- Technician and assistant: independent 50-joint weighted skeletons, including three joints for each of the five fingers on both hands.
+- Robot clips: `Idle`, `Walk`, `Repair`, `Board`.
+- Asset structure, skin attributes, joint names, animation channels, and door hierarchy are covered by `tests/veyrost-3d-assets.test.mjs`.
+
+**Production status:** These are procedural rigged starter assets, not final bespoke Blender-quality cinematic sculpts. The skeletons and GLB structures are real; final visual sculpting, hand-pose authoring, calibrated foot locking, robust IK pole controls, collision-aware contact, and on-device visual acceptance remain open gates.
