@@ -1,4 +1,5 @@
 import { SEQUENCE_DURATION, stageAt, wireProgress } from "./sequence-contract.mjs";
+import { solvePlanarTwoBone } from "./ik.mjs";
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const smooth=t=>{t=clamp(t,0,1);return t*t*(3-2*t)};
 export function createServiceScene(T,loader,stateLabel,notice){
@@ -53,10 +54,10 @@ export function createServiceScene(T,loader,stateLabel,notice){
   root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});return {root,limbs};
  }
  const tech=makeRobot(0xbcc8d8),assistant=makeRobot(0x657caa);
- tech.root.position.set(-4,0,1.6);assistant.root.position.set(-4.8,0,1.6);
+ tech.root.position.set(1.05,0,-2.0);assistant.root.position.set(-1.2,0,-2.0);
  const cableMat=[0xe1b75f,0x4fd3dc,0xe66c73,0x8bc18b,0x9c8cff,0xd6e2ee,0xd68b54].map(c=>mat(c,.25,.32));
  const cables=[];
- for(let i=0;i<7;i++){const curve=new T.CatmullRomCurve3([new T.Vector3(0,0,0),new T.Vector3(0,.1,0),new T.Vector3(0,.2,0)]);const mesh=new T.Mesh(new T.TubeGeometry(curve,20,.018,6,false),cableMat[i]);wall.add(mesh);cables.push(mesh)}
+ for(let i=0;i<7;i++){const curve=new T.CatmullRomCurve3([new T.Vector3(0,0,0),new T.Vector3(0,.1,0),new T.Vector3(0,.2,0)]);const mesh=new T.Mesh(new T.TubeGeometry(curve,20,.018,6,false),cableMat[i]);scene.add(mesh);cables.push(mesh)}
  const assetWarnings=[];
  const loadAsset=(url,target,kind)=>loader.load(url,g=>{target.clear();target.add(g.scene);g.scene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}})},undefined,()=>assetWarnings.push(kind+" GLB missing; procedural proxy active"));
  // Hybrid asset hooks: add files to 3d/assets when licensed, optimized GLBs are available.
@@ -73,9 +74,9 @@ export function createServiceScene(T,loader,stateLabel,notice){
   rightDoor.rotation.y=doorsOut*.95-phase(40,41)*.95;
   const p1=new T.Vector3(-.95,0,.9),p2=new T.Vector3(.95,0,.9);
   for(const [i,actor] of [[0,tech],[1,assistant]]){
-   const startX=i===0?-4:-4.8,goalX=i===0?1.5:-1.5;
+   const startX=i===0?-4:-4.8,goalX=i===0?1.05:-1.2;
    const out=clamp((walk-.0),0,1),back=returnWalk;
-   actor.root.position.set(startX+(goalX-startX)*out+(startX-goalX)*back,0,1.6);
+   actor.root.position.set(startX+(goalX-startX)*out+(startX-goalX)*back,0,-2.0);
    actor.root.position.x+=board*(i===0?-.3:.3);
    actor.root.rotation.y=repair>.05&&repair<.8?(i===0?-.18:.18):0;
    const gait=walk>0&&walk<1?Math.sin(t*9+i)*.55:returnWalk>0&&returnWalk<1?Math.sin(t*9+i)*.55:0;
@@ -83,15 +84,31 @@ export function createServiceScene(T,loader,stateLabel,notice){
   }
   // Button is detached during the repair interval, then returned to its mount.
   const detached=t>=11&&t<31;
-  if(detached){mount.remove(button);scene.add(button);button.position.set(.85,2.05,1.55);button.rotation.y=-.16}
+  if(detached){mount.remove(button);scene.add(button);button.position.set(.85,2.05,-2.35);button.rotation.y=-.16}
   else{if(button.parent!==mount){scene.remove(button);mount.add(button)}button.position.set(0,0,0);button.rotation.set(0,0,0)}
-  // Cable tips travel to sockets one by one. The current proxy is visual-only; final pass adds hand IK + connector locking.
+  // Two-bone IK aims both technician hands at the detached MENU.
+  function aimArm(actor,limb,target){
+   actor.root.updateMatrixWorld(true);
+   const local=actor.root.worldToLocal(target.clone());
+   const solution=solvePlanarTwoBone(local.x-limb.side*.38,local.y-1.62,.5,.43);
+   limb.shoulder.rotation.z=solution.shoulder;
+   limb.elbow.rotation.z=solution.elbow;
+  }
+  if(t>=11&&t<31){
+   const center=new T.Vector3(.85,2.05,-2.35);
+   aimArm(tech,tech.limbs[0],center.clone().add(new T.Vector3(-.28,-.02,0)));
+   aimArm(tech,tech.limbs[1],center.clone().add(new T.Vector3(.28,-.02,0)));
+  }
+  // Each cable is routed from the assistant hand to an individual socket.
   cables.forEach((c,i)=>{
    const progress=wireProgress(t,i),active=t>=14+i*1.8&&t<15.1+i*1.8;
-   const start=new T.Vector3(-.8+i*.06,1.4,1.7),end=sockets[i].getWorldPosition(new T.Vector3());
+   const end=sockets[i].getWorldPosition(new T.Vector3());
+   const start=assistant.limbs[1].hand.getWorldPosition(new T.Vector3());
    const tip=start.clone().lerp(end,progress);
-   const curve=new T.CatmullRomCurve3([start,new T.Vector3((start.x+end.x)/2,1.2+Math.sin(t+i)*.08,1.8),tip]);
-   c.geometry.dispose();c.geometry=new T.TubeGeometry(curve,16,.018,6,false);c.visible=active||progress>=1;
+   const curve=new T.CatmullRomCurve3([start,new T.Vector3((start.x+end.x)/2,1.65,-2.0),tip]);
+   c.geometry.dispose();c.geometry=new T.TubeGeometry(curve,18,.018,6,false);c.visible=t>=14+i*1.8;
+   if(active) aimArm(assistant,assistant.limbs[1],end.clone().add(new T.Vector3(0,.04,.08)));
+   c.userData.locked=progress>=1;
   });
   stateLabel.textContent=stageAt(t).replaceAll("_"," ");
   if(t>=seq.duration){seq.running=false;stateLabel.textContent="SEQUENCE COMPLETE"}
