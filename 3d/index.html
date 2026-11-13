@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080b12"><title>VEYROST 3D Service Simulation</title>
+<link rel="stylesheet" href="./scene.css">
+</head>
+<body>
+<main id="stage" aria-label="VEYROST 3D service simulation">
+  <canvas id="scene"></canvas>
+  <section class="hud">
+    <div class="brand"><span class="mark">V</span><span>VEYROST <small>3D SERVICE UNIT</small></span></div>
+    <div class="status"><span class="pulse"></span><span id="state">INITIALIZING SCENE</span></div>
+    <div class="controls"><button id="play" type="button">▶ RUN SEQUENCE</button><button id="reset" type="button">↺ RESET</button><label>QUALITY <select id="quality"><option value="auto">AUTO</option><option value="cinematic">CINEMATIC</option><option value="balanced">BALANCED</option><option value="low">LOW POWER</option></select></label></div>
+    <p id="notice" role="status">Parallel prototype · original website animation is unchanged</p>
+  </section>
+  <div class="loading" id="loading">BUILDING 3D SERVICE ENVIRONMENT…</div>
+</main>
+<script type="module" src="./src/main.js"></script>
+</body></html>
