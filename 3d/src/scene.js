@@ -82,7 +82,7 @@ export function createServiceScene(T,loader,stateLabel,notice){
    actor.limbs.forEach((l,j)=>{l.hip.rotation.x=(j===0?1:-1)*gait;l.knee.rotation.x=Math.max(0,-gait)*.8;l.shoulder.rotation.x=-gait*.45;l.elbow.rotation.z=i===0?-.35:.15});
   }
   // Button is detached during the repair interval, then returned to its mount.
-  const detached=repair>0&&repair<.9;
+  const detached=t>=11&&t<31;
   if(detached){mount.remove(button);scene.add(button);button.position.set(.85,2.05,1.55);button.rotation.y=-.16}
   else{if(button.parent!==mount){scene.remove(button);mount.add(button)}button.position.set(0,0,0);button.rotation.set(0,0,0)}
   // Cable tips travel to sockets one by one. The current proxy is visual-only; final pass adds hand IK + connector locking.
