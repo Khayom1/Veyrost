@@ -11,7 +11,8 @@ This scene is an isolated prototype. The existing production repair animation re
 - Three.js WebGL renderer, physically based materials, ACES tone mapping, shadow-map quality tiers.
 - GLTFLoader asset boundary for Blender-authored vehicle and humanoid rigs.
 - Scene orchestration as a deterministic finite-state sequence.
-- Hand/object contact and cable endpoint constraints are explicit integration points; the prototype does not claim full skeletal IK or physical wire insertion until those systems and rigged assets are supplied.
+- Skinned GLB rigs are bound through `AnimationMixer`; clips are selected by semantic names (`idle`, `walk`, `repair`, `board`). The procedural proxy remains as a fallback when assets are absent.
+- Current procedural IK is a planar two-bone approximation. It is not yet a calibrated full-3D skeletal IK solver; physical wire insertion and collision constraints remain pending.
 - Reduced-motion and low-power device profiles.
 
 ## Asset contract
