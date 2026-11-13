@@ -21,8 +21,9 @@ jobs:
           node --check 3d/src/main.js
           node --check 3d/src/scene.js
           node --check 3d/src/sequence-contract.mjs
+          node --check 3d/src/ik.mjs
       - name: Test deterministic sequence
-        run: node --test tests/veyrost-3d-sequence.test.mjs
+        run: node --test tests/veyrost-3d-*.test.mjs
       - name: Verify parallel scene entry points
         run: |
           test -f 3d/index.html
